@@ -1,5 +1,10 @@
 # pring.ts
 
+This library has an interface similar to iOS's Pring.
+https://github.com/1amageek/Pring
+
+⚠️ This code still contains bugs.
+
 ## Usage
 
 ``` typescript
