@@ -1,0 +1,26 @@
+{
+  "name": "pring.ts",
+  "version": "0.1.0",
+  "description": "Cloud Firestore model framework for TypeScript - Google",
+  "main": "pring.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1amageek/pring.ts.git"
+  },
+  "keywords": [
+    "firestore",
+    "firebase",
+    "pring",
+    "model",
+    "typescript"
+  ],
+  "author": "1amageek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/1amageek/pring.ts/issues"
+  },
+  "homepage": "https://github.com/1amageek/pring.ts#readme"
+}
