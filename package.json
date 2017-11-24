@@ -4,6 +4,7 @@
   "description": "Cloud Firestore model framework for TypeScript - Google",
   "main": "pring.ts",
   "scripts": {
+    "build": "tsc --outDir src pring.ts -d && mv src/pring.d.ts ./types/.  ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,8 +23,21 @@
   "bugs": {
     "url": "https://github.com/1amageek/pring.ts/issues"
   },
+  "files": [
+    "src",
+    "types"
+  ],
   "homepage": "https://github.com/1amageek/pring.ts#readme",
   "dependencies": {
     "@google-cloud/firestore": "^0.10.0"
+  },
+  "contributors": [
+    {
+      "name": "Norikazu Muramoto",
+      "email": "tmy0x3@icloud.com"
+    }
+  ],
+  "devDependencies": {
+    "typings": "^2.1.1"
   }
 }
