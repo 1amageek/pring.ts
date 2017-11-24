@@ -5,15 +5,23 @@ https://github.com/1amageek/Pring
 
 ⚠️ This library still contains bugs.
 
+## Installation ⚙
+- `npm install pring --save `
+
+
 ## Usage
 
 ``` typescript
-import { Pring } from "./pring"
+import { Pring } from "pring"
 
+// On your server
 Pring.initialize({
     projectId: '',
     keyFilename: ''
 })
+
+// cloud functions
+Pring.initialize(functions.config().firebase)
 ```
 
 ### Scheme
@@ -36,7 +44,7 @@ user.save()
 ``` typescript
 User.get("x8lJLxtHYbQEFFBs52Hq", (document) => {
     let user = document as User
-    user.name = "aodsijaposidfjpasdiojfpaoidfjpoa"
+    user.name = "NAME"
 })
 ```
 
@@ -44,7 +52,7 @@ User.get("x8lJLxtHYbQEFFBs52Hq", (document) => {
 ``` typescript
 User.get("x8lJLxtHYbQEFFBs52Hq", (document) => {
     let user = document as User
-    user.name = "hoge"
+    user.name = "UPDATE NAME"
     user.update()
 })
 ```
