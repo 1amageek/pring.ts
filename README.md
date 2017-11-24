@@ -6,7 +6,8 @@ https://github.com/1amageek/Pring
 ⚠️ This library still contains bugs.
 
 ## Installation ⚙
-- `npm install pring --save `
+
+`npm install pring --save `
 
 
 ## Usage
