@@ -1,8 +1,9 @@
 {
   "name": "pring",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Cloud Firestore model framework for TypeScript - Google",
-  "main": "pring.ts",
+  "main": "./src/pring.ts",
+  "types": "./types/pring.d.ts",
   "scripts": {
     "build": "tsc --outDir src pring.ts -d && mv src/pring.d.ts ./types/.  ",
     "test": "echo \"Error: no test specified\" && exit 1"
