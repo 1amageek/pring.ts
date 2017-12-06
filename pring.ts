@@ -1,4 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
+import { read } from 'fs';
 var firestore: FirebaseFirestore.Firestore
 export module Pring {
 
@@ -11,6 +12,7 @@ export module Pring {
         modelName: String
         path: String
         id: String
+        reference: FirebaseFirestore.DocumentReference
         createdAt: Date
         updatedAt: Date
         init(snapshot: FirebaseFirestore.DocumentSnapshot)
@@ -69,6 +71,17 @@ export module Pring {
 
         self(): this {
             return this
+        }
+
+        private _init() {
+            let properties = this.getProperties()
+
+            for (var prop in properties) {
+                let key = properties[prop].toString()
+                let value = Object.getOwnPropertyDescriptor(this, key).value
+                console.log(Object.getOwnPropertyDescriptor(this, key))
+                console.log(value)
+            }
         }
 
         init(snapshot: FirebaseFirestore.DocumentSnapshot) {
@@ -155,4 +168,37 @@ export module Pring {
             return this.reference.delete()
         }
     }
+
+    export interface SubCollection {
+        path: String
+        reference: FirebaseFirestore.CollectionReference
+        key: String
+    }
+
+    export class ReferenceCollection<T> implements SubCollection {
+
+        public path: String
+
+        public reference: FirebaseFirestore.CollectionReference
+
+        public parent: Base
+
+        public key: String
+
+        public length: number
+
+    }
 }
+
+class Item extends Pring.Base {
+    name: String
+}
+
+class User extends Pring.Base {
+    name: String
+    items: Pring.ReferenceCollection<Item> = new Pring.ReferenceCollection<Item>()
+}
+
+let user: User = new User()
+
+console.log(user)
