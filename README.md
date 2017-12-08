@@ -43,15 +43,18 @@ user.save()
 
 #### Get
 ``` typescript
-User.get("x8lJLxtHYbQEFFBs52Hq", (document) => {
+User.get("x8lJLxtHYbQEFFBs52Hq").then((document) => {
     let user = document as User
     user.name = "NAME"
 })
+
+
+
 ```
 
 #### Update
 ``` typescript
-User.get("x8lJLxtHYbQEFFBs52Hq", (document) => {
+User.get("x8lJLxtHYbQEFFBs52Hq").then((document) => {
     let user = document as User
     user.name = "UPDATE NAME"
     user.update()
@@ -60,7 +63,7 @@ User.get("x8lJLxtHYbQEFFBs52Hq", (document) => {
 
 #### Delete
 ``` typescript
-User.get("x8lJLxtHYbQEFFBs52Hq", (document) => {
+User.get("x8lJLxtHYbQEFFBs52Hq").then((document) => {
     let user = document as User
     user.delete()
 })
