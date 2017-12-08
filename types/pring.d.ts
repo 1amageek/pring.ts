@@ -44,7 +44,7 @@ export declare module Pring {
         isSaved: Boolean;
         constructor(id?: String);
         self(): this;
-        private _init();
+        _init(): void;
         init(snapshot: FirebaseFirestore.DocumentSnapshot): void;
         getVersion(): Number;
         getModelName(): String;
@@ -66,18 +66,42 @@ export declare module Pring {
         key: String;
         setParent(parent: Base, key: String): any;
     }
-    class ReferenceCollection<T extends Document> implements SubCollection, Batchable {
+    class ReferenceCollection<T extends Base> implements SubCollection, Batchable {
         path: String;
         reference: FirebaseFirestore.CollectionReference;
         parent: Base;
         key: String;
         objects: T[];
         private _count;
+        constructor(parent: Base);
         isSaved(): Boolean;
         setParent(parent: Base, key: String): void;
         getPath(): String;
         getReference(): FirebaseFirestore.CollectionReference;
-        insert(newMember: T): void;
+        insert(newMember: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
+        remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
+        contains(id: String): Promise<Boolean>;
+        forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
+        count(): Number;
+        value(): any;
+        setValue(value: any, key: String): void;
+        pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
+    }
+    class NestedCollection<T extends Base> implements SubCollection, Batchable {
+        path: String;
+        reference: FirebaseFirestore.CollectionReference;
+        parent: Base;
+        key: String;
+        objects: T[];
+        private _count;
+        constructor(parent: Base);
+        isSaved(): Boolean;
+        setParent(parent: Base, key: String): void;
+        getPath(): String;
+        getReference(): FirebaseFirestore.CollectionReference;
+        insert(newMember: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
+        remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
+        contains(id: String): Promise<Boolean>;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
         count(): Number;
         value(): any;
