@@ -165,6 +165,7 @@ var Pring;
             }
         };
         Base.prototype.save = function () {
+            var _this = this;
             this._init();
             var batch = this.pack(BatchType.save);
             var properties = this.getProperties();
@@ -178,7 +179,10 @@ var Pring;
                     batchable.pack(BatchType.save, batch);
                 }
             }
-            return batch.commit();
+            return batch.commit().then(function (result) {
+                _this.isSaved = true;
+                return result;
+            });
         };
         Base.prototype.update = function () {
             return this.reference.update(this.value());
@@ -214,7 +218,7 @@ var Pring;
         ReferenceCollection.prototype.insert = function (newMember) {
             var _this = this;
             if (this.isSaved()) {
-                var reference_1 = newMember.reference;
+                var reference = newMember.reference;
                 var parentRef_1 = this.parent.reference;
                 var key_1 = this.key.toString();
                 var count = 0;
@@ -232,10 +236,16 @@ var Pring;
                         _this._count = count;
                         var batch = firestore.batch();
                         if (newMember.isSaved) {
-                            resolve(batch.create(reference_1, newMember.value()).commit());
+                            var parentRefDoc = parentRef_1.collection(key_1).doc(newMember.id.toString());
+                            batch.create(parentRefDoc, {
+                                createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
+                                updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
+                            }).commit().then(function (result) {
+                                resolve(result);
+                            });
                         }
                         else {
-                            resolve(batch.update(reference_1, newMember.value()).commit());
+                            reject("key:" + key_1 + " must be saved before insert");
                         }
                     })["catch"](function (error) {
                         reject(error);
@@ -243,16 +253,13 @@ var Pring;
                 });
             }
             else {
-                this.objects.push(newMember);
-                return new Promise(function (resolve, reject) {
-                    resolve();
-                });
+                return Promise.reject('Must save newMember before insert');
             }
         };
         ReferenceCollection.prototype.remove = function (member) {
             var _this = this;
             if (this.isSaved()) {
-                var reference_2 = member.reference;
+                var reference_1 = member.reference;
                 var parentRef_2 = this.parent.reference;
                 var key_2 = this.key.toString();
                 var count = 0;
@@ -269,7 +276,7 @@ var Pring;
                     }).then(function (result) {
                         _this._count = count;
                         var batch = firestore.batch();
-                        resolve(batch["delete"](reference_2).commit());
+                        resolve(batch["delete"](reference_1).commit());
                     })["catch"](function (error) {
                         reject(error);
                     });
@@ -390,7 +397,7 @@ var Pring;
         NestedCollection.prototype.insert = function (newMember) {
             var _this = this;
             if (this.isSaved()) {
-                var reference_3 = this.reference.doc(newMember.id.toString());
+                var reference = this.reference.doc(newMember.id.toString());
                 var parentRef_3 = this.parent.reference;
                 var key_3 = this.key.toString();
                 var count = 0;
@@ -408,10 +415,16 @@ var Pring;
                         _this._count = count;
                         var batch = firestore.batch();
                         if (newMember.isSaved) {
-                            resolve(batch.update(reference_3, newMember.value()).commit());
+                            var parentRefDoc = parentRef_3.collection(key_3).doc(newMember.id.toString());
+                            var value = newMember.value();
+                            value['createdAt'] = FirebaseFirestore.FieldValue.serverTimestamp();
+                            value['updatedAt'] = FirebaseFirestore.FieldValue.serverTimestamp();
+                            batch.create(parentRefDoc, value).commit().then(function (result) {
+                                resolve(result);
+                            });
                         }
                         else {
-                            resolve(batch.create(reference_3, newMember.value()).commit());
+                            reject("key:" + key_3 + " must be saved before insert");
                         }
                     })["catch"](function (error) {
                         reject(error);
@@ -419,16 +432,13 @@ var Pring;
                 });
             }
             else {
-                this.objects.push(newMember);
-                return new Promise(function (resolve, reject) {
-                    resolve();
-                });
+                return Promise.reject('Must save newMember before insert');
             }
         };
         NestedCollection.prototype.remove = function (member) {
             var _this = this;
             if (this.isSaved()) {
-                var reference_4 = this.reference.doc(member.id.toString());
+                var reference_2 = this.reference.doc(member.id.toString());
                 var parentRef_4 = this.parent.reference;
                 var key_4 = this.key.toString();
                 var count = 0;
@@ -445,7 +455,7 @@ var Pring;
                     }).then(function (result) {
                         _this._count = count;
                         var batch = firestore.batch();
-                        resolve(batch["delete"](reference_4).commit());
+                        resolve(batch["delete"](reference_2).commit());
                     })["catch"](function (error) {
                         reject(error);
                     });
