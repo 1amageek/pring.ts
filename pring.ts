@@ -321,8 +321,8 @@ export module Pring {
                             batch.create(parentRefDoc, {
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
-                            }).commit().then(a => {
-                                resolve(a)
+                            }).commit().then(result => {
+                                resolve(result)
                             })
                         } else {
                             reject(`key:${key} must be saved before insert`)
@@ -489,7 +489,7 @@ export module Pring {
             return firestore.collection(this.getPath().toString())
         }
 
-        insert(newMember: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>> {
+        insert(newMember: T): Promise<FirebaseFirestore.WriteResult[] | null> {
             if (this.isSaved()) {
                 let reference = this.reference.doc(newMember.id.toString())
                 let parentRef = this.parent.reference
@@ -508,20 +508,22 @@ export module Pring {
                         this._count = count
                         var batch = firestore.batch()
                         if (newMember.isSaved) {
-                            resolve(batch.update(reference, newMember.value()).commit())
+                            let parentRefDoc = parentRef.collection(key).doc(newMember.id.toString())
+                            const value = newMember.value()
+                            value['createdAt'] = FirebaseFirestore.FieldValue.serverTimestamp()
+                            value['updatedAt'] = FirebaseFirestore.FieldValue.serverTimestamp()
+                            batch.create(parentRefDoc, value).commit().then(result => {
+                                resolve(result)
+                            })
                         } else {
-                            resolve(batch.create(reference, newMember.value()).commit())
+                            reject(`key:${key} must be saved before insert`)
                         }
                     }).catch((error) => {
                         reject(error)
                     })
                 })
-
             } else {
-                this.objects.push(newMember)
-                return new Promise((resolve, reject) => {
-                    resolve()
-                })
+                return Promise.reject('Must save newMember before insert')
             }
         }
 
