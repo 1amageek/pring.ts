@@ -17,10 +17,10 @@ import { Pring } from "pring"
 
 // On your server
 const serviceAccount = require("path/to/serviceAccountKey.json");
- Pring.initialize({
+Pring.initialize({
     projectId: 'YOUR_PROJECT_ID',
     keyFilename: '/path/to/keyfile.json'
- })
+})
 
 // cloud functions
 Pring.initialize(functions.config().firebase)
