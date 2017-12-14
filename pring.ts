@@ -489,7 +489,7 @@ export module Pring {
             return firestore.collection(this.getPath().toString())
         }
 
-        insert(newMember: T): Promise<FirebaseFirestore.WriteResult[] | null> {
+        insert(newMember: T): Promise<FirebaseFirestore.WriteResult[]> {
             if (this.isSaved()) {
                 let reference = this.reference.doc(newMember.id.toString())
                 let parentRef = this.parent.reference
