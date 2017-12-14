@@ -1,8 +1,8 @@
 {
   "name": "pring",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Cloud Firestore model framework for TypeScript - Google",
-  "main": "./src/pring.ts",
+  "main": "./src/pring.js",
   "types": "./types/pring.d.ts",
   "scripts": {
     "build": "tsc --outDir src pring.ts -d && mv src/pring.d.ts ./types/.  ",
@@ -40,7 +40,6 @@
   ],
   "devDependencies": {
     "@types/es6-promise": "0.0.33",
-    "firebase-admin": "^5.5.1",
     "typings": "^2.1.1"
   }
 }
