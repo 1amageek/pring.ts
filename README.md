@@ -16,9 +16,9 @@ https://github.com/1amageek/Pring
 import { Pring } from "pring"
 
 // On your server
+const serviceAccount = require("path/to/serviceAccountKey.json");
 Pring.initialize({
-    projectId: '',
-    keyFilename: ''
+    credential: admin.credential.cert(serviceAccount)
 })
 
 // cloud functions
@@ -28,7 +28,7 @@ Pring.initialize(functions.config().firebase)
 ### Scheme
 ``` typescript
 class User extends Pring.Base {
-    public name: String
+    name: string
 }
 ```
 
@@ -47,9 +47,6 @@ User.get("x8lJLxtHYbQEFFBs52Hq").then((document) => {
     let user = document as User
     user.name = "NAME"
 })
-
-
-
 ```
 
 #### Update
