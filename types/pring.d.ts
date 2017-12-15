@@ -78,7 +78,7 @@ export declare module Pring {
         setParent(parent: Base, key: String): void;
         getPath(): String;
         getReference(): FirebaseFirestore.CollectionReference;
-        insert(newMember: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
+        insert(newMember: T): Promise<FirebaseFirestore.WriteResult[]>;
         remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
         contains(id: String): Promise<Boolean>;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
@@ -99,7 +99,7 @@ export declare module Pring {
         setParent(parent: Base, key: String): void;
         getPath(): String;
         getReference(): FirebaseFirestore.CollectionReference;
-        insert(newMember: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
+        insert(newMember: T): Promise<FirebaseFirestore.WriteResult[]>;
         remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
         contains(id: String): Promise<Boolean>;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
