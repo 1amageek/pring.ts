@@ -223,7 +223,7 @@ export module Pring {
             }
         }
 
-        save(): Promise<FirebaseFirestore.WriteResult[]> {
+        async save() {
             this._init()
             var batch = this.pack(BatchType.save)
             let properties = this.getProperties()
@@ -238,7 +238,13 @@ export module Pring {
                     batchable.pack(BatchType.save, batch)
                 }
             }
-            return batch.commit()
+            try {
+                const result = await batch.commit()
+                this.isSaved = true
+                return result
+            } catch (error) {
+                throw error
+            }
         }
 
         update(): Promise<FirebaseFirestore.WriteResult> {
@@ -295,14 +301,14 @@ export module Pring {
             return firestore.collection(this.getPath().toString())
         }
 
-        insert(newMember: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>> {
+        async insert(newMember: T) {
             if (this.isSaved()) {
                 let reference = newMember.reference
                 let parentRef = this.parent.reference
                 let key = this.key.toString()
                 var count = 0
-                return new Promise((resolve, reject) => {
-                    return firestore.runTransaction((transaction) => {
+                try {
+                    const result = await firestore.runTransaction((transaction) => {
                         return transaction.get(parentRef).then((document) => {
                             const data = document.data()
                             const subCollection = data[key] || { "count": 0 }
@@ -310,24 +316,20 @@ export module Pring {
                             count = oldCount + 1
                             transaction.update(parentRef, { [key]: { "count": count } })
                         })
-                    }).then((result) => {
-                        this._count = count
-                        var batch = firestore.batch()
-                        if (newMember.isSaved) {
-                            resolve(batch.create(reference, newMember.value()).commit())
-                        } else {
-                            resolve(batch.update(reference, newMember.value()).commit())
-                        }
-                    }).catch((error) => {
-                        reject(error)
                     })
-                })
-
+                    this._count = count
+                    var batch = firestore.batch()
+                    if (newMember.isSaved) {
+                        return batch.update(reference, newMember.value()).commit()
+                    } else {
+                        return batch.create(reference, newMember.value()).commit()
+                    }
+                } catch (error) {
+                    return error
+                }
             } else {
                 this.objects.push(newMember)
-                return new Promise((resolve, reject) => {
-                    resolve()
-                })
+                return
             }
         }
 
@@ -484,14 +486,14 @@ export module Pring {
             return firestore.collection(this.getPath().toString())
         }
 
-        insert(newMember: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>> {
+        async insert(newMember: T) {
             if (this.isSaved()) {
                 let reference = this.reference.doc(newMember.id.toString())
                 let parentRef = this.parent.reference
                 let key = this.key.toString()
                 var count = 0
-                return new Promise((resolve, reject) => {
-                    return firestore.runTransaction((transaction) => {
+                try {
+                    const result = await firestore.runTransaction((transaction) => {
                         return transaction.get(parentRef).then((document) => {
                             const data = document.data()
                             const subCollection = data[key] || { "count": 0 }
@@ -499,24 +501,20 @@ export module Pring {
                             count = oldCount + 1
                             transaction.update(parentRef, { [key]: { "count": count } })
                         })
-                    }).then((result) => {
-                        this._count = count
-                        var batch = firestore.batch()
-                        if (newMember.isSaved) {
-                            resolve(batch.update(reference, newMember.value()).commit())
-                        } else {
-                            resolve(batch.create(reference, newMember.value()).commit())
-                        }
-                    }).catch((error) => {
-                        reject(error)
                     })
-                })
-
+                    this._count = count
+                    var batch = firestore.batch()
+                    if (newMember.isSaved) {
+                        return batch.update(reference, newMember.value()).commit()
+                    } else {
+                        return batch.create(reference, newMember.value()).commit()
+                    }
+                } catch (error) {
+                    return error
+                }
             } else {
                 this.objects.push(newMember)
-                return new Promise((resolve, reject) => {
-                    resolve()
-                })
+                return
             }
         }
 
