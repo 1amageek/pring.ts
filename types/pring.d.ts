@@ -79,6 +79,7 @@ export declare module Pring {
         getPath(): String;
         getReference(): FirebaseFirestore.CollectionReference;
         insert(newMember: T): Promise<any>;
+        merge(newMembers: T[]): Promise<any>;
         remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
         contains(id: String): Promise<Boolean>;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
@@ -100,6 +101,7 @@ export declare module Pring {
         getPath(): String;
         getReference(): FirebaseFirestore.CollectionReference;
         insert(newMember: T): Promise<any>;
+        merge(newMembers: T[]): Promise<any>;
         remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
         contains(id: String): Promise<Boolean>;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;

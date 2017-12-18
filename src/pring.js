@@ -312,21 +312,73 @@ var Pring;
                 });
             });
         };
+        ReferenceCollection.prototype.merge = function (newMembers) {
+            return __awaiter(this, void 0, void 0, function () {
+                var length_1, parentRef_2, key_2, count, result, batch, i, newMember, reference, error_3;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!this.isSaved()) return [3 /*break*/, 5];
+                            length_1 = newMembers.length;
+                            if (!(length_1 > 0)) return [3 /*break*/, 4];
+                            parentRef_2 = this.parent.reference;
+                            key_2 = this.key.toString();
+                            count = 0;
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, firestore.runTransaction(function (transaction) {
+                                    return transaction.get(parentRef_2).then(function (document) {
+                                        var data = document.data();
+                                        var subCollection = data[key_2] || { "count": 0 };
+                                        var oldCount = subCollection["count"] || 0;
+                                        count = oldCount + length_1;
+                                        transaction.update(parentRef_2, (_a = {}, _a[key_2] = { "count": count }, _a));
+                                        var _a;
+                                    });
+                                })];
+                        case 2:
+                            result = _a.sent();
+                            this._count = count;
+                            batch = firestore.batch();
+                            for (i = 0; i < length_1; i++) {
+                                newMember = newMembers[i];
+                                reference = newMember.reference;
+                                if (newMember.isSaved) {
+                                    batch.update(reference, newMember.value());
+                                }
+                                else {
+                                    batch.create(reference, newMember.value());
+                                }
+                            }
+                            return [2 /*return*/, batch.commit()];
+                        case 3:
+                            error_3 = _a.sent();
+                            return [2 /*return*/, error_3];
+                        case 4: return [3 /*break*/, 6];
+                        case 5:
+                            this.objects.concat(newMembers);
+                            return [2 /*return*/];
+                        case 6: return [2 /*return*/];
+                    }
+                });
+            });
+        };
         ReferenceCollection.prototype.remove = function (member) {
             var _this = this;
             if (this.isSaved()) {
                 var reference_1 = member.reference;
-                var parentRef_2 = this.parent.reference;
-                var key_2 = this.key.toString();
+                var parentRef_3 = this.parent.reference;
+                var key_3 = this.key.toString();
                 var count = 0;
                 return new Promise(function (resolve, reject) {
                     return firestore.runTransaction(function (transaction) {
-                        return transaction.get(parentRef_2).then(function (document) {
+                        return transaction.get(parentRef_3).then(function (document) {
                             var data = document.data();
-                            var subCollection = data[key_2] || { "count": 0 };
+                            var subCollection = data[key_3] || { "count": 0 };
                             var oldCount = subCollection["count"] || 0;
                             count = oldCount - 1;
-                            transaction.update(parentRef_2, (_a = {}, _a[key_2] = { "count": count }, _a));
+                            transaction.update(parentRef_3, (_a = {}, _a[key_3] = { "count": count }, _a));
                             var _a;
                         });
                     }).then(function (result) {
@@ -452,25 +504,25 @@ var Pring;
         };
         NestedCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_3, key_3, count, result, batch, error_3;
+                var reference, parentRef_4, key_4, count, result, batch, error_4;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             if (!this.isSaved()) return [3 /*break*/, 5];
                             reference = this.reference.doc(newMember.id.toString());
-                            parentRef_3 = this.parent.reference;
-                            key_3 = this.key.toString();
+                            parentRef_4 = this.parent.reference;
+                            key_4 = this.key.toString();
                             count = 0;
                             _a.label = 1;
                         case 1:
                             _a.trys.push([1, 3, , 4]);
                             return [4 /*yield*/, firestore.runTransaction(function (transaction) {
-                                    return transaction.get(parentRef_3).then(function (document) {
+                                    return transaction.get(parentRef_4).then(function (document) {
                                         var data = document.data();
-                                        var subCollection = data[key_3] || { "count": 0 };
+                                        var subCollection = data[key_4] || { "count": 0 };
                                         var oldCount = subCollection["count"] || 0;
                                         count = oldCount + 1;
-                                        transaction.update(parentRef_3, (_a = {}, _a[key_3] = { "count": count }, _a));
+                                        transaction.update(parentRef_4, (_a = {}, _a[key_4] = { "count": count }, _a));
                                         var _a;
                                     });
                                 })];
@@ -486,11 +538,63 @@ var Pring;
                             }
                             return [3 /*break*/, 4];
                         case 3:
-                            error_3 = _a.sent();
-                            return [2 /*return*/, error_3];
+                            error_4 = _a.sent();
+                            return [2 /*return*/, error_4];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.push(newMember);
+                            return [2 /*return*/];
+                        case 6: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        NestedCollection.prototype.merge = function (newMembers) {
+            return __awaiter(this, void 0, void 0, function () {
+                var length_2, parentRef_5, key_5, count, result, batch, i, newMember, reference, error_5;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!this.isSaved()) return [3 /*break*/, 5];
+                            length_2 = newMembers.length;
+                            if (!(length_2 > 0)) return [3 /*break*/, 4];
+                            parentRef_5 = this.parent.reference;
+                            key_5 = this.key.toString();
+                            count = 0;
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, firestore.runTransaction(function (transaction) {
+                                    return transaction.get(parentRef_5).then(function (document) {
+                                        var data = document.data();
+                                        var subCollection = data[key_5] || { "count": 0 };
+                                        var oldCount = subCollection["count"] || 0;
+                                        count = oldCount + length_2;
+                                        transaction.update(parentRef_5, (_a = {}, _a[key_5] = { "count": count }, _a));
+                                        var _a;
+                                    });
+                                })];
+                        case 2:
+                            result = _a.sent();
+                            this._count = count;
+                            batch = firestore.batch();
+                            for (i = 0; i < length_2; i++) {
+                                newMember = newMembers[i];
+                                reference = this.reference.doc(newMember.id.toString());
+                                if (newMember.isSaved) {
+                                    batch.update(reference, newMember.value());
+                                }
+                                else {
+                                    batch.create(reference, newMember.value());
+                                }
+                            }
+                            return [2 /*return*/, batch.commit()];
+                        case 3:
+                            error_5 = _a.sent();
+                            return [2 /*return*/, error_5];
+                        case 4: return [3 /*break*/, 6];
+                        case 5:
+                            this.objects.concat(newMembers);
                             return [2 /*return*/];
                         case 6: return [2 /*return*/];
                     }
@@ -501,17 +605,17 @@ var Pring;
             var _this = this;
             if (this.isSaved()) {
                 var reference_2 = this.reference.doc(member.id.toString());
-                var parentRef_4 = this.parent.reference;
-                var key_4 = this.key.toString();
+                var parentRef_6 = this.parent.reference;
+                var key_6 = this.key.toString();
                 var count = 0;
                 return new Promise(function (resolve, reject) {
                     return firestore.runTransaction(function (transaction) {
-                        return transaction.get(parentRef_4).then(function (document) {
+                        return transaction.get(parentRef_6).then(function (document) {
                             var data = document.data();
-                            var subCollection = data[key_4] || { "count": 0 };
+                            var subCollection = data[key_6] || { "count": 0 };
                             var oldCount = subCollection["count"] || 0;
                             count = oldCount - 1;
-                            transaction.update(parentRef_4, (_a = {}, _a[key_4] = { "count": count }, _a));
+                            transaction.update(parentRef_6, (_a = {}, _a[key_6] = { "count": count }, _a));
                             var _a;
                         });
                     }).then(function (result) {
