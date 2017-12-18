@@ -333,6 +333,46 @@ export module Pring {
             }
         }
 
+        async merge(newMembers: T[]) {
+            if (this.isSaved()) {
+                const length = newMembers.length
+                if (length > 0) {
+                    let parentRef = this.parent.reference
+                    let key = this.key.toString()
+                    var count = 0
+                    try {
+                        const result = await firestore.runTransaction((transaction) => {
+                            return transaction.get(parentRef).then((document) => {
+                                const data = document.data()
+                                const subCollection = data[key] || { "count": 0 }
+                                const oldCount = subCollection["count"] || 0
+                                count = oldCount + length
+                                transaction.update(parentRef, { [key]: { "count": count } })
+                            })
+                        })
+                        this._count = count
+                        var batch = firestore.batch()
+
+                        for (var i = 0; i < length; i++) {
+                            let newMember = newMembers[i]
+                            let reference = newMember.reference
+                            if (newMember.isSaved) {
+                                batch.update(reference, newMember.value())
+                            } else {
+                                batch.create(reference, newMember.value())
+                            }
+                        }
+                        return batch.commit()
+                    } catch (error) {
+                        return error
+                    }
+                }
+            } else {
+                this.objects.concat(newMembers)
+                return
+            }
+        }
+
         remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>> {
             if (this.isSaved()) {
                 let reference = member.reference
@@ -514,6 +554,46 @@ export module Pring {
                 }
             } else {
                 this.objects.push(newMember)
+                return
+            }
+        }
+
+        async merge(newMembers: T[]) {
+            if (this.isSaved()) {
+                const length = newMembers.length
+                if (length > 0) {
+                    let parentRef = this.parent.reference
+                    let key = this.key.toString()
+                    var count = 0
+                    try {
+                        const result = await firestore.runTransaction((transaction) => {
+                            return transaction.get(parentRef).then((document) => {
+                                const data = document.data()
+                                const subCollection = data[key] || { "count": 0 }
+                                const oldCount = subCollection["count"] || 0
+                                count = oldCount + length
+                                transaction.update(parentRef, { [key]: { "count": count } })
+                            })
+                        })
+                        this._count = count
+                        var batch = firestore.batch()
+
+                        for (var i = 0; i < length; i++) {
+                            let newMember = newMembers[i]
+                            let reference = this.reference.doc(newMember.id.toString())
+                            if (newMember.isSaved) {
+                                batch.update(reference, newMember.value())
+                            } else {
+                                batch.create(reference, newMember.value())
+                            }
+                        }
+                        return batch.commit()
+                    } catch (error) {
+                        return error
+                    }
+                }
+            } else {
+                this.objects.concat(newMembers)
                 return
             }
         }
