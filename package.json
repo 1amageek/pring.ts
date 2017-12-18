@@ -1,6 +1,6 @@
 {
   "name": "pring",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Cloud Firestore model framework for TypeScript - Google",
   "main": "./src/pring.js",
   "types": "./types/pring.d.ts",
