@@ -15,6 +15,7 @@ test("test", async () => {
     try {
         let doc: Document.Document = await Document.Document.get(document.id)
         expect(doc.array).toBe(document.array)
+        console.log(doc)
     } catch(error) {
         console.log(error)
     }
