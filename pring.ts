@@ -103,7 +103,7 @@ export module Pring {
                 let key = properties[prop].toString()
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = descriptor.value
-                if (typeof value === "object") {            
+                if (isCollection(value)) {         
                     let collection: SubCollection = value as SubCollection
                     collection.setParent(this, key)
                 }
@@ -126,7 +126,7 @@ export module Pring {
                 let key = properties[prop].toString()
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = data[key]
-                if (typeof descriptor.value === "object") {
+                if (isCollection(descriptor.value)) {
                     let collection: SubCollection = descriptor.value as SubCollection
                     collection.setParent(this, key)
                     collection.setValue(value, key)
@@ -186,7 +186,7 @@ export module Pring {
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = descriptor.value
 
-                if (typeof value === "object") {
+                if (isCollection(value)) {
                     let collection: ValueProtocol = value as ValueProtocol
                     values[key] = collection.value()
                 } else {
@@ -219,7 +219,7 @@ export module Pring {
                         let descriptor = Object.getOwnPropertyDescriptor(this, key)
                         let value = descriptor.value
 
-                        if (typeof value === "object") {
+                        if (isCollection(value)) {
                             var collection: SubCollection = value as SubCollection
                             collection.setParent(this, key)
                             var batchable: Batchable = value as Batchable
@@ -234,7 +234,7 @@ export module Pring {
                         let descriptor = Object.getOwnPropertyDescriptor(this, key)
                         let value = descriptor.value
 
-                        if (typeof value === "object") {
+                        if (isCollection(value)) {
                             var collection: SubCollection = value as SubCollection
                             collection.setParent(this, key)
                             var batchable: Batchable = value as Batchable
@@ -274,6 +274,10 @@ export module Pring {
         reference: FirebaseFirestore.CollectionReference
         key: String
         setParent(parent: Base, key: String)
+    }
+
+    function isCollection(arg): Boolean {
+        return (arg instanceof ReferenceCollection) || (arg instanceof NestedCollection)
     }
 
     export class ReferenceCollection<T extends Base> implements SubCollection, Batchable {

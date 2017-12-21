@@ -92,7 +92,7 @@ var Pring;
                 var key = properties[prop].toString();
                 var descriptor = Object.getOwnPropertyDescriptor(this, key);
                 var value = descriptor.value;
-                if (typeof value === "object") {
+                if (isCollection(value)) {
                     var collection = value;
                     collection.setParent(this, key);
                 }
@@ -113,7 +113,7 @@ var Pring;
                 var key = properties[prop].toString();
                 var descriptor = Object.getOwnPropertyDescriptor(this, key);
                 var value = data[key];
-                if (typeof descriptor.value === "object") {
+                if (isCollection(descriptor.value)) {
                     var collection = descriptor.value;
                     collection.setParent(this, key);
                     collection.setValue(value, key);
@@ -163,7 +163,7 @@ var Pring;
                 var key = properties[prop].toString();
                 var descriptor = Object.getOwnPropertyDescriptor(this, key);
                 var value = descriptor.value;
-                if (typeof value === "object") {
+                if (isCollection(value)) {
                     var collection = value;
                     values[key] = collection.value();
                 }
@@ -195,7 +195,7 @@ var Pring;
                         var key = properties[prop].toString();
                         var descriptor = Object.getOwnPropertyDescriptor(this, key);
                         var value = descriptor.value;
-                        if (typeof value === "object") {
+                        if (isCollection(value)) {
                             var collection = value;
                             collection.setParent(this, key);
                             var batchable = value;
@@ -209,7 +209,7 @@ var Pring;
                         var key = properties[prop].toString();
                         var descriptor = Object.getOwnPropertyDescriptor(this, key);
                         var value = descriptor.value;
-                        if (typeof value === "object") {
+                        if (isCollection(value)) {
                             var collection = value;
                             collection.setParent(this, key);
                             var batchable = value;
@@ -255,6 +255,9 @@ var Pring;
         return Base;
     }());
     Pring.Base = Base;
+    function isCollection(arg) {
+        return (arg instanceof ReferenceCollection) || (arg instanceof NestedCollection);
+    }
     var ReferenceCollection = /** @class */ (function () {
         function ReferenceCollection(parent) {
             this.objects = [];
