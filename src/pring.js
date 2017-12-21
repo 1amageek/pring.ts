@@ -131,19 +131,30 @@ var Pring;
                 var key = properties[prop];
                 var descriptor = Object.getOwnPropertyDescriptor(this, key);
                 var value = data[key];
-                console.log(value);
-                if (isCollection(descriptor.value)) {
-                    var collection = descriptor.value;
-                    collection.setParent(this, key);
-                    collection.setValue(value, key);
+                if (descriptor) {
+                    if (isCollection(descriptor.value)) {
+                        var collection = descriptor.value;
+                        collection.setParent(this, key);
+                        collection.setValue(value, key);
+                    }
+                    else {
+                        Object.defineProperty(this, key, {
+                            value: value,
+                            writable: true,
+                            enumerable: true,
+                            configurable: true
+                        });
+                    }
                 }
                 else {
-                    Object.defineProperty(this, key, {
-                        value: value,
-                        writable: true,
-                        enumerable: true,
-                        configurable: true
-                    });
+                    if (value) {
+                        Object.defineProperty(this, key, {
+                            value: value,
+                            writable: true,
+                            enumerable: true,
+                            configurable: true
+                        });
+                    }
                 }
             }
             // Properties
