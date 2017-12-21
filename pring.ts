@@ -103,7 +103,7 @@ export module Pring {
                 let key = properties[prop].toString()
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = descriptor.value
-                if (typeof value === "object") {
+                if (typeof value === "object") {            
                     let collection: SubCollection = value as SubCollection
                     collection.setParent(this, key)
                 }
@@ -209,13 +209,38 @@ export module Pring {
 
         pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
             var batch = batch || firestore.batch()
-            let reference = this.reference
+            const reference = this.reference
+            const properties = this.getProperties()
             switch (type) {
                 case BatchType.save:
                     batch.set(reference, this.value())
+                    for (var prop in properties) {
+                        let key = properties[prop].toString()
+                        let descriptor = Object.getOwnPropertyDescriptor(this, key)
+                        let value = descriptor.value
+
+                        if (typeof value === "object") {
+                            var collection: SubCollection = value as SubCollection
+                            collection.setParent(this, key)
+                            var batchable: Batchable = value as Batchable
+                            batchable.pack(BatchType.save, batch)
+                        }
+                    }
                     return batch
                 case BatchType.update:
                     batch.update(reference, this.value())
+                    for (var prop in properties) {
+                        let key = properties[prop].toString()
+                        let descriptor = Object.getOwnPropertyDescriptor(this, key)
+                        let value = descriptor.value
+
+                        if (typeof value === "object") {
+                            var collection: SubCollection = value as SubCollection
+                            collection.setParent(this, key)
+                            var batchable: Batchable = value as Batchable
+                            batchable.pack(BatchType.update, batch)
+                        }
+                    }
                     return batch
                 case BatchType.delete:
                     batch.delete(reference)
@@ -226,18 +251,6 @@ export module Pring {
         async save() {
             this._init()
             var batch = this.pack(BatchType.save)
-            let properties = this.getProperties()
-            for (var prop in properties) {
-                let key = properties[prop].toString()
-                let descriptor = Object.getOwnPropertyDescriptor(this, key)
-                let value = descriptor.value
-
-                if (typeof value === "object") {
-                    var collection: SubCollection = value as SubCollection
-                    var batchable: Batchable = value as Batchable
-                    batchable.pack(BatchType.save, batch)
-                }
-            }
             try {
                 const result = await batch.commit()
                 this.isSaved = true
@@ -439,22 +452,23 @@ export module Pring {
 
         pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
             var batch = batch || firestore.batch()
+            const self = this
             switch (type) {
-                case BatchType.save:
+                case BatchType.save:                    
                     this.forEach(document => {
                         let doc: T = document as T
                         if (document.isSaved) {
                             let value = {
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             }
-                            let reference = this.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id.toString())
                             document.pack(BatchType.update, batch).update(reference, value)
                         } else {
                             let value = {
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             }
-                            let reference = this.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id.toString())
                             document.pack(BatchType.save, batch).set(reference, value)
                         }
                     })
@@ -466,21 +480,21 @@ export module Pring {
                             let value = {
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             }
-                            let reference = this.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id.toString())
                             document.pack(BatchType.update, batch).update(reference, value)
                         } else {
                             let value = {
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             }
-                            let reference = this.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id.toString())
                             document.pack(BatchType.save, batch).set(reference, value)
                         }
                     })
                     return batch
                 case BatchType.delete:
                     this.forEach(document => {
-                        let reference = this.reference.doc(document.id.toString())
+                        let reference = self.reference.doc(document.id.toString())
                         batch.delete(reference)
                     })
                     return batch
@@ -663,15 +677,16 @@ export module Pring {
 
         pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
             var batch = batch || firestore.batch()
+            const self = this
             switch (type) {
                 case BatchType.save:
                     this.forEach(document => {
                         let doc: T = document as T
                         if (document.isSaved) {
-                            let reference = this.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id.toString())
                             batch.update(reference, document.value())
                         } else {
-                            let reference = this.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id.toString())
                             batch.set(reference, document.value())
                         }
                     })
@@ -680,17 +695,17 @@ export module Pring {
                     this.forEach(document => {
                         let doc: T = document as T
                         if (document.isSaved) {
-                            let reference = this.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id.toString())
                             batch.update(reference, document.value())
                         } else {
-                            let reference = this.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id.toString())
                             batch.set(reference, document.value())
                         }
                     })
                     return batch
                 case BatchType.delete:
                     this.forEach(document => {
-                        let reference = this.reference.doc(document.id.toString())
+                        let reference = self.reference.doc(document.id.toString())
                         batch.delete(reference)
                     })
                     return batch

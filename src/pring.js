@@ -187,12 +187,35 @@ var Pring;
         Base.prototype.pack = function (type, batch) {
             var batch = batch || firestore.batch();
             var reference = this.reference;
+            var properties = this.getProperties();
             switch (type) {
                 case BatchType.save:
                     batch.set(reference, this.value());
+                    for (var prop in properties) {
+                        var key = properties[prop].toString();
+                        var descriptor = Object.getOwnPropertyDescriptor(this, key);
+                        var value = descriptor.value;
+                        if (typeof value === "object") {
+                            var collection = value;
+                            collection.setParent(this, key);
+                            var batchable = value;
+                            batchable.pack(BatchType.save, batch);
+                        }
+                    }
                     return batch;
                 case BatchType.update:
                     batch.update(reference, this.value());
+                    for (var prop in properties) {
+                        var key = properties[prop].toString();
+                        var descriptor = Object.getOwnPropertyDescriptor(this, key);
+                        var value = descriptor.value;
+                        if (typeof value === "object") {
+                            var collection = value;
+                            collection.setParent(this, key);
+                            var batchable = value;
+                            batchable.pack(BatchType.update, batch);
+                        }
+                    }
                     return batch;
                 case BatchType["delete"]:
                     batch["delete"](reference);
@@ -201,23 +224,12 @@ var Pring;
         };
         Base.prototype.save = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var batch, properties, prop, key, descriptor, value, collection, batchable, result, error_1;
+                var batch, result, error_1;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             this._init();
                             batch = this.pack(BatchType.save);
-                            properties = this.getProperties();
-                            for (prop in properties) {
-                                key = properties[prop].toString();
-                                descriptor = Object.getOwnPropertyDescriptor(this, key);
-                                value = descriptor.value;
-                                if (typeof value === "object") {
-                                    collection = value;
-                                    batchable = value;
-                                    batchable.pack(BatchType.save, batch);
-                                }
-                            }
                             _a.label = 1;
                         case 1:
                             _a.trys.push([1, 3, , 4]);
@@ -426,8 +438,8 @@ var Pring;
             this._count = value["count"] || 0;
         };
         ReferenceCollection.prototype.pack = function (type, batch) {
-            var _this = this;
             var batch = batch || firestore.batch();
+            var self = this;
             switch (type) {
                 case BatchType.save:
                     this.forEach(function (document) {
@@ -436,7 +448,7 @@ var Pring;
                             var value = {
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
-                            var reference = _this.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id.toString());
                             document.pack(BatchType.update, batch).update(reference, value);
                         }
                         else {
@@ -444,7 +456,7 @@ var Pring;
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
-                            var reference = _this.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id.toString());
                             document.pack(BatchType.save, batch).set(reference, value);
                         }
                     });
@@ -456,7 +468,7 @@ var Pring;
                             var value = {
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
-                            var reference = _this.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id.toString());
                             document.pack(BatchType.update, batch).update(reference, value);
                         }
                         else {
@@ -464,14 +476,14 @@ var Pring;
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
-                            var reference = _this.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id.toString());
                             document.pack(BatchType.save, batch).set(reference, value);
                         }
                     });
                     return batch;
                 case BatchType["delete"]:
                     this.forEach(function (document) {
-                        var reference = _this.reference.doc(document.id.toString());
+                        var reference = self.reference.doc(document.id.toString());
                         batch["delete"](reference);
                     });
                     return batch;
@@ -663,18 +675,18 @@ var Pring;
             this._count = value["count"] || 0;
         };
         NestedCollection.prototype.pack = function (type, batch) {
-            var _this = this;
             var batch = batch || firestore.batch();
+            var self = this;
             switch (type) {
                 case BatchType.save:
                     this.forEach(function (document) {
                         var doc = document;
                         if (document.isSaved) {
-                            var reference = _this.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id.toString());
                             batch.update(reference, document.value());
                         }
                         else {
-                            var reference = _this.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id.toString());
                             batch.set(reference, document.value());
                         }
                     });
@@ -683,18 +695,18 @@ var Pring;
                     this.forEach(function (document) {
                         var doc = document;
                         if (document.isSaved) {
-                            var reference = _this.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id.toString());
                             batch.update(reference, document.value());
                         }
                         else {
-                            var reference = _this.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id.toString());
                             batch.set(reference, document.value());
                         }
                     });
                     return batch;
                 case BatchType["delete"]:
                     this.forEach(function (document) {
-                        var reference = _this.reference.doc(document.id.toString());
+                        var reference = self.reference.doc(document.id.toString());
                         batch["delete"](reference);
                     });
                     return batch;
