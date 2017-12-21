@@ -6,7 +6,7 @@ import * as Document from './test_document'
 
 Pring.initialize({
     projectId: 'sandbox-329fc',
-    keyFilename: '../sandbox-329fc-firebase-adminsdk-8kgnw-3a2693f6cb.json'
+    keyFilename: './sandbox-329fc-firebase-adminsdk-8kgnw-3a2693f6cb.json'
 })
 
 test("test", async () => {
@@ -14,7 +14,8 @@ test("test", async () => {
     await document.save()
     try {
         let doc: Document.Document = await Document.Document.get(document.id)
-        expect(doc.array).toBe(document.array)
+        expect(doc.array).toEqual(document.array)
+        expect(doc.string).toEqual(document.string)
         console.log(doc)
     } catch(error) {
         console.log(error)
