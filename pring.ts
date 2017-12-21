@@ -1,4 +1,13 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
+import "reflect-metadata"
+
+const propertyMetadataKey = Symbol("property");
+
+export const property = (target, propertyKey) => {
+    var properties = Reflect.getOwnMetadata(propertyMetadataKey, target) || []
+    properties.push(propertyKey)
+    Reflect.defineMetadata(propertyMetadataKey, properties, target)
+}
 
 var firestore: FirebaseFirestore.Firestore
 export module Pring {
@@ -24,16 +33,16 @@ export module Pring {
 
     export interface Document extends Batchable, ValueProtocol {
         version: Number
-        modelName: String
-        path: String
-        id: String
+        modelName: string
+        path: string
+        id: string
         reference: FirebaseFirestore.DocumentReference
         createdAt: Date
         updatedAt: Date
         init(snapshot: FirebaseFirestore.DocumentSnapshot)
         getVersion(): Number
-        getModelName(): String
-        getPath(): String
+        getModelName(): string
+        getPath(): string
         value(): any
         rawValue(): any
     }
@@ -41,22 +50,22 @@ export module Pring {
     export class Base implements Document {
 
         static getReference(): FirebaseFirestore.CollectionReference {
-            return firestore.collection(this.getPath().toString())
+            return firestore.collection(this.getPath())
         }
 
         static getVersion(): Number {
             return 1
         }
 
-        static getModelName(): String {
+        static getModelName(): string {
             return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1].toLowerCase()
         }
 
-        static getPath(): String {
+        static getPath(): string {
             return `version/${this.getVersion()}/${this.getModelName()}`
         }
 
-        static async get(id: String) {
+        static async get(id: string) {
             try {
                 const snapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
                 const document = new this()
@@ -69,13 +78,13 @@ export module Pring {
 
         public version: Number
 
-        public modelName: String
+        public modelName: string
 
-        public path: String
+        public path: string
 
         public reference: FirebaseFirestore.DocumentReference
 
-        public id: String
+        public id: string
 
         public createdAt: Date
 
@@ -83,7 +92,7 @@ export module Pring {
 
         public isSaved: Boolean = false
 
-        constructor(id?: String) {
+        constructor(id?: string) {
             this.version = this.getVersion()
             this.modelName = this.getModelName()
             this.id = id || firestore.collection(`version/${this.version}/${this.modelName}`).doc().id
@@ -121,10 +130,14 @@ export module Pring {
 
             let properties = this.getProperties()
             let data = snapshot.data()
+            console.log(this)
+            console.log(properties)
+            console.log(data)
             for (var prop in properties) {
                 let key = properties[prop].toString()
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = data[key]
+                console.log(value)
                 if (isCollection(descriptor.value)) {
                     let collection: SubCollection = descriptor.value as SubCollection
                     collection.setParent(this, key)
@@ -149,11 +162,11 @@ export module Pring {
             return 1
         }
 
-        getModelName(): String {
+        getModelName(): string {
             return this.constructor.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1].toLowerCase()
         }
 
-        getPath(): String {
+        getPath(): string {
             return `version/${this.version}/${this.modelName}/${this.id}`
         }
 
@@ -161,19 +174,15 @@ export module Pring {
             return firestore.doc(this.getPath().toString())
         }
 
-        getSystemProperties(): String[] {
+        getSystemProperties(): string[] {
             return ["version", "modelName", "path", "id", "reference", "isSaved"]
         }
 
-        getProperties(): String[] {
-            var properties = Object.getOwnPropertyNames(this)
-            const that = this
-            return properties.filter(function (v) {
-                return (that.getSystemProperties().indexOf(v) == -1)
-            })
+        getProperties(): string[] {
+            return Reflect.getOwnMetadata(propertyMetadataKey, this)
         }
 
-        setValue(value: any, key: String) {
+        setValue(value: any, key: string) {
 
         }
 
@@ -214,7 +223,7 @@ export module Pring {
                 case BatchType.save:
                     batch.set(reference, this.value())
                     for (var prop in properties) {
-                        let key = properties[prop].toString()
+                        let key = properties[prop]
                         let descriptor = Object.getOwnPropertyDescriptor(this, key)
                         let value = descriptor.value
 
@@ -229,7 +238,7 @@ export module Pring {
                 case BatchType.update:
                     batch.update(reference, this.value())
                     for (var prop in properties) {
-                        let key = properties[prop].toString()
+                        let key = properties[prop]
                         let descriptor = Object.getOwnPropertyDescriptor(this, key)
                         let value = descriptor.value
 
@@ -269,10 +278,10 @@ export module Pring {
     }
 
     export interface SubCollection extends ValueProtocol {
-        path: String
+        path: string
         reference: FirebaseFirestore.CollectionReference
-        key: String
-        setParent(parent: Base, key: String)
+        key: string
+        setParent(parent: Base, key: string)
     }
 
     function isCollection(arg): Boolean {
@@ -281,13 +290,13 @@ export module Pring {
 
     export class ReferenceCollection<T extends Base> implements SubCollection, Batchable {
 
-        public path: String
+        public path: string
 
         public reference: FirebaseFirestore.CollectionReference
 
         public parent: Base
 
-        public key: String
+        public key: string
 
         public objects: T[] = []
 
@@ -302,26 +311,26 @@ export module Pring {
             return this.parent.isSaved
         }
 
-        setParent(parent: Base, key: String) {
+        setParent(parent: Base, key: string) {
             this.parent = parent
             this.key = key
             this.path = this.getPath()
             this.reference = this.getReference()
         }
 
-        getPath(): String {
+        getPath(): string {
             return `${this.parent.path}/${this.key}`
         }
 
         getReference(): FirebaseFirestore.CollectionReference {
-            return firestore.collection(this.getPath().toString())
+            return firestore.collection(this.getPath())
         }
 
         async insert(newMember: T) {
             if (this.isSaved()) {
                 let reference = newMember.reference
                 let parentRef = this.parent.reference
-                let key = this.key.toString()
+                let key = this.key
                 var count = 0
                 try {
                     const result = await firestore.runTransaction((transaction) => {
@@ -354,7 +363,7 @@ export module Pring {
                 const length = newMembers.length
                 if (length > 0) {
                     let parentRef = this.parent.reference
-                    let key = this.key.toString()
+                    let key = this.key
                     var count = 0
                     try {
                         const result = await firestore.runTransaction((transaction) => {
@@ -393,7 +402,7 @@ export module Pring {
             if (this.isSaved()) {
                 let reference = member.reference
                 let parentRef = this.parent.reference
-                let key = this.key.toString()
+                let key = this.key
                 var count = 0
                 return new Promise((resolve, reject) => {
                     return firestore.runTransaction((transaction) => {
@@ -427,9 +436,9 @@ export module Pring {
             }
         }
 
-        contains(id: String): Promise<Boolean> {
+        contains(id: string): Promise<Boolean> {
             return new Promise<Boolean>((resolve, reject) => {
-                this.reference.doc(id.toString()).get().then((snapshot) => {
+                this.reference.doc(id).get().then((snapshot) => {
                     resolve(snapshot.exists)
                 }).catch((error) => {
                     reject(error)
@@ -449,7 +458,7 @@ export module Pring {
             return { "count": this.count() }
         }
 
-        setValue(value: any, key: String) {
+        setValue(value: any, key: string) {
             this._count = value["count"] || 0
         }
 
@@ -507,13 +516,13 @@ export module Pring {
 
     export class NestedCollection<T extends Base> implements SubCollection, Batchable {
 
-        public path: String
+        public path: string
 
         public reference: FirebaseFirestore.CollectionReference
 
         public parent: Base
 
-        public key: String
+        public key: string
 
         public objects: T[] = []
 
@@ -528,26 +537,26 @@ export module Pring {
             return this.parent.isSaved
         }
 
-        setParent(parent: Base, key: String) {
+        setParent(parent: Base, key: string) {
             this.parent = parent
             this.key = key
             this.path = this.getPath()
             this.reference = this.getReference()
         }
 
-        getPath(): String {
+        getPath(): string {
             return `${this.parent.path}/${this.key}`
         }
 
         getReference(): FirebaseFirestore.CollectionReference {
-            return firestore.collection(this.getPath().toString())
+            return firestore.collection(this.getPath())
         }
 
         async insert(newMember: T) {
             if (this.isSaved()) {
-                let reference = this.reference.doc(newMember.id.toString())
+                let reference = this.reference.doc(newMember.id)
                 let parentRef = this.parent.reference
-                let key = this.key.toString()
+                let key = this.key
                 var count = 0
                 try {
                     const result = await firestore.runTransaction((transaction) => {
@@ -580,7 +589,7 @@ export module Pring {
                 const length = newMembers.length
                 if (length > 0) {
                     let parentRef = this.parent.reference
-                    let key = this.key.toString()
+                    let key = this.key
                     var count = 0
                     try {
                         const result = await firestore.runTransaction((transaction) => {
@@ -617,9 +626,9 @@ export module Pring {
 
         remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>> {
             if (this.isSaved()) {
-                let reference = this.reference.doc(member.id.toString())
+                let reference = this.reference.doc(member.id)
                 let parentRef = this.parent.reference
-                let key = this.key.toString()
+                let key = this.key
                 var count = 0
                 return new Promise((resolve, reject) => {
                     return firestore.runTransaction((transaction) => {
@@ -654,7 +663,7 @@ export module Pring {
 
         contains(id: String): Promise<Boolean> {
             return new Promise<Boolean>((resolve, reject) => {
-                this.reference.doc(id.toString()).get().then((snapshot) => {
+                this.reference.doc(id).get().then((snapshot) => {
                     resolve(snapshot.exists)
                 }).catch((error) => {
                     reject(error)
@@ -674,7 +683,7 @@ export module Pring {
             return { "count": this.count() }
         }
 
-        setValue(value: any, key: String) {
+        setValue(value: any, key: string) {
             this._count = value["count"] || 0
         }
 
@@ -686,10 +695,10 @@ export module Pring {
                     this.forEach(document => {
                         let doc: T = document as T
                         if (document.isSaved) {
-                            let reference = self.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id)
                             batch.update(reference, document.value())
                         } else {
-                            let reference = self.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id)
                             batch.set(reference, document.value())
                         }
                     })
@@ -698,17 +707,17 @@ export module Pring {
                     this.forEach(document => {
                         let doc: T = document as T
                         if (document.isSaved) {
-                            let reference = self.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id)
                             batch.update(reference, document.value())
                         } else {
-                            let reference = self.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id)
                             batch.set(reference, document.value())
                         }
                     })
                     return batch
                 case BatchType.delete:
                     this.forEach(document => {
-                        let reference = self.reference.doc(document.id.toString())
+                        let reference = self.reference.doc(document.id)
                         batch.delete(reference)
                     })
                     return batch

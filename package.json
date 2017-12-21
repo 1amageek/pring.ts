@@ -1,6 +1,6 @@
 {
   "name": "pring",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Cloud Firestore model framework for TypeScript - Google",
   "main": "./src/pring.js",
   "types": "./types/pring.d.ts",
@@ -30,7 +30,8 @@
   ],
   "homepage": "https://github.com/1amageek/pring.ts#readme",
   "dependencies": {
-    "@google-cloud/firestore": "^0.10.0"
+    "@google-cloud/firestore": "^0.10.0",
+    "reflect-metadata": "^0.1.10"
   },
   "contributors": [
     {
