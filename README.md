@@ -13,7 +13,7 @@ https://github.com/1amageek/Pring
 ## Usage
 
 ``` typescript
-import { Pring } from "pring"
+import { Pring, property } from "pring"
 
 // On your server
 const serviceAccount = require("path/to/serviceAccountKey.json");
@@ -30,13 +30,13 @@ Pring.initialize(functions.config().firebase)
 ``` typescript
 
 class Group extends Pring.Base {
-    name: string
-    users: NestedCollection<User> = NestedCollection(this)
+    @property name: string
+    @property users: NestedCollection<User> = NestedCollection(this)
 }
 
 class User extends Pring.Base {
-    name: string
-    groups: ReferenceCollection<Group> = ReferenceCollection(this)
+    @property name: string
+    @property groups: ReferenceCollection<Group> = ReferenceCollection(this)
 }
 ```
 
