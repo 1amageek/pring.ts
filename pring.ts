@@ -132,22 +132,32 @@ export module Pring {
 
             let properties = this.getProperties()
             let data = snapshot.data()
-            for (var prop in properties) {
-                let key = properties[prop]
+            for (var prop in properties) {                
+                let key = properties[prop]                
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = data[key]
-                console.log(value)
-                if (isCollection(descriptor.value)) {
-                    let collection: SubCollection = descriptor.value as SubCollection
-                    collection.setParent(this, key)
-                    collection.setValue(value, key)
+                if (descriptor) {
+                    if (isCollection(descriptor.value)) {
+                        let collection: SubCollection = descriptor.value as SubCollection
+                        collection.setParent(this, key)
+                        collection.setValue(value, key)
+                    } else {
+                        Object.defineProperty(this, key, {
+                            value: value,
+                            writable: true,
+                            enumerable: true,
+                            configurable: true
+                        })
+                    }
                 } else {
-                    Object.defineProperty(this, key, {
-                        value: value,
-                        writable: true,
-                        enumerable: true,
-                        configurable: true
-                    })
+                    if (value) {
+                        Object.defineProperty(this, key, {
+                            value: value,
+                            writable: true,
+                            enumerable: true,
+                            configurable: true
+                        })
+                    }
                 }
             }
 
