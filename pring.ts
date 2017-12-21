@@ -56,16 +56,15 @@ export module Pring {
             return `version/${this.getVersion()}/${this.getModelName()}`
         }
 
-        static get<T extends Base>(id: String): Promise<T> {
-            return new Promise<T>((resolve, reject) => {
-                firestore.doc(`${this.getPath()}/${id}`).get().then(snapshot => {
-                    let document = new this() as T
-                    document.init(snapshot)
-                    resolve(document)
-                }).catch(error => {
-                    reject(error)
-                })
-            })
+        static async get(id: String) {
+            try {
+                const snapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
+                const document = new this()
+                document.init(snapshot)
+                return document
+            } catch (error) {
+                return error
+            }
         }
 
         public version: Number
@@ -103,7 +102,7 @@ export module Pring {
                 let key = properties[prop].toString()
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = descriptor.value
-                if (isCollection(value)) {         
+                if (isCollection(value)) {
                     let collection: SubCollection = value as SubCollection
                     collection.setParent(this, key)
                 }
@@ -458,7 +457,7 @@ export module Pring {
             var batch = batch || firestore.batch()
             const self = this
             switch (type) {
-                case BatchType.save:                    
+                case BatchType.save:
                     this.forEach(document => {
                         let doc: T = document as T
                         if (document.isSaved) {

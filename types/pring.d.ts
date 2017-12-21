@@ -33,7 +33,7 @@ export declare module Pring {
         static getVersion(): Number;
         static getModelName(): String;
         static getPath(): String;
-        static get<T extends Base>(id: String): Promise<T>;
+        static get(id: String): Promise<any>;
         version: Number;
         modelName: String;
         path: String;

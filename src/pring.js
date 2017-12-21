@@ -72,14 +72,23 @@ var Pring;
             return "version/" + this.getVersion() + "/" + this.getModelName();
         };
         Base.get = function (id) {
-            var _this = this;
-            return new Promise(function (resolve, reject) {
-                firestore.doc(_this.getPath() + "/" + id).get().then(function (snapshot) {
-                    var document = new _this();
-                    document.init(snapshot);
-                    resolve(document);
-                })["catch"](function (error) {
-                    reject(error);
+            return __awaiter(this, void 0, void 0, function () {
+                var snapshot, document_1, error_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, firestore.doc(this.getPath() + "/" + id).get()];
+                        case 1:
+                            snapshot = _a.sent();
+                            document_1 = new this();
+                            document_1.init(snapshot);
+                            return [2 /*return*/, document_1];
+                        case 2:
+                            error_1 = _a.sent();
+                            return [2 /*return*/, error_1];
+                        case 3: return [2 /*return*/];
+                    }
                 });
             });
         };
@@ -224,7 +233,7 @@ var Pring;
         };
         Base.prototype.save = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var batch, result, error_1;
+                var batch, result, error_2;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -239,8 +248,8 @@ var Pring;
                             this.isSaved = true;
                             return [2 /*return*/, result];
                         case 3:
-                            error_1 = _a.sent();
-                            throw error_1;
+                            error_2 = _a.sent();
+                            throw error_2;
                         case 4: return [2 /*return*/];
                     }
                 });
@@ -282,7 +291,7 @@ var Pring;
         };
         ReferenceCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_1, key_1, count, result, batch, error_2;
+                var reference, parentRef_1, key_1, count, result, batch, error_3;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -316,8 +325,8 @@ var Pring;
                             }
                             return [3 /*break*/, 4];
                         case 3:
-                            error_2 = _a.sent();
-                            return [2 /*return*/, error_2];
+                            error_3 = _a.sent();
+                            return [2 /*return*/, error_3];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.push(newMember);
@@ -329,7 +338,7 @@ var Pring;
         };
         ReferenceCollection.prototype.merge = function (newMembers) {
             return __awaiter(this, void 0, void 0, function () {
-                var length_1, parentRef_2, key_2, count, result, batch, i, newMember, reference, error_3;
+                var length_1, parentRef_2, key_2, count, result, batch, i, newMember, reference, error_4;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -368,8 +377,8 @@ var Pring;
                             }
                             return [2 /*return*/, batch.commit()];
                         case 3:
-                            error_3 = _a.sent();
-                            return [2 /*return*/, error_3];
+                            error_4 = _a.sent();
+                            return [2 /*return*/, error_4];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.concat(newMembers);
@@ -519,7 +528,7 @@ var Pring;
         };
         NestedCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_4, key_4, count, result, batch, error_4;
+                var reference, parentRef_4, key_4, count, result, batch, error_5;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -553,8 +562,8 @@ var Pring;
                             }
                             return [3 /*break*/, 4];
                         case 3:
-                            error_4 = _a.sent();
-                            return [2 /*return*/, error_4];
+                            error_5 = _a.sent();
+                            return [2 /*return*/, error_5];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.push(newMember);
@@ -566,7 +575,7 @@ var Pring;
         };
         NestedCollection.prototype.merge = function (newMembers) {
             return __awaiter(this, void 0, void 0, function () {
-                var length_2, parentRef_5, key_5, count, result, batch, i, newMember, reference, error_5;
+                var length_2, parentRef_5, key_5, count, result, batch, i, newMember, reference, error_6;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -605,8 +614,8 @@ var Pring;
                             }
                             return [2 /*return*/, batch.commit()];
                         case 3:
-                            error_5 = _a.sent();
-                            return [2 /*return*/, error_5];
+                            error_6 = _a.sent();
+                            return [2 /*return*/, error_6];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.concat(newMembers);
