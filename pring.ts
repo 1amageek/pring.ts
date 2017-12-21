@@ -120,13 +120,12 @@ export module Pring {
                 configurable: true
             })
 
-            let properties = this.getProperties()
+            var keys = Object.keys(snapshot.data());
             let data = snapshot.data()
-            for (var prop in properties) {
-                let key = properties[prop].toString()
+            keys.forEach(key => {
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = data[key]
-                if (isCollection(descriptor.value)) {
+                if (descriptor && isCollection(descriptor.value)) {
                     let collection: SubCollection = descriptor.value as SubCollection
                     collection.setParent(this, key)
                     collection.setValue(value, key)
@@ -138,7 +137,7 @@ export module Pring {
                         configurable: true
                     })
                 }
-            }
+            })
 
             // Properties
             this.path = this.getPath()
