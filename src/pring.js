@@ -108,6 +108,7 @@ var Pring;
             }
         };
         Base.prototype.init = function (snapshot) {
+            var _this = this;
             // ID
             var id = snapshot.id;
             Object.defineProperty(this, "id", {
@@ -116,26 +117,25 @@ var Pring;
                 enumerable: true,
                 configurable: true
             });
-            var properties = this.getProperties();
+            var keys = Object.keys(snapshot.data());
             var data = snapshot.data();
-            for (var prop in properties) {
-                var key = properties[prop].toString();
-                var descriptor = Object.getOwnPropertyDescriptor(this, key);
+            keys.forEach(function (key) {
+                var descriptor = Object.getOwnPropertyDescriptor(_this, key);
                 var value = data[key];
-                if (isCollection(descriptor.value)) {
+                if (descriptor && isCollection(descriptor.value)) {
                     var collection = descriptor.value;
-                    collection.setParent(this, key);
+                    collection.setParent(_this, key);
                     collection.setValue(value, key);
                 }
                 else {
-                    Object.defineProperty(this, key, {
+                    Object.defineProperty(_this, key, {
                         value: value,
                         writable: true,
                         enumerable: true,
                         configurable: true
                     });
                 }
-            }
+            });
             // Properties
             this.path = this.getPath();
             this.reference = this.getReference();
