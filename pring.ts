@@ -28,11 +28,11 @@ export module Pring {
 
     export interface ValueProtocol {
         value(): any
-        setValue(value: any, key: String)
+        setValue(value: any, key: string)
     }
 
     export interface Document extends Batchable, ValueProtocol {
-        version: Number
+        version: number
         modelName: string
         path: string
         id: string
@@ -40,7 +40,7 @@ export module Pring {
         createdAt: Date
         updatedAt: Date
         init(snapshot: FirebaseFirestore.DocumentSnapshot)
-        getVersion(): Number
+        getVersion(): number
         getModelName(): string
         getPath(): string
         value(): any
@@ -53,7 +53,7 @@ export module Pring {
             return firestore.collection(this.getPath())
         }
 
-        static getVersion(): Number {
+        static getVersion(): number {
             return 1
         }
 
@@ -76,7 +76,7 @@ export module Pring {
             }
         }
 
-        public version: Number
+        public version: number
 
         public modelName: string
 
@@ -108,7 +108,7 @@ export module Pring {
         _init() {
             let properties = this.getProperties()
             for (var prop in properties) {
-                let key = properties[prop].toString()
+                let key = properties[prop]
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = descriptor.value
                 if (isCollection(value)) {
@@ -134,7 +134,7 @@ export module Pring {
             console.log(properties)
             console.log(data)
             for (var prop in properties) {
-                let key = properties[prop].toString()
+                let key = properties[prop]
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = data[key]
                 console.log(value)
@@ -158,7 +158,7 @@ export module Pring {
             this.isSaved = true
         }
 
-        getVersion(): Number {
+        getVersion(): number {
             return 1
         }
 
@@ -171,7 +171,7 @@ export module Pring {
         }
 
         getReference(): FirebaseFirestore.DocumentReference {
-            return firestore.doc(this.getPath().toString())
+            return firestore.doc(this.getPath())
         }
 
         getSystemProperties(): string[] {
@@ -190,7 +190,7 @@ export module Pring {
             let properties = this.getProperties()
             var values = {}
             for (var prop in properties) {
-                let key = properties[prop].toString()
+                let key = properties[prop]
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = descriptor.value
 
@@ -300,7 +300,7 @@ export module Pring {
 
         public objects: T[] = []
 
-        private _count: Number = 0
+        private _count: number = 0
 
         constructor(parent: Base) {
             this.parent = parent
@@ -450,7 +450,7 @@ export module Pring {
             this.objects.forEach(callbackfn)
         }
 
-        count(): Number {
+        count(): number {
             return this.isSaved() ? this._count : this.objects.length
         }
 
@@ -473,14 +473,14 @@ export module Pring {
                             let value = {
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             }
-                            let reference = self.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id)
                             document.pack(BatchType.update, batch).update(reference, value)
                         } else {
                             let value = {
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             }
-                            let reference = self.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id)
                             document.pack(BatchType.save, batch).set(reference, value)
                         }
                     })
@@ -492,21 +492,21 @@ export module Pring {
                             let value = {
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             }
-                            let reference = self.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id)
                             document.pack(BatchType.update, batch).update(reference, value)
                         } else {
                             let value = {
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             }
-                            let reference = self.reference.doc(document.id.toString())
+                            let reference = self.reference.doc(document.id)
                             document.pack(BatchType.save, batch).set(reference, value)
                         }
                     })
                     return batch
                 case BatchType.delete:
                     this.forEach(document => {
-                        let reference = self.reference.doc(document.id.toString())
+                        let reference = self.reference.doc(document.id)
                         batch.delete(reference)
                     })
                     return batch
@@ -526,7 +526,7 @@ export module Pring {
 
         public objects: T[] = []
 
-        private _count: Number = 0
+        private _count: number = 0
 
         constructor(parent: Base) {
             this.parent = parent
@@ -606,7 +606,7 @@ export module Pring {
 
                         for (var i = 0; i < length; i++) {
                             let newMember = newMembers[i]
-                            let reference = this.reference.doc(newMember.id.toString())
+                            let reference = this.reference.doc(newMember.id)
                             if (newMember.isSaved) {
                                 batch.update(reference, newMember.value())
                             } else {
@@ -661,7 +661,7 @@ export module Pring {
             }
         }
 
-        contains(id: String): Promise<Boolean> {
+        contains(id: string): Promise<Boolean> {
             return new Promise<Boolean>((resolve, reject) => {
                 this.reference.doc(id).get().then((snapshot) => {
                     resolve(snapshot.exists)
@@ -675,7 +675,7 @@ export module Pring {
             this.objects.forEach(callbackfn)
         }
 
-        count(): Number {
+        count(): number {
             return this.isSaved() ? this._count : this.objects.length
         }
 
