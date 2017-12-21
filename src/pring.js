@@ -36,6 +36,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var FirebaseFirestore = require("@google-cloud/firestore");
+require("reflect-metadata");
+var propertyMetadataKey = "property"; //Symbol("property")
+exports.property = function (target, propertyKey) {
+    var properties = Reflect.getMetadata(propertyMetadataKey, target) || [];
+    properties.push(propertyKey);
+    Reflect.defineMetadata(propertyMetadataKey, properties, target);
+};
 var firestore;
 var Pring;
 (function (Pring) {
@@ -60,7 +67,7 @@ var Pring;
             this._init();
         }
         Base.getReference = function () {
-            return firestore.collection(this.getPath().toString());
+            return firestore.collection(this.getPath());
         };
         Base.getVersion = function () {
             return 1;
@@ -98,12 +105,14 @@ var Pring;
         Base.prototype._init = function () {
             var properties = this.getProperties();
             for (var prop in properties) {
-                var key = properties[prop].toString();
+                var key = properties[prop];
                 var descriptor = Object.getOwnPropertyDescriptor(this, key);
-                var value = descriptor.value;
-                if (isCollection(value)) {
-                    var collection = value;
-                    collection.setParent(this, key);
+                if (descriptor) {
+                    var value = descriptor.value;
+                    if (isCollection(value)) {
+                        var collection = value;
+                        collection.setParent(this, key);
+                    }
                 }
             }
         };
@@ -119,9 +128,10 @@ var Pring;
             var properties = this.getProperties();
             var data = snapshot.data();
             for (var prop in properties) {
-                var key = properties[prop].toString();
+                var key = properties[prop];
                 var descriptor = Object.getOwnPropertyDescriptor(this, key);
                 var value = data[key];
+                console.log(value);
                 if (isCollection(descriptor.value)) {
                     var collection = descriptor.value;
                     collection.setParent(this, key);
@@ -151,17 +161,13 @@ var Pring;
             return "version/" + this.version + "/" + this.modelName + "/" + this.id;
         };
         Base.prototype.getReference = function () {
-            return firestore.doc(this.getPath().toString());
+            return firestore.doc(this.getPath());
         };
         Base.prototype.getSystemProperties = function () {
             return ["version", "modelName", "path", "id", "reference", "isSaved"];
         };
         Base.prototype.getProperties = function () {
-            var properties = Object.getOwnPropertyNames(this);
-            var that = this;
-            return properties.filter(function (v) {
-                return (that.getSystemProperties().indexOf(v) == -1);
-            });
+            return Reflect.getMetadata(propertyMetadataKey, this);
         };
         Base.prototype.setValue = function (value, key) {
         };
@@ -169,15 +175,17 @@ var Pring;
             var properties = this.getProperties();
             var values = {};
             for (var prop in properties) {
-                var key = properties[prop].toString();
+                var key = properties[prop];
                 var descriptor = Object.getOwnPropertyDescriptor(this, key);
-                var value = descriptor.value;
-                if (isCollection(value)) {
-                    var collection = value;
-                    values[key] = collection.value();
-                }
-                else {
-                    values[key] = value;
+                if (descriptor) {
+                    var value = descriptor.value;
+                    if (isCollection(value)) {
+                        var collection = value;
+                        values[key] = collection.value();
+                    }
+                    else {
+                        values[key] = value;
+                    }
                 }
             }
             return values;
@@ -201,28 +209,32 @@ var Pring;
                 case BatchType.save:
                     batch.set(reference, this.value());
                     for (var prop in properties) {
-                        var key = properties[prop].toString();
+                        var key = properties[prop];
                         var descriptor = Object.getOwnPropertyDescriptor(this, key);
-                        var value = descriptor.value;
-                        if (isCollection(value)) {
-                            var collection = value;
-                            collection.setParent(this, key);
-                            var batchable = value;
-                            batchable.pack(BatchType.save, batch);
+                        if (descriptor) {
+                            var value = descriptor.value;
+                            if (isCollection(value)) {
+                                var collection = value;
+                                collection.setParent(this, key);
+                                var batchable = value;
+                                batchable.pack(BatchType.save, batch);
+                            }
                         }
                     }
                     return batch;
                 case BatchType.update:
                     batch.update(reference, this.value());
                     for (var prop in properties) {
-                        var key = properties[prop].toString();
+                        var key = properties[prop];
                         var descriptor = Object.getOwnPropertyDescriptor(this, key);
-                        var value = descriptor.value;
-                        if (isCollection(value)) {
-                            var collection = value;
-                            collection.setParent(this, key);
-                            var batchable = value;
-                            batchable.pack(BatchType.update, batch);
+                        if (descriptor) {
+                            var value = descriptor.value;
+                            if (isCollection(value)) {
+                                var collection = value;
+                                collection.setParent(this, key);
+                                var batchable = value;
+                                batchable.pack(BatchType.update, batch);
+                            }
                         }
                     }
                     return batch;
@@ -287,7 +299,7 @@ var Pring;
             return this.parent.path + "/" + this.key;
         };
         ReferenceCollection.prototype.getReference = function () {
-            return firestore.collection(this.getPath().toString());
+            return firestore.collection(this.getPath());
         };
         ReferenceCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
@@ -298,7 +310,7 @@ var Pring;
                             if (!this.isSaved()) return [3 /*break*/, 5];
                             reference = newMember.reference;
                             parentRef_1 = this.parent.reference;
-                            key_1 = this.key.toString();
+                            key_1 = this.key;
                             count = 0;
                             _a.label = 1;
                         case 1:
@@ -346,7 +358,7 @@ var Pring;
                             length_1 = newMembers.length;
                             if (!(length_1 > 0)) return [3 /*break*/, 4];
                             parentRef_2 = this.parent.reference;
-                            key_2 = this.key.toString();
+                            key_2 = this.key;
                             count = 0;
                             _a.label = 1;
                         case 1:
@@ -393,7 +405,7 @@ var Pring;
             if (this.isSaved()) {
                 var reference_1 = member.reference;
                 var parentRef_3 = this.parent.reference;
-                var key_3 = this.key.toString();
+                var key_3 = this.key;
                 var count = 0;
                 return new Promise(function (resolve, reject) {
                     return firestore.runTransaction(function (transaction) {
@@ -430,7 +442,7 @@ var Pring;
         ReferenceCollection.prototype.contains = function (id) {
             var _this = this;
             return new Promise(function (resolve, reject) {
-                _this.reference.doc(id.toString()).get().then(function (snapshot) {
+                _this.reference.doc(id).get().then(function (snapshot) {
                     resolve(snapshot.exists);
                 })["catch"](function (error) {
                     reject(error);
@@ -460,7 +472,7 @@ var Pring;
                             var value = {
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
-                            var reference = self.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id);
                             document.pack(BatchType.update, batch).update(reference, value);
                         }
                         else {
@@ -468,7 +480,7 @@ var Pring;
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
-                            var reference = self.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id);
                             document.pack(BatchType.save, batch).set(reference, value);
                         }
                     });
@@ -480,7 +492,7 @@ var Pring;
                             var value = {
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
-                            var reference = self.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id);
                             document.pack(BatchType.update, batch).update(reference, value);
                         }
                         else {
@@ -488,14 +500,14 @@ var Pring;
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
-                            var reference = self.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id);
                             document.pack(BatchType.save, batch).set(reference, value);
                         }
                     });
                     return batch;
                 case BatchType["delete"]:
                     this.forEach(function (document) {
-                        var reference = self.reference.doc(document.id.toString());
+                        var reference = self.reference.doc(document.id);
                         batch["delete"](reference);
                     });
                     return batch;
@@ -524,7 +536,7 @@ var Pring;
             return this.parent.path + "/" + this.key;
         };
         NestedCollection.prototype.getReference = function () {
-            return firestore.collection(this.getPath().toString());
+            return firestore.collection(this.getPath());
         };
         NestedCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
@@ -533,9 +545,9 @@ var Pring;
                     switch (_a.label) {
                         case 0:
                             if (!this.isSaved()) return [3 /*break*/, 5];
-                            reference = this.reference.doc(newMember.id.toString());
+                            reference = this.reference.doc(newMember.id);
                             parentRef_4 = this.parent.reference;
-                            key_4 = this.key.toString();
+                            key_4 = this.key;
                             count = 0;
                             _a.label = 1;
                         case 1:
@@ -583,7 +595,7 @@ var Pring;
                             length_2 = newMembers.length;
                             if (!(length_2 > 0)) return [3 /*break*/, 4];
                             parentRef_5 = this.parent.reference;
-                            key_5 = this.key.toString();
+                            key_5 = this.key;
                             count = 0;
                             _a.label = 1;
                         case 1:
@@ -604,7 +616,7 @@ var Pring;
                             batch = firestore.batch();
                             for (i = 0; i < length_2; i++) {
                                 newMember = newMembers[i];
-                                reference = this.reference.doc(newMember.id.toString());
+                                reference = this.reference.doc(newMember.id);
                                 if (newMember.isSaved) {
                                     batch.update(reference, newMember.value());
                                 }
@@ -628,9 +640,9 @@ var Pring;
         NestedCollection.prototype.remove = function (member) {
             var _this = this;
             if (this.isSaved()) {
-                var reference_2 = this.reference.doc(member.id.toString());
+                var reference_2 = this.reference.doc(member.id);
                 var parentRef_6 = this.parent.reference;
-                var key_6 = this.key.toString();
+                var key_6 = this.key;
                 var count = 0;
                 return new Promise(function (resolve, reject) {
                     return firestore.runTransaction(function (transaction) {
@@ -667,7 +679,7 @@ var Pring;
         NestedCollection.prototype.contains = function (id) {
             var _this = this;
             return new Promise(function (resolve, reject) {
-                _this.reference.doc(id.toString()).get().then(function (snapshot) {
+                _this.reference.doc(id).get().then(function (snapshot) {
                     resolve(snapshot.exists);
                 })["catch"](function (error) {
                     reject(error);
@@ -694,11 +706,11 @@ var Pring;
                     this.forEach(function (document) {
                         var doc = document;
                         if (document.isSaved) {
-                            var reference = self.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id);
                             batch.update(reference, document.value());
                         }
                         else {
-                            var reference = self.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id);
                             batch.set(reference, document.value());
                         }
                     });
@@ -707,18 +719,18 @@ var Pring;
                     this.forEach(function (document) {
                         var doc = document;
                         if (document.isSaved) {
-                            var reference = self.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id);
                             batch.update(reference, document.value());
                         }
                         else {
-                            var reference = self.reference.doc(document.id.toString());
+                            var reference = self.reference.doc(document.id);
                             batch.set(reference, document.value());
                         }
                     });
                     return batch;
                 case BatchType["delete"]:
                     this.forEach(function (document) {
-                        var reference = self.reference.doc(document.id.toString());
+                        var reference = self.reference.doc(document.id);
                         batch["delete"](reference);
                     });
                     return batch;

@@ -1,4 +1,6 @@
 import * as FirebaseFirestore from '@google-cloud/firestore';
+import "reflect-metadata";
+export declare const property: (target: any, propertyKey: any) => void;
 export declare module Pring {
     function initialize(options?: any): void;
     enum BatchType {
@@ -11,48 +13,48 @@ export declare module Pring {
     }
     interface ValueProtocol {
         value(): any;
-        setValue(value: any, key: String): any;
+        setValue(value: any, key: string): any;
     }
     interface Document extends Batchable, ValueProtocol {
-        version: Number;
-        modelName: String;
-        path: String;
-        id: String;
+        version: number;
+        modelName: string;
+        path: string;
+        id: string;
         reference: FirebaseFirestore.DocumentReference;
         createdAt: Date;
         updatedAt: Date;
         init(snapshot: FirebaseFirestore.DocumentSnapshot): any;
-        getVersion(): Number;
-        getModelName(): String;
-        getPath(): String;
+        getVersion(): number;
+        getModelName(): string;
+        getPath(): string;
         value(): any;
         rawValue(): any;
     }
     class Base implements Document {
         static getReference(): FirebaseFirestore.CollectionReference;
-        static getVersion(): Number;
-        static getModelName(): String;
-        static getPath(): String;
-        static get(id: String): Promise<any>;
-        version: Number;
-        modelName: String;
-        path: String;
+        static getVersion(): number;
+        static getModelName(): string;
+        static getPath(): string;
+        static get(id: string): Promise<any>;
+        version: number;
+        modelName: string;
+        path: string;
         reference: FirebaseFirestore.DocumentReference;
-        id: String;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         isSaved: Boolean;
-        constructor(id?: String);
+        constructor(id?: string);
         self(): this;
         _init(): void;
         init(snapshot: FirebaseFirestore.DocumentSnapshot): void;
-        getVersion(): Number;
-        getModelName(): String;
-        getPath(): String;
+        getVersion(): number;
+        getModelName(): string;
+        getPath(): string;
         getReference(): FirebaseFirestore.DocumentReference;
-        getSystemProperties(): String[];
-        getProperties(): String[];
-        setValue(value: any, key: String): void;
+        getSystemProperties(): string[];
+        getProperties(): string[];
+        setValue(value: any, key: string): void;
         rawValue(): any;
         value(): any;
         pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
@@ -61,53 +63,53 @@ export declare module Pring {
         delete(): Promise<FirebaseFirestore.WriteResult>;
     }
     interface SubCollection extends ValueProtocol {
-        path: String;
+        path: string;
         reference: FirebaseFirestore.CollectionReference;
-        key: String;
-        setParent(parent: Base, key: String): any;
+        key: string;
+        setParent(parent: Base, key: string): any;
     }
     class ReferenceCollection<T extends Base> implements SubCollection, Batchable {
-        path: String;
+        path: string;
         reference: FirebaseFirestore.CollectionReference;
         parent: Base;
-        key: String;
+        key: string;
         objects: T[];
         private _count;
         constructor(parent: Base);
         isSaved(): Boolean;
-        setParent(parent: Base, key: String): void;
-        getPath(): String;
+        setParent(parent: Base, key: string): void;
+        getPath(): string;
         getReference(): FirebaseFirestore.CollectionReference;
         insert(newMember: T): Promise<any>;
         merge(newMembers: T[]): Promise<any>;
         remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
-        contains(id: String): Promise<Boolean>;
+        contains(id: string): Promise<Boolean>;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
-        count(): Number;
+        count(): number;
         value(): any;
-        setValue(value: any, key: String): void;
+        setValue(value: any, key: string): void;
         pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
     }
     class NestedCollection<T extends Base> implements SubCollection, Batchable {
-        path: String;
+        path: string;
         reference: FirebaseFirestore.CollectionReference;
         parent: Base;
-        key: String;
+        key: string;
         objects: T[];
         private _count;
         constructor(parent: Base);
         isSaved(): Boolean;
-        setParent(parent: Base, key: String): void;
-        getPath(): String;
+        setParent(parent: Base, key: string): void;
+        getPath(): string;
         getReference(): FirebaseFirestore.CollectionReference;
         insert(newMember: T): Promise<any>;
         merge(newMembers: T[]): Promise<any>;
         remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
-        contains(id: String): Promise<Boolean>;
+        contains(id: string): Promise<Boolean>;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
-        count(): Number;
+        count(): number;
         value(): any;
-        setValue(value: any, key: String): void;
+        setValue(value: any, key: string): void;
         pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
     }
 }

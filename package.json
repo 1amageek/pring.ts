@@ -5,7 +5,7 @@
   "main": "./src/pring.js",
   "types": "./types/pring.d.ts",
   "scripts": {
-    "build": "tsc --outDir src pring.ts -d && mv src/pring.d.ts ./types/.  ",
+    "build": "tsc --outDir src pring.ts -d && mv src/pring.d.ts ./types/.",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

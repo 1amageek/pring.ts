@@ -1,10 +1,10 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import "reflect-metadata"
 
-const propertyMetadataKey = Symbol("property");
+const propertyMetadataKey = "property"//Symbol("property")
 
 export const property = (target, propertyKey) => {
-    var properties = Reflect.getOwnMetadata(propertyMetadataKey, target) || []
+    var properties = Reflect.getMetadata(propertyMetadataKey, target) || []
     properties.push(propertyKey)
     Reflect.defineMetadata(propertyMetadataKey, properties, target)
 }
@@ -110,10 +110,12 @@ export module Pring {
             for (var prop in properties) {
                 let key = properties[prop]
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
-                let value = descriptor.value
-                if (isCollection(value)) {
-                    let collection: SubCollection = value as SubCollection
-                    collection.setParent(this, key)
+                if (descriptor) {
+                    const value = descriptor.value
+                    if (isCollection(value)) {
+                        let collection: SubCollection = value as SubCollection
+                        collection.setParent(this, key)
+                    }
                 }
             }
         }
@@ -130,9 +132,6 @@ export module Pring {
 
             let properties = this.getProperties()
             let data = snapshot.data()
-            console.log(this)
-            console.log(properties)
-            console.log(data)
             for (var prop in properties) {
                 let key = properties[prop]
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
@@ -179,7 +178,7 @@ export module Pring {
         }
 
         getProperties(): string[] {
-            return Reflect.getOwnMetadata(propertyMetadataKey, this)
+            return Reflect.getMetadata(propertyMetadataKey, this)
         }
 
         setValue(value: any, key: string) {
@@ -192,13 +191,14 @@ export module Pring {
             for (var prop in properties) {
                 let key = properties[prop]
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
-                let value = descriptor.value
-
-                if (isCollection(value)) {
-                    let collection: ValueProtocol = value as ValueProtocol
-                    values[key] = collection.value()
-                } else {
-                    values[key] = value
+                if (descriptor) {
+                    let value = descriptor.value
+                    if (isCollection(value)) {
+                        let collection: ValueProtocol = value as ValueProtocol
+                        values[key] = collection.value()
+                    } else {
+                        values[key] = value
+                    }
                 }
             }
             return values
@@ -225,13 +225,14 @@ export module Pring {
                     for (var prop in properties) {
                         let key = properties[prop]
                         let descriptor = Object.getOwnPropertyDescriptor(this, key)
-                        let value = descriptor.value
-
-                        if (isCollection(value)) {
-                            var collection: SubCollection = value as SubCollection
-                            collection.setParent(this, key)
-                            var batchable: Batchable = value as Batchable
-                            batchable.pack(BatchType.save, batch)
+                        if (descriptor) {
+                            let value = descriptor.value
+                            if (isCollection(value)) {
+                                var collection: SubCollection = value as SubCollection
+                                collection.setParent(this, key)
+                                var batchable: Batchable = value as Batchable
+                                batchable.pack(BatchType.save, batch)
+                            }
                         }
                     }
                     return batch
@@ -240,13 +241,14 @@ export module Pring {
                     for (var prop in properties) {
                         let key = properties[prop]
                         let descriptor = Object.getOwnPropertyDescriptor(this, key)
-                        let value = descriptor.value
-
-                        if (isCollection(value)) {
-                            var collection: SubCollection = value as SubCollection
-                            collection.setParent(this, key)
-                            var batchable: Batchable = value as Batchable
-                            batchable.pack(BatchType.update, batch)
+                        if (descriptor) {
+                            let value = descriptor.value
+                            if (isCollection(value)) {
+                                var collection: SubCollection = value as SubCollection
+                                collection.setParent(this, key)
+                                var batchable: Batchable = value as Batchable
+                                batchable.pack(BatchType.update, batch)
+                            }
                         }
                     }
                     return batch
