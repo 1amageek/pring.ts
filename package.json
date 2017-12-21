@@ -40,6 +40,23 @@
   ],
   "devDependencies": {
     "@types/es6-promise": "0.0.33",
+    "@types/jest": "^21.1.9",
+    "jest": "^22.0.3",
+    "ts-jest": "^22.0.0",
     "typings": "^2.1.1"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   }
 }
