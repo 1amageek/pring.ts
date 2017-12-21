@@ -28,8 +28,15 @@ Pring.initialize(functions.config().firebase)
 
 ### Scheme
 ``` typescript
+
+class Group extends Pring.Base {
+    name: string
+    users: NestedCollection<User> = NestedCollection(this)
+}
+
 class User extends Pring.Base {
     name: string
+    groups: ReferenceCollection<Group> = ReferenceCollection(this)
 }
 ```
 
