@@ -12,6 +12,25 @@ https://github.com/1amageek/Pring
 
 ## Usage
 
+### tsconfig.json
+
+Pring uses a decorator.
+Set `experimentalDecorators` to `true`.
+
+```
+{
+    "compilerOptions": {
+        "target": "es2017",
+        "lib": ["es2017"],
+        "module": "commonjs",
+        "experimentalDecorators": true,
+        "sourceMap": true
+    }
+}
+```
+
+### Initialize
+
 ``` typescript
 import { Pring, property } from "pring"
 
