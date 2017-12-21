@@ -126,12 +126,10 @@ var Pring;
                 configurable: true
             });
             var properties = this.getProperties();
-            console.log(properties);
             var data = snapshot.data();
             for (var prop in properties) {
                 var key = properties[prop];
                 var descriptor = Object.getOwnPropertyDescriptor(this, key);
-                console.log(prop, key, descriptor);
                 var value = data[key];
                 if (descriptor) {
                     if (isCollection(descriptor.value)) {
