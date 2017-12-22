@@ -122,8 +122,34 @@ describe("Document pack function", () => {
         test("doc 1 reference", async () => {
             try {
                 const doc = await Document.get(doc0_id)
+                const docs: FirebaseFirestore.DocumentSnapshot[] = await doc0.referenceCollection.get() 
+                expect( docs.filter((value) => {
+                    return (value.id == doc1_id)
+                })).toBeTruthy()
+            } catch (error) {
+                console.log(error)
+            }
+        })
 
-                expect(doc).not.toBeNull()
+        test("doc 2 reference", async () => {
+            try {
+                const doc = await Document.get(doc1_id)
+                const docs: FirebaseFirestore.DocumentSnapshot[] = await doc0.referenceCollection.get() 
+                expect( docs.filter((value) => {
+                    return (value.id == doc2_id)
+                })).toBeTruthy()
+            } catch (error) {
+                console.log(error)
+            }
+        })
+
+        test("doc 1 reference before saved document", async () => {
+            try {
+                const doc = await Document.get(doc0_id)
+                const docs: FirebaseFirestore.DocumentSnapshot[] = await doc0.referenceCollection.get() 
+                expect( docs.filter((value) => {
+                    return (value.id == doc1_other_id)
+                })).toBeTruthy()
             } catch (error) {
                 console.log(error)
             }

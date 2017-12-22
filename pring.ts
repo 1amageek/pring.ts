@@ -65,6 +65,10 @@ export module Pring {
             return `version/${this.getVersion()}/${this.getModelName()}`
         }
 
+        static self(): any {
+            return new this()
+        }
+
         static async get(id: string) {
             try {
                 const snapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
@@ -360,6 +364,16 @@ export module Pring {
             return firestore.collection(this.getPath())
         }
 
+        async get() {
+            try {
+                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+                return docs
+            } catch(error) {
+                throw error
+            }
+        }
+
         async insert(newMember: T) {
             if (this.isSaved()) {
                 let reference = newMember.reference
@@ -585,6 +599,16 @@ export module Pring {
 
         getReference(): FirebaseFirestore.CollectionReference {
             return firestore.collection(this.getPath())
+        }
+
+        async get() {
+            try {
+                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+                return docs
+            } catch(error) {
+                throw error
+            }
         }
 
         async insert(newMember: T) {
