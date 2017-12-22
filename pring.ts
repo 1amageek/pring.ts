@@ -351,6 +351,7 @@ export module Pring {
         }
 
         didSaved() {
+            this._count = this.objects.length
             this.forEach((value) => {
                 value.isSaved = true
             })
@@ -588,6 +589,7 @@ export module Pring {
         }
 
         didSaved() {
+            this._count = this.objects.length
             this.forEach((value) => {
                 value.isSaved = true
             })

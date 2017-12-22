@@ -8,7 +8,7 @@ yarn-error.log*
 playground.ts
 playground.js
 *.json
-
+!tsconfig.json
 # Runtime data
 pids
 *.pid
