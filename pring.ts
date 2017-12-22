@@ -72,7 +72,7 @@ export module Pring {
                 document.init(snapshot)
                 return document
             } catch (error) {
-                return error
+                throw error
             }
         }
 
@@ -502,19 +502,14 @@ export module Pring {
                 case BatchType.save:
                     this.forEach(document => {
                         let doc: T = document as T
-                        if (document.isSaved) {
-                            let value = {
-                                createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
-                                updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
-                            }
-                            let reference = self.reference.doc(document.id)
+                        let value = {
+                            createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
+                            updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
+                        }
+                        let reference = self.reference.doc(document.id)
+                        if (document.isSaved) {                            
                             document.pack(BatchType.update, batch).set(reference, value)
                         } else {
-                            let value = {
-                                createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
-                                updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
-                            }
-                            let reference = self.reference.doc(document.id)
                             document.pack(BatchType.save, batch).set(reference, value)
                         }
                     })
@@ -767,13 +762,8 @@ export module Pring {
                 case BatchType.save:
                     this.forEach(document => {
                         let doc: T = document as T
-                        if (document.isSaved) {
-                            let reference = self.reference.doc(document.id)
-                            batch.update(reference, document.value())
-                        } else {
-                            let reference = self.reference.doc(document.id)
-                            batch.set(reference, document.value())
-                        }
+                        let reference = self.reference.doc(document.id)
+                        batch.set(reference, document.value())
                     })
                     return batch
                 case BatchType.update:

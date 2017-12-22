@@ -93,7 +93,7 @@ var Pring;
                             return [2 /*return*/, document_1];
                         case 2:
                             error_1 = _a.sent();
-                            return [2 /*return*/, error_1];
+                            throw error_1;
                         case 3: return [2 /*return*/];
                     }
                 });
@@ -500,20 +500,15 @@ var Pring;
                 case BatchType.save:
                     this.forEach(function (document) {
                         var doc = document;
+                        var value = {
+                            createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
+                            updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
+                        };
+                        var reference = self.reference.doc(document.id);
                         if (document.isSaved) {
-                            var value = {
-                                createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
-                                updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
-                            };
-                            var reference = self.reference.doc(document.id);
                             document.pack(BatchType.update, batch).set(reference, value);
                         }
                         else {
-                            var value = {
-                                createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
-                                updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
-                            };
-                            var reference = self.reference.doc(document.id);
                             document.pack(BatchType.save, batch).set(reference, value);
                         }
                     });
@@ -789,14 +784,8 @@ var Pring;
                 case BatchType.save:
                     this.forEach(function (document) {
                         var doc = document;
-                        if (document.isSaved) {
-                            var reference = self.reference.doc(document.id);
-                            batch.update(reference, document.value());
-                        }
-                        else {
-                            var reference = self.reference.doc(document.id);
-                            batch.set(reference, document.value());
-                        }
+                        var reference = self.reference.doc(document.id);
+                        batch.set(reference, document.value());
                     });
                     return batch;
                 case BatchType.update:
