@@ -504,10 +504,11 @@ export module Pring {
                         let doc: T = document as T
                         if (document.isSaved) {
                             let value = {
+                                createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             }
                             let reference = self.reference.doc(document.id)
-                            document.pack(BatchType.update, batch).update(reference, value)
+                            document.pack(BatchType.update, batch).set(reference, value)
                         } else {
                             let value = {
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),

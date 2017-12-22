@@ -502,10 +502,11 @@ var Pring;
                         var doc = document;
                         if (document.isSaved) {
                             var value = {
+                                createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
                             var reference = self.reference.doc(document.id);
-                            document.pack(BatchType.update, batch).update(reference, value);
+                            document.pack(BatchType.update, batch).set(reference, value);
                         }
                         else {
                             var value = {

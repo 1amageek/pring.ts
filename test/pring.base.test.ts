@@ -2,39 +2,21 @@ process.env.NODE_ENV = 'test';
 
 import { Pring } from "../pring"
 import * as FirebaseFirestore from '@google-cloud/firestore'
-import * as Document from './test_document'
+import { Document } from './test_document'
 
 Pring.initialize({
     projectId: 'sandbox-329fc',
     keyFilename: './sandbox-329fc-firebase-adminsdk-8kgnw-3a2693f6cb.json'
 })
 
-// test("The document can get some type", async () => {
-//     const document = new Document.Document()
-//     try {
-//         await document.save()
-//         let doc: Document.Document = await Document.Document.get(document.id)
-//         expect(doc.string).toEqual(document.string)
-//         expect(doc.number).toEqual(document.number)
-//         expect(doc.number).toEqual(document.string)
-//         expect(doc.number).toEqual(document.number)
-//         expect(doc.number).toEqual(document.number)
-//         expect(doc.number).toEqual(document.number)
-//     } catch(error) {
-
-//     }
-
-// })
 describe("Document property", () => {
 
-    const document = new Document.Document()
-    var doc: Document.Document
-    console.log("describe 1")
+    const document = new Document()
+    var doc: Document
 
     beforeAll(async () => {
         await document.save()
-        doc = await Document.Document.get(document.id)
-        console.log("beforeAll 1")
+        doc = await Document.get(document.id)
     });
 
     describe("properties", async () => {
@@ -67,70 +49,72 @@ describe("Document property", () => {
             expect(doc.array).toEqual(document.array)
         })
 
-        // test("File type", () => {
-        //     expect(doc.file).toEqual(document.file)
-        // })
+        test("Set type", () => {
+            expect(doc.set).toEqual(document.set)
+        })
 
-        // test("Set type", () => {
-        //     expect(doc.set).toEqual(document.set)
-        // })
+        test("File type", () => {
+            expect(doc.file).toEqual(document.file)
+        })
     })
 })
 
+describe("Document pack function", () => {
 
+    const doc0 = new Document()
+    const doc1 = new Document()
+    const doc2 = new Document()
+    const doc1_other = new Document()
 
-// test("", async () => {
-//     const document = new Document.Document()
-//     try {
-//         await document.save()
-//         expect((1 + 2)).toBe(3);
-//     } catch(error) {
+    const doc0_id = doc0.id
+    const doc1_id = doc1.id
+    const doc2_id = doc2.id
+    const doc1_other_id = doc1_other.id
 
-//     }
+    beforeAll(async () => {
+        await doc1_other.save()
+        doc0.referenceCollection.insert(doc1)
+        doc0.referenceCollection.insert(doc1_other)
+        doc1.referenceCollection.insert(doc2)
+        await doc0.save()
+    });
 
-//     describe("aa", () => {
-//         it("ww", () => {
-//             expect((1 + 2)).toBe(3);
-//         })
-//     })
+    describe("Document get", async () => {
 
-// })
+        test("doc 0", async () => {
+            try {
+                const doc = await Document.get(doc0_id)
+                expect(doc).not.toBeNull()
+            } catch(error) {
+                console.log(error)
+            }
+        })
 
+        test("doc 1", async () => {
+            try {
+                const doc = await Document.get(doc1_id)
+                expect(doc).not.toBeNull()
+            } catch(error) {
+                console.log(error)
+            }
+        })
 
+        test("doc 2", async () => {
+            try {
+                const doc = await Document.get(doc2_id)
+                expect(doc).not.toBeNull()
+            } catch(error) {
+                console.log(error)
+            }
+        })
 
-// describe("The document can get some type", async () => {
-//     const document = new Document.Document()
-//     try {
-//         await document.save()
-//         let doc: Document.Document = await Document.Document.get(document.id)
-
-//         test("String type", () => {
-//             expect(doc.string).toEqual(document.string)
-//         })
-
-//         // test("Number type", () => {
-//         //     expect(doc.array).toEqual(document.array)
-//         // })
-
-//         // test("Boolean type", () => {
-//         //     expect(doc.bool).toEqual(document.bool)
-//         // })
-
-//         // test("Number type", () => {
-//         //     expect(doc.array).toEqual(document.array)
-//         // })
-
-//         // test("Number type", () => {
-//         //     expect(doc.array).toEqual(document.array)
-//         // })
-
-//         // test("Number type", () => {
-//         //     expect(doc.array).toEqual(document.array)
-//         // })
-
-
-//         console.log(doc)
-//     } catch(error) {
-//         console.log(error)
-//     }
-// })
+        test("doc 1 other", async () => {
+            try {
+                const doc = await Document.get(doc1_other_id)
+                expect(doc).not.toBeNull()
+            } catch(error) {
+                console.log(error)
+            }
+        })
+    })
+})
