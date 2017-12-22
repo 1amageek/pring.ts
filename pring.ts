@@ -132,8 +132,8 @@ export module Pring {
 
             let properties = this.getProperties()
             let data = snapshot.data()
-            for (var prop in properties) {                
-                let key = properties[prop]                
+            for (var prop in properties) {
+                let key = properties[prop]
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
                 let value = data[key]
                 if (descriptor) {
@@ -183,10 +183,6 @@ export module Pring {
             return firestore.doc(this.getPath())
         }
 
-        getSystemProperties(): string[] {
-            return ["version", "modelName", "path", "id", "reference", "isSaved"]
-        }
-
         getProperties(): string[] {
             return Reflect.getMetadata(propertyMetadataKey, this)
         }
@@ -206,6 +202,9 @@ export module Pring {
                     if (isCollection(value)) {
                         let collection: ValueProtocol = value as ValueProtocol
                         values[key] = collection.value()
+                    } else if (isFile(value)) {
+                        let file: ValueProtocol = value as ValueProtocol
+                        values[key] = file.value()
                     } else {
                         values[key] = value
                     }
@@ -274,6 +273,18 @@ export module Pring {
             try {
                 const result = await batch.commit()
                 this.isSaved = true
+                const properties = this.getProperties()
+                for (var prop in properties) {
+                    let key = properties[prop]
+                    let descriptor = Object.getOwnPropertyDescriptor(this, key)
+                    if (descriptor) {
+                        let value = descriptor.value
+                        if (isCollection(value)) {
+                            var collection: SubCollection = value as SubCollection
+                           collection.didSaved()
+                        }
+                    }
+                }
                 return result
             } catch (error) {
                 throw error
@@ -294,10 +305,15 @@ export module Pring {
         reference: FirebaseFirestore.CollectionReference
         key: string
         setParent(parent: Base, key: string)
+        didSaved()
     }
 
     function isCollection(arg): Boolean {
         return (arg instanceof ReferenceCollection) || (arg instanceof NestedCollection)
+    }
+
+    function isFile(arg): Boolean {
+        return (arg instanceof File)
     }
 
     export class ReferenceCollection<T extends Base> implements SubCollection, Batchable {
@@ -328,6 +344,12 @@ export module Pring {
             this.key = key
             this.path = this.getPath()
             this.reference = this.getReference()
+        }
+
+        didSaved() {
+            this.forEach((value) => {
+                value.isSaved = true
+            })
         }
 
         getPath(): string {
@@ -389,7 +411,6 @@ export module Pring {
                         })
                         this._count = count
                         var batch = firestore.batch()
-
                         for (var i = 0; i < length; i++) {
                             let newMember = newMembers[i]
                             let reference = newMember.reference
@@ -556,6 +577,12 @@ export module Pring {
             this.reference = this.getReference()
         }
 
+        didSaved() {
+            this.forEach((value) => {
+                value.isSaved = true
+            })
+        }
+
         getPath(): string {
             return `${this.parent.path}/${this.key}`
         }
@@ -636,14 +663,14 @@ export module Pring {
             }
         }
 
-        remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>> {
+        async remove(member: T) {
             if (this.isSaved()) {
                 let reference = this.reference.doc(member.id)
                 let parentRef = this.parent.reference
                 let key = this.key
                 var count = 0
-                return new Promise((resolve, reject) => {
-                    return firestore.runTransaction((transaction) => {
+                try {
+                    const result = await firestore.runTransaction((transaction) => {
                         return transaction.get(parentRef).then((document) => {
                             const data = document.data()
                             const subCollection = data[key] || { "count": 0 }
@@ -651,14 +678,13 @@ export module Pring {
                             count = oldCount - 1
                             transaction.update(parentRef, { [key]: { "count": count } })
                         })
-                    }).then((result) => {
-                        this._count = count
-                        var batch = firestore.batch()
-                        resolve(batch.delete(reference).commit())
-                    }).catch((error) => {
-                        reject(error)
                     })
-                })
+                    this._count = count
+                    var batch = firestore.batch()
+                    batch.delete(reference).commit()
+                } catch (error) {
+                    return error
+                }
             } else {
                 this.objects.some((v, i) => {
                     if (v.id == member.id) {
@@ -667,11 +693,45 @@ export module Pring {
                     }
                     return false
                 })
-                return new Promise((resolve, reject) => {
-                    resolve()
-                })
             }
         }
+
+        // remove(member: T): Promise < Promise < FirebaseFirestore.WriteResult[] | null >> {
+        //     if(this.isSaved()) {
+        //         let reference = this.reference.doc(member.id)
+        //         let parentRef = this.parent.reference
+        //         let key = this.key
+        //         var count = 0
+        //         return new Promise((resolve, reject) => {
+        //             return firestore.runTransaction((transaction) => {
+        //                 return transaction.get(parentRef).then((document) => {
+        //                     const data = document.data()
+        //                     const subCollection = data[key] || { "count": 0 }
+        //                     const oldCount = subCollection["count"] || 0
+        //                     count = oldCount - 1
+        //                     transaction.update(parentRef, { [key]: { "count": count } })
+        //                 })
+        //             }).then((result) => {
+        //                 this._count = count
+        //                 var batch = firestore.batch()
+        //                 resolve(batch.delete(reference).commit())
+        //             }).catch((error) => {
+        //                 reject(error)
+        //             })
+        //         })
+        //     } else {
+        //         this.objects.some((v, i) => {
+        //             if (v.id == member.id) {
+        //                 this.objects.splice(i, 1)
+        //                 return true
+        //             }
+        //             return false
+        //         })
+        //     return new Promise((resolve, reject) => {
+        //             resolve()
+        //         })
+        //     }
+        // }
 
         contains(id: string): Promise<Boolean> {
             return new Promise<Boolean>((resolve, reject) => {
@@ -736,4 +796,37 @@ export module Pring {
             }
         }
     }
+
+    export class File implements ValueProtocol {
+        
+        mimeType: string
+
+        name: string
+        
+        url: string
+
+        constructor(name?: string, url?: string, mimeType?: string) {
+            this.name = name
+            this.url = url
+            this.mimeType = mimeType
+        }
+
+        init(value: object) {
+            this.mimeType = value["mimeType"]
+            this.name = value["name"]
+            this.url = value["url"]
+        }
+
+        setValue(value: any, key: string) {
+            this[key] = value
+        }
+        value(): any {
+            return {
+                "name": this.name || "",
+                "url": this.url || "",
+                "mimeType": this.mimeType || ""
+            }
+        }
+    }
+
 }
