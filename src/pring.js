@@ -326,6 +326,7 @@ var Pring;
             this.reference = this.getReference();
         };
         ReferenceCollection.prototype.didSaved = function () {
+            this._count = this.objects.length;
             this.forEach(function (value) {
                 value.isSaved = true;
             });
@@ -584,6 +585,7 @@ var Pring;
             this.reference = this.getReference();
         };
         NestedCollection.prototype.didSaved = function () {
+            this._count = this.objects.length;
             this.forEach(function (value) {
                 value.isSaved = true;
             });
