@@ -121,3 +121,15 @@ The SubCollection of Pring has a Count.
 ``` typescript
 user.groups.count
 ```
+
+## Test
+
+https://facebook.github.io/jest/
+
+```shell
+npm install -g jest 
+```
+
+```shell
+jest
+```
