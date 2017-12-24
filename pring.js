@@ -78,6 +78,9 @@ var Pring;
         Base.getPath = function () {
             return "version/" + this.getVersion() + "/" + this.getModelName();
         };
+        Base.self = function () {
+            return new this();
+        };
         Base.get = function (id) {
             return __awaiter(this, void 0, void 0, function () {
                 var snapshot, document_1, error_1;
@@ -323,6 +326,7 @@ var Pring;
             this.reference = this.getReference();
         };
         ReferenceCollection.prototype.didSaved = function () {
+            this._count = this.objects.length;
             this.forEach(function (value) {
                 value.isSaved = true;
             });
@@ -333,9 +337,29 @@ var Pring;
         ReferenceCollection.prototype.getReference = function () {
             return firestore.collection(this.getPath());
         };
+        ReferenceCollection.prototype.get = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var snapshot, docs, error_3;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 1:
+                            snapshot = _a.sent();
+                            docs = snapshot.docs;
+                            return [2 /*return*/, docs];
+                        case 2:
+                            error_3 = _a.sent();
+                            throw error_3;
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        };
         ReferenceCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_1, key_1, count, result, batch, error_3;
+                var reference, parentRef_1, key_1, count, result, batch, error_4;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -369,8 +393,8 @@ var Pring;
                             }
                             return [3 /*break*/, 4];
                         case 3:
-                            error_3 = _a.sent();
-                            return [2 /*return*/, error_3];
+                            error_4 = _a.sent();
+                            return [2 /*return*/, error_4];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.push(newMember);
@@ -382,7 +406,7 @@ var Pring;
         };
         ReferenceCollection.prototype.merge = function (newMembers) {
             return __awaiter(this, void 0, void 0, function () {
-                var length_1, parentRef_2, key_2, count, result, batch, i, newMember, reference, error_4;
+                var length_1, parentRef_2, key_2, count, result, batch, i, newMember, reference, error_5;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -421,8 +445,8 @@ var Pring;
                             }
                             return [2 /*return*/, batch.commit()];
                         case 3:
-                            error_4 = _a.sent();
-                            return [2 /*return*/, error_4];
+                            error_5 = _a.sent();
+                            return [2 /*return*/, error_5];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.concat(newMembers);
@@ -561,6 +585,7 @@ var Pring;
             this.reference = this.getReference();
         };
         NestedCollection.prototype.didSaved = function () {
+            this._count = this.objects.length;
             this.forEach(function (value) {
                 value.isSaved = true;
             });
@@ -571,9 +596,29 @@ var Pring;
         NestedCollection.prototype.getReference = function () {
             return firestore.collection(this.getPath());
         };
+        NestedCollection.prototype.get = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var snapshot, docs, error_6;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 1:
+                            snapshot = _a.sent();
+                            docs = snapshot.docs;
+                            return [2 /*return*/, docs];
+                        case 2:
+                            error_6 = _a.sent();
+                            throw error_6;
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        };
         NestedCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_4, key_4, count, result, batch, error_5;
+                var reference, parentRef_4, key_4, count, result, batch, error_7;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -607,8 +652,8 @@ var Pring;
                             }
                             return [3 /*break*/, 4];
                         case 3:
-                            error_5 = _a.sent();
-                            return [2 /*return*/, error_5];
+                            error_7 = _a.sent();
+                            return [2 /*return*/, error_7];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.push(newMember);
@@ -620,7 +665,7 @@ var Pring;
         };
         NestedCollection.prototype.merge = function (newMembers) {
             return __awaiter(this, void 0, void 0, function () {
-                var length_2, parentRef_5, key_5, count, result, batch, i, newMember, reference, error_6;
+                var length_2, parentRef_5, key_5, count, result, batch, i, newMember, reference, error_8;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -659,8 +704,8 @@ var Pring;
                             }
                             return [2 /*return*/, batch.commit()];
                         case 3:
-                            error_6 = _a.sent();
-                            return [2 /*return*/, error_6];
+                            error_8 = _a.sent();
+                            return [2 /*return*/, error_8];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.concat(newMembers);
@@ -673,7 +718,7 @@ var Pring;
         NestedCollection.prototype.remove = function (member) {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
-                var reference, parentRef_6, key_6, count, result, batch, error_7;
+                var reference, parentRef_6, key_6, count, result, batch, error_9;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -702,8 +747,8 @@ var Pring;
                             batch["delete"](reference).commit();
                             return [3 /*break*/, 4];
                         case 3:
-                            error_7 = _a.sent();
-                            return [2 /*return*/, error_7];
+                            error_9 = _a.sent();
+                            return [2 /*return*/, error_9];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.some(function (v, i) {
