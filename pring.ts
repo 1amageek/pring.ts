@@ -552,7 +552,12 @@ export module Pring {
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             }
                             let reference = self.reference.doc(document.id)
-                            document.pack(BatchType.save, batch).set(reference, value)
+                            if (document.isLocalSaved) {
+                                batch.set(reference, value)
+                            } else {
+                                document.isLocalSaved = true
+                                document.pack(BatchType.save, batch).set(reference, value)
+                            }
                         }
                     })
                     return batch
