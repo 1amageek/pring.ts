@@ -78,11 +78,13 @@ describe("SubCollection pack", () => {
     const doc1 = new Document()
     const doc2 = new Document()
     const doc1_other = new Document()
+    const doc2_other = new Document()
 
     const doc0_id = doc0.id
     const doc1_id = doc1.id
     const doc2_id = doc2.id
     const doc1_other_id = doc1_other.id
+    const doc2_other_id = doc2_other.id
 
     // NestedCollection
     const doc0_nested = new Document()
@@ -100,7 +102,9 @@ describe("SubCollection pack", () => {
         await doc1_other.save()
         doc0.referenceCollection.insert(doc1)
         doc0.referenceCollection.insert(doc1_other)
+        doc0.referenceCollection.insert(doc2_other)
         doc1.referenceCollection.insert(doc2)
+        doc1.referenceCollection.insert(doc2_other)
         await doc0.save()
 
         // Nested
@@ -144,6 +148,15 @@ describe("SubCollection pack", () => {
             test("A ReferenceCollection saved before doc0 is saved", async () => {
                 try {
                     const doc = await Document.get(doc1_other_id)
+                    expect(doc).not.toBeNull()
+                } catch (error) {
+                    console.log(error)
+                }
+            })
+
+            test("This doc2_other is saved in another ReferenceCollection", async () => {
+                try {
+                    const doc = await Document.get(doc2_other_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
                     console.log(error)
