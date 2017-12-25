@@ -4,12 +4,12 @@ import { Document } from './test/test_document';
 
 const propertyMetadataKey = "property"//Symbol("property")
 
-export const property = (target, propertyKey) => {
+export const property = <T extends Pring.Document>(target: T, propertyKey) => {
     var properties = Reflect.getMetadata(propertyMetadataKey, target) || []
     properties.push(propertyKey)
     Reflect.defineMetadata(propertyMetadataKey, properties, target)
 }
-
+  
 var firestore: FirebaseFirestore.Firestore
 export module Pring {
 
@@ -105,7 +105,6 @@ export module Pring {
             this.id = id || firestore.collection(`version/${this.version}/${this.modelName}`).doc().id
             this.path = this.getPath()
             this.reference = this.getReference()
-            this._init()
         }
 
         self(): this {
@@ -288,7 +287,7 @@ export module Pring {
                         let value = descriptor.value
                         if (isCollection(value)) {
                             var collection: SubCollection = value as SubCollection
-                           collection.didSaved()
+                            collection.didSaved()
                         }
                     }
                 }
@@ -368,16 +367,6 @@ export module Pring {
             return firestore.collection(this.getPath())
         }
 
-        async get() {
-            try {
-                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
-                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
-                return docs
-            } catch(error) {
-                throw error
-            }
-        }
-
         async insert(newMember: T) {
             if (this.isSaved()) {
                 let reference = newMember.reference
@@ -449,7 +438,7 @@ export module Pring {
             }
         }
 
-        remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>> {
+        delete(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>> {
             if (this.isSaved()) {
                 let reference = member.reference
                 let parentRef = this.parent.reference
@@ -484,6 +473,47 @@ export module Pring {
                 return new Promise((resolve, reject) => {
                     resolve()
                 })
+            }
+        }
+
+        async deleteAll() {
+            this.parent._init()
+            try {
+                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+                const batch: FirebaseFirestore.WriteBatch = firestore.batch()
+                const key = this.key
+                const parentRef = this.parent.reference
+                await firestore.runTransaction((transaction) => {
+                    return transaction.get(parentRef).then((document) => {
+                        transaction.update(parentRef, { [key]: { "count": 0 } })
+                    })
+                })
+                docs.forEach( doc => {
+                    const reference = this.reference.doc(doc.id)                    
+                    batch.delete(reference)
+                })
+                const result = await batch.commit()
+                this.objects = []
+                return result
+            } catch(error) {
+                throw error
+            }
+        }
+
+        async get(type: { new(): T; }) {
+            try {
+                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+                const documents: T[] = docs.map((snapshot) => {
+                    let document: T = new type()
+                    document.init(snapshot)
+                    return document
+                })
+                this.objects = documents
+                return documents
+            } catch (error) {
+                throw error
             }
         }
 
@@ -525,7 +555,7 @@ export module Pring {
                             updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                         }
                         let reference = self.reference.doc(document.id)
-                        if (document.isSaved) {                            
+                        if (document.isSaved) {
                             document.pack(BatchType.update, batch).set(reference, value)
                         } else {
                             if (document.isLocalSaved) {
@@ -616,16 +646,6 @@ export module Pring {
             return firestore.collection(this.getPath())
         }
 
-        async get() {
-            try {
-                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
-                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
-                return docs
-            } catch(error) {
-                throw error
-            }
-        }
-
         async insert(newMember: T) {
             if (this.isSaved()) {
                 let reference = this.reference.doc(newMember.id)
@@ -698,7 +718,7 @@ export module Pring {
             }
         }
 
-        async remove(member: T) {
+        async delete(member: T) {
             if (this.isSaved()) {
                 let reference = this.reference.doc(member.id)
                 let parentRef = this.parent.reference
@@ -716,7 +736,7 @@ export module Pring {
                     })
                     this._count = count
                     var batch = firestore.batch()
-                    batch.delete(reference).commit()
+                    return batch.delete(reference).commit()
                 } catch (error) {
                     return error
                 }
@@ -728,6 +748,47 @@ export module Pring {
                     }
                     return false
                 })
+            }
+        }
+
+        async deleteAll() {
+            this.parent._init()
+            try {
+                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+                const batch: FirebaseFirestore.WriteBatch = firestore.batch()
+                const key = this.key
+                const parentRef = this.parent.reference
+                await firestore.runTransaction((transaction) => {
+                    return transaction.get(parentRef).then((document) => {
+                        transaction.update(parentRef, { [key]: { "count": 0 } })
+                    })
+                })
+                docs.forEach( doc => {
+                    const reference = this.reference.doc(doc.id)                    
+                    batch.delete(reference)
+                })
+                const result = await batch.commit()
+                this.objects = []
+                return result
+            } catch(error) {
+                throw error
+            }
+        }
+
+        async get(type: { new(): T; }) {
+            try {
+                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+                const documents: T[] = docs.map((snapshot) => {
+                    let document: T = new type()
+                    document.init(snapshot)
+                    return document
+                })
+                this.objects = documents
+                return documents
+            } catch (error) {
+                throw error
             }
         }
 
@@ -791,11 +852,11 @@ export module Pring {
     }
 
     export class File implements ValueProtocol {
-        
+
         mimeType: string
 
         name: string
-        
+
         url: string
 
         constructor(name?: string, url?: string, mimeType?: string) {

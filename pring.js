@@ -59,12 +59,12 @@ var Pring;
     var Base = /** @class */ (function () {
         function Base(id) {
             this.isSaved = false;
+            this.isLocalSaved = false;
             this.version = this.getVersion();
             this.modelName = this.getModelName();
             this.id = id || firestore.collection("version/" + this.version + "/" + this.modelName).doc().id;
             this.path = this.getPath();
             this.reference = this.getReference();
-            this._init();
         }
         Base.getReference = function () {
             return firestore.collection(this.getPath());
@@ -337,29 +337,9 @@ var Pring;
         ReferenceCollection.prototype.getReference = function () {
             return firestore.collection(this.getPath());
         };
-        ReferenceCollection.prototype.get = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var snapshot, docs, error_3;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, this.reference.get()];
-                        case 1:
-                            snapshot = _a.sent();
-                            docs = snapshot.docs;
-                            return [2 /*return*/, docs];
-                        case 2:
-                            error_3 = _a.sent();
-                            throw error_3;
-                        case 3: return [2 /*return*/];
-                    }
-                });
-            });
-        };
         ReferenceCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_1, key_1, count, result, batch, error_4;
+                var reference, parentRef_1, key_1, count, result, batch, error_3;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -393,8 +373,8 @@ var Pring;
                             }
                             return [3 /*break*/, 4];
                         case 3:
-                            error_4 = _a.sent();
-                            return [2 /*return*/, error_4];
+                            error_3 = _a.sent();
+                            return [2 /*return*/, error_3];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.push(newMember);
@@ -406,7 +386,7 @@ var Pring;
         };
         ReferenceCollection.prototype.merge = function (newMembers) {
             return __awaiter(this, void 0, void 0, function () {
-                var length_1, parentRef_2, key_2, count, result, batch, i, newMember, reference, error_5;
+                var length_1, parentRef_2, key_2, count, result, batch, i, newMember, reference, error_4;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -445,8 +425,8 @@ var Pring;
                             }
                             return [2 /*return*/, batch.commit()];
                         case 3:
-                            error_5 = _a.sent();
-                            return [2 /*return*/, error_5];
+                            error_4 = _a.sent();
+                            return [2 /*return*/, error_4];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.concat(newMembers);
@@ -456,7 +436,7 @@ var Pring;
                 });
             });
         };
-        ReferenceCollection.prototype.remove = function (member) {
+        ReferenceCollection.prototype["delete"] = function (member) {
             var _this = this;
             if (this.isSaved()) {
                 var reference_1 = member.reference;
@@ -494,6 +474,75 @@ var Pring;
                     resolve();
                 });
             }
+        };
+        ReferenceCollection.prototype.deleteAll = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                var snapshot, docs, batch_1, key_4, parentRef_4, result, error_5;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.parent._init();
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 5, , 6]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 2:
+                            snapshot = _a.sent();
+                            docs = snapshot.docs;
+                            batch_1 = firestore.batch();
+                            key_4 = this.key;
+                            parentRef_4 = this.parent.reference;
+                            return [4 /*yield*/, firestore.runTransaction(function (transaction) {
+                                    return transaction.get(parentRef_4).then(function (document) {
+                                        transaction.update(parentRef_4, (_a = {}, _a[key_4] = { "count": 0 }, _a));
+                                        var _a;
+                                    });
+                                })];
+                        case 3:
+                            _a.sent();
+                            docs.forEach(function (doc) {
+                                var reference = _this.reference.doc(doc.id);
+                                batch_1["delete"](reference);
+                            });
+                            return [4 /*yield*/, batch_1.commit()];
+                        case 4:
+                            result = _a.sent();
+                            this.objects = [];
+                            return [2 /*return*/, result];
+                        case 5:
+                            error_5 = _a.sent();
+                            throw error_5;
+                        case 6: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        ReferenceCollection.prototype.get = function (type) {
+            return __awaiter(this, void 0, void 0, function () {
+                var snapshot, docs, documents, error_6;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 1:
+                            snapshot = _a.sent();
+                            docs = snapshot.docs;
+                            documents = docs.map(function (snapshot) {
+                                var document = new type();
+                                document.init(snapshot);
+                                return document;
+                            });
+                            this.objects = documents;
+                            return [2 /*return*/, documents];
+                        case 2:
+                            error_6 = _a.sent();
+                            throw error_6;
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
         };
         ReferenceCollection.prototype.contains = function (id) {
             var _this = this;
@@ -533,7 +582,13 @@ var Pring;
                             document.pack(BatchType.update, batch).set(reference, value);
                         }
                         else {
-                            document.pack(BatchType.save, batch).set(reference, value);
+                            if (document.isLocalSaved) {
+                                batch.set(reference, value);
+                            }
+                            else {
+                                document.isLocalSaved = true;
+                                document.pack(BatchType.save, batch).set(reference, value);
+                            }
                         }
                     });
                     return batch;
@@ -553,7 +608,13 @@ var Pring;
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
                             var reference = self.reference.doc(document.id);
-                            document.pack(BatchType.save, batch).set(reference, value);
+                            if (document.isLocalSaved) {
+                                batch.set(reference, value);
+                            }
+                            else {
+                                document.isLocalSaved = true;
+                                document.pack(BatchType.save, batch).set(reference, value);
+                            }
                         }
                     });
                     return batch;
@@ -596,47 +657,27 @@ var Pring;
         NestedCollection.prototype.getReference = function () {
             return firestore.collection(this.getPath());
         };
-        NestedCollection.prototype.get = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var snapshot, docs, error_6;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, this.reference.get()];
-                        case 1:
-                            snapshot = _a.sent();
-                            docs = snapshot.docs;
-                            return [2 /*return*/, docs];
-                        case 2:
-                            error_6 = _a.sent();
-                            throw error_6;
-                        case 3: return [2 /*return*/];
-                    }
-                });
-            });
-        };
         NestedCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_4, key_4, count, result, batch, error_7;
+                var reference, parentRef_5, key_5, count, result, batch, error_7;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             if (!this.isSaved()) return [3 /*break*/, 5];
                             reference = this.reference.doc(newMember.id);
-                            parentRef_4 = this.parent.reference;
-                            key_4 = this.key;
+                            parentRef_5 = this.parent.reference;
+                            key_5 = this.key;
                             count = 0;
                             _a.label = 1;
                         case 1:
                             _a.trys.push([1, 3, , 4]);
                             return [4 /*yield*/, firestore.runTransaction(function (transaction) {
-                                    return transaction.get(parentRef_4).then(function (document) {
+                                    return transaction.get(parentRef_5).then(function (document) {
                                         var data = document.data();
-                                        var subCollection = data[key_4] || { "count": 0 };
+                                        var subCollection = data[key_5] || { "count": 0 };
                                         var oldCount = subCollection["count"] || 0;
                                         count = oldCount + 1;
-                                        transaction.update(parentRef_4, (_a = {}, _a[key_4] = { "count": count }, _a));
+                                        transaction.update(parentRef_5, (_a = {}, _a[key_5] = { "count": count }, _a));
                                         var _a;
                                     });
                                 })];
@@ -665,26 +706,26 @@ var Pring;
         };
         NestedCollection.prototype.merge = function (newMembers) {
             return __awaiter(this, void 0, void 0, function () {
-                var length_2, parentRef_5, key_5, count, result, batch, i, newMember, reference, error_8;
+                var length_2, parentRef_6, key_6, count, result, batch, i, newMember, reference, error_8;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             if (!this.isSaved()) return [3 /*break*/, 5];
                             length_2 = newMembers.length;
                             if (!(length_2 > 0)) return [3 /*break*/, 4];
-                            parentRef_5 = this.parent.reference;
-                            key_5 = this.key;
+                            parentRef_6 = this.parent.reference;
+                            key_6 = this.key;
                             count = 0;
                             _a.label = 1;
                         case 1:
                             _a.trys.push([1, 3, , 4]);
                             return [4 /*yield*/, firestore.runTransaction(function (transaction) {
-                                    return transaction.get(parentRef_5).then(function (document) {
+                                    return transaction.get(parentRef_6).then(function (document) {
                                         var data = document.data();
-                                        var subCollection = data[key_5] || { "count": 0 };
+                                        var subCollection = data[key_6] || { "count": 0 };
                                         var oldCount = subCollection["count"] || 0;
                                         count = oldCount + length_2;
-                                        transaction.update(parentRef_5, (_a = {}, _a[key_5] = { "count": count }, _a));
+                                        transaction.update(parentRef_6, (_a = {}, _a[key_6] = { "count": count }, _a));
                                         var _a;
                                     });
                                 })];
@@ -715,28 +756,28 @@ var Pring;
                 });
             });
         };
-        NestedCollection.prototype.remove = function (member) {
+        NestedCollection.prototype["delete"] = function (member) {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
-                var reference, parentRef_6, key_6, count, result, batch, error_9;
+                var reference, parentRef_7, key_7, count, result, batch, error_9;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             if (!this.isSaved()) return [3 /*break*/, 5];
                             reference = this.reference.doc(member.id);
-                            parentRef_6 = this.parent.reference;
-                            key_6 = this.key;
+                            parentRef_7 = this.parent.reference;
+                            key_7 = this.key;
                             count = 0;
                             _a.label = 1;
                         case 1:
                             _a.trys.push([1, 3, , 4]);
                             return [4 /*yield*/, firestore.runTransaction(function (transaction) {
-                                    return transaction.get(parentRef_6).then(function (document) {
+                                    return transaction.get(parentRef_7).then(function (document) {
                                         var data = document.data();
-                                        var subCollection = data[key_6] || { "count": 0 };
+                                        var subCollection = data[key_7] || { "count": 0 };
                                         var oldCount = subCollection["count"] || 0;
                                         count = oldCount - 1;
-                                        transaction.update(parentRef_6, (_a = {}, _a[key_6] = { "count": count }, _a));
+                                        transaction.update(parentRef_7, (_a = {}, _a[key_7] = { "count": count }, _a));
                                         var _a;
                                     });
                                 })];
@@ -744,8 +785,7 @@ var Pring;
                             result = _a.sent();
                             this._count = count;
                             batch = firestore.batch();
-                            batch["delete"](reference).commit();
-                            return [3 /*break*/, 4];
+                            return [2 /*return*/, batch["delete"](reference).commit()];
                         case 3:
                             error_9 = _a.sent();
                             return [2 /*return*/, error_9];
@@ -764,42 +804,75 @@ var Pring;
                 });
             });
         };
-        // remove(member: T): Promise < Promise < FirebaseFirestore.WriteResult[] | null >> {
-        //     if(this.isSaved()) {
-        //         let reference = this.reference.doc(member.id)
-        //         let parentRef = this.parent.reference
-        //         let key = this.key
-        //         var count = 0
-        //         return new Promise((resolve, reject) => {
-        //             return firestore.runTransaction((transaction) => {
-        //                 return transaction.get(parentRef).then((document) => {
-        //                     const data = document.data()
-        //                     const subCollection = data[key] || { "count": 0 }
-        //                     const oldCount = subCollection["count"] || 0
-        //                     count = oldCount - 1
-        //                     transaction.update(parentRef, { [key]: { "count": count } })
-        //                 })
-        //             }).then((result) => {
-        //                 this._count = count
-        //                 var batch = firestore.batch()
-        //                 resolve(batch.delete(reference).commit())
-        //             }).catch((error) => {
-        //                 reject(error)
-        //             })
-        //         })
-        //     } else {
-        //         this.objects.some((v, i) => {
-        //             if (v.id == member.id) {
-        //                 this.objects.splice(i, 1)
-        //                 return true
-        //             }
-        //             return false
-        //         })
-        //     return new Promise((resolve, reject) => {
-        //             resolve()
-        //         })
-        //     }
-        // }
+        NestedCollection.prototype.deleteAll = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                var snapshot, docs, batch_2, key_8, parentRef_8, result, error_10;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.parent._init();
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 5, , 6]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 2:
+                            snapshot = _a.sent();
+                            docs = snapshot.docs;
+                            batch_2 = firestore.batch();
+                            key_8 = this.key;
+                            parentRef_8 = this.parent.reference;
+                            return [4 /*yield*/, firestore.runTransaction(function (transaction) {
+                                    return transaction.get(parentRef_8).then(function (document) {
+                                        transaction.update(parentRef_8, (_a = {}, _a[key_8] = { "count": 0 }, _a));
+                                        var _a;
+                                    });
+                                })];
+                        case 3:
+                            _a.sent();
+                            docs.forEach(function (doc) {
+                                var reference = _this.reference.doc(doc.id);
+                                batch_2["delete"](reference);
+                            });
+                            return [4 /*yield*/, batch_2.commit()];
+                        case 4:
+                            result = _a.sent();
+                            this.objects = [];
+                            return [2 /*return*/, result];
+                        case 5:
+                            error_10 = _a.sent();
+                            throw error_10;
+                        case 6: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        NestedCollection.prototype.get = function (type) {
+            return __awaiter(this, void 0, void 0, function () {
+                var snapshot, docs, documents, error_11;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 1:
+                            snapshot = _a.sent();
+                            docs = snapshot.docs;
+                            documents = docs.map(function (snapshot) {
+                                var document = new type();
+                                document.init(snapshot);
+                                return document;
+                            });
+                            this.objects = documents;
+                            return [2 /*return*/, documents];
+                        case 2:
+                            error_11 = _a.sent();
+                            throw error_11;
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        };
         NestedCollection.prototype.contains = function (id) {
             var _this = this;
             return new Promise(function (resolve, reject) {

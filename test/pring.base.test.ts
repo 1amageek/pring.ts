@@ -218,7 +218,6 @@ describe("SubCollection pack", () => {
             test("doc0's ReferenceCollection", async () => {
                 try {
                     const doc = new Document(doc0_nested_id)
-                    doc.nestedCollection.
                     // const doc = await Document.get(doc1_nested_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
@@ -282,46 +281,62 @@ describe("SubCollection pack", () => {
                 }
             })
         })
+
+        describe("Document delete", async () => {
+
+            test("doc 0", async () => {
+                try {
+                    const doc = await Document.get(doc0_id)
+                    await doc.delete()
+                    await Document.get(doc0_id)
+                } catch (error) {
+                    expect(error).not.toBeNull()
+                }
+            })
+    
+            test("doc 1", async () => {
+                try {
+                    const doc = await Document.get(doc1_id)
+                    expect(doc).not.toBeNull()
+                } catch(error) {
+                    console.log(error)
+                }
+            })
+    
+            test("doc 2", async () => {
+                try {
+                    const doc = await Document.get(doc2_id)
+                    expect(doc).not.toBeNull()
+                } catch(error) {
+                    console.log(error)
+                }
+            })
+    
+            test("doc 1 other", async () => {
+                try {
+                    const doc = await Document.get(doc1_other_id)
+                    expect(doc).not.toBeNull()
+                } catch(error) {
+                    console.log(error)
+                }
+            })
+        })
     })
 
 
-    describe("Document delete", async () => {
 
-        test("doc 0", async () => {
-            try {
-                const doc = await Document.get(doc0_id)
-                await doc.delete()
-                await Document.get(doc0_id)
-            } catch (error) {
-                expect(error).not.toBeNull()
-            }
+
+    describe("NestedCollection", async () => {
+        describe("Get NestedCollection's document", async () => {
+
+            test("Root document", async () => {
+                try {
+                    const doc = await Document.get(doc0_nested_id)
+                    expect(doc).not.toBeNull()
+                } catch (error) {
+                    console.log(error)
+                }
+            })
         })
-
-        // test("doc 1", async () => {
-        //     try {
-        //         const doc = await Document.get(doc1_id)
-        //         expect(doc).not.toBeNull()
-        //     } catch(error) {
-        //         console.log(error)
-        //     }
-        // })
-
-        // test("doc 2", async () => {
-        //     try {
-        //         const doc = await Document.get(doc2_id)
-        //         expect(doc).not.toBeNull()
-        //     } catch(error) {
-        //         console.log(error)
-        //     }
-        // })
-
-        // test("doc 1 other", async () => {
-        //     try {
-        //         const doc = await Document.get(doc1_other_id)
-        //         expect(doc).not.toBeNull()
-        //     } catch(error) {
-        //         console.log(error)
-        //     }
-        // })
     })
 })
