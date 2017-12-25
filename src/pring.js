@@ -59,6 +59,7 @@ var Pring;
     var Base = /** @class */ (function () {
         function Base(id) {
             this.isSaved = false;
+            this.isLocalSaved = false;
             this.version = this.getVersion();
             this.modelName = this.getModelName();
             this.id = id || firestore.collection("version/" + this.version + "/" + this.modelName).doc().id;
@@ -533,7 +534,13 @@ var Pring;
                             document.pack(BatchType.update, batch).set(reference, value);
                         }
                         else {
-                            document.pack(BatchType.save, batch).set(reference, value);
+                            if (document.isLocalSaved) {
+                                batch.set(reference, value);
+                            }
+                            else {
+                                document.isLocalSaved = true;
+                                document.pack(BatchType.save, batch).set(reference, value);
+                            }
                         }
                     });
                     return batch;
@@ -553,7 +560,13 @@ var Pring;
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                             };
                             var reference = self.reference.doc(document.id);
-                            document.pack(BatchType.save, batch).set(reference, value);
+                            if (document.isLocalSaved) {
+                                batch.set(reference, value);
+                            }
+                            else {
+                                document.isLocalSaved = true;
+                                document.pack(BatchType.save, batch).set(reference, value);
+                            }
                         }
                     });
                     return batch;
@@ -764,42 +777,6 @@ var Pring;
                 });
             });
         };
-        // remove(member: T): Promise < Promise < FirebaseFirestore.WriteResult[] | null >> {
-        //     if(this.isSaved()) {
-        //         let reference = this.reference.doc(member.id)
-        //         let parentRef = this.parent.reference
-        //         let key = this.key
-        //         var count = 0
-        //         return new Promise((resolve, reject) => {
-        //             return firestore.runTransaction((transaction) => {
-        //                 return transaction.get(parentRef).then((document) => {
-        //                     const data = document.data()
-        //                     const subCollection = data[key] || { "count": 0 }
-        //                     const oldCount = subCollection["count"] || 0
-        //                     count = oldCount - 1
-        //                     transaction.update(parentRef, { [key]: { "count": count } })
-        //                 })
-        //             }).then((result) => {
-        //                 this._count = count
-        //                 var batch = firestore.batch()
-        //                 resolve(batch.delete(reference).commit())
-        //             }).catch((error) => {
-        //                 reject(error)
-        //             })
-        //         })
-        //     } else {
-        //         this.objects.some((v, i) => {
-        //             if (v.id == member.id) {
-        //                 this.objects.splice(i, 1)
-        //                 return true
-        //             }
-        //             return false
-        //         })
-        //     return new Promise((resolve, reject) => {
-        //             resolve()
-        //         })
-        //     }
-        // }
         NestedCollection.prototype.contains = function (id) {
             var _this = this;
             return new Promise(function (resolve, reject) {
