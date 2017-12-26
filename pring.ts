@@ -666,11 +666,7 @@ export module Pring {
                     })
                     this._count = count
                     var batch = firestore.batch()
-                    if (newMember.isSaved) {
-                        return batch.update(reference, newMember.value()).commit()
-                    } else {
-                        return batch.create(reference, newMember.value()).commit()
-                    }
+                    batch.create(reference, newMember.value()).commit()
                 } catch (error) {
                     return error
                 }

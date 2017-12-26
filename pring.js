@@ -686,12 +686,7 @@ var Pring;
                             result = _a.sent();
                             this._count = count;
                             batch = firestore.batch();
-                            if (newMember.isSaved) {
-                                return [2 /*return*/, batch.update(reference, newMember.value()).commit()];
-                            }
-                            else {
-                                return [2 /*return*/, batch.create(reference, newMember.value()).commit()];
-                            }
+                            batch.create(reference, newMember.value()).commit();
                             return [3 /*break*/, 4];
                         case 3:
                             error_7 = _a.sent();
