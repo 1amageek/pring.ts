@@ -495,6 +495,7 @@ export module Pring {
                 })
                 const result = await batch.commit()
                 this.objects = []
+                this._count = 0
                 return result
             } catch(error) {
                 throw error
@@ -510,7 +511,7 @@ export module Pring {
                     document.init(snapshot)
                     return document
                 })
-                this.objects = documents
+                this.objects = documents                
                 return documents
             } catch (error) {
                 throw error
@@ -770,6 +771,7 @@ export module Pring {
                 })
                 const result = await batch.commit()
                 this.objects = []
+                this._count = 0
                 return result
             } catch(error) {
                 throw error
