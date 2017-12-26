@@ -367,6 +367,7 @@ export module Pring {
         }
 
         async insert(newMember: T) {
+            this.parent._init()
             if (this.isSaved()) {
                 let reference = newMember.reference
                 let parentRef = this.parent.reference
@@ -384,7 +385,8 @@ export module Pring {
                     })
                     this._count = count
                     var batch = firestore.batch()
-                    const collectionReference = this.reference.doc(newMember.id)   
+                    const collectionReference = this.reference.doc(newMember.id)
+                    console.log(collectionReference.path) 
                     const value = {
                         createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                         updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
@@ -401,6 +403,7 @@ export module Pring {
         }
 
         async merge(newMembers: T[]) {
+            this.parent._init()
             if (this.isSaved()) {
                 const length = newMembers.length
                 if (length > 0) {
@@ -440,6 +443,7 @@ export module Pring {
         }
 
         delete(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>> {
+            this.parent._init()
             if (this.isSaved()) {
                 let reference = member.reference
                 let parentRef = this.parent.reference
@@ -504,6 +508,7 @@ export module Pring {
         }
 
         async get(type: { new(): T; }) {
+            this.parent._init()
             try {
                 const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
                 const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
@@ -520,6 +525,7 @@ export module Pring {
         }
 
         contains(id: string): Promise<Boolean> {
+            this.parent._init()
             return new Promise<Boolean>((resolve, reject) => {
                 this.reference.doc(id).get().then((snapshot) => {
                     resolve(snapshot.exists)
@@ -530,6 +536,7 @@ export module Pring {
         }
 
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any) {
+            this.parent._init()
             this.objects.forEach(callbackfn)
         }
 
@@ -649,6 +656,7 @@ export module Pring {
         }
 
         async insert(newMember: T) {
+            this.parent._init()
             if (this.isSaved()) {
                 let reference = this.reference.doc(newMember.id)
                 let parentRef = this.parent.reference
@@ -679,6 +687,7 @@ export module Pring {
         }
 
         async merge(newMembers: T[]) {
+            this.parent._init()
             if (this.isSaved()) {
                 const length = newMembers.length
                 if (length > 0) {
@@ -719,6 +728,7 @@ export module Pring {
         }
 
         async delete(member: T) {
+            this.parent._init()
             if (this.isSaved()) {
                 let reference = this.reference.doc(member.id)
                 let parentRef = this.parent.reference
@@ -778,9 +788,10 @@ export module Pring {
         }
 
         async get(type: { new(): T; }) {
+            this.parent._init()
             try {
                 const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
-                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs   
                 const documents: T[] = docs.map((snapshot) => {
                     let document: T = new type()
                     document.init(snapshot)
@@ -794,6 +805,7 @@ export module Pring {
         }
 
         contains(id: string): Promise<Boolean> {
+            this.parent._init()
             return new Promise<Boolean>((resolve, reject) => {
                 this.reference.doc(id).get().then((snapshot) => {
                     resolve(snapshot.exists)
@@ -804,6 +816,7 @@ export module Pring {
         }
 
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any) {
+            this.parent._init()
             this.objects.forEach(callbackfn)
         }
 

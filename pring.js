@@ -343,6 +343,7 @@ var Pring;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            this.parent._init();
                             if (!this.isSaved()) return [3 /*break*/, 5];
                             reference = newMember.reference;
                             parentRef_1 = this.parent.reference;
@@ -366,6 +367,7 @@ var Pring;
                             this._count = count;
                             batch = firestore.batch();
                             collectionReference = this.reference.doc(newMember.id);
+                            console.log(collectionReference.path);
                             value = {
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
@@ -390,6 +392,7 @@ var Pring;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            this.parent._init();
                             if (!this.isSaved()) return [3 /*break*/, 5];
                             length_1 = newMembers.length;
                             if (!(length_1 > 0)) return [3 /*break*/, 4];
@@ -438,6 +441,7 @@ var Pring;
         };
         ReferenceCollection.prototype["delete"] = function (member) {
             var _this = this;
+            this.parent._init();
             if (this.isSaved()) {
                 var reference_1 = member.reference;
                 var parentRef_3 = this.parent.reference;
@@ -525,9 +529,12 @@ var Pring;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, this.reference.get()];
+                            this.parent._init();
+                            _a.label = 1;
                         case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 2:
                             snapshot = _a.sent();
                             docs = snapshot.docs;
                             documents = docs.map(function (snapshot) {
@@ -537,16 +544,17 @@ var Pring;
                             });
                             this.objects = documents;
                             return [2 /*return*/, documents];
-                        case 2:
+                        case 3:
                             error_6 = _a.sent();
                             throw error_6;
-                        case 3: return [2 /*return*/];
+                        case 4: return [2 /*return*/];
                     }
                 });
             });
         };
         ReferenceCollection.prototype.contains = function (id) {
             var _this = this;
+            this.parent._init();
             return new Promise(function (resolve, reject) {
                 _this.reference.doc(id).get().then(function (snapshot) {
                     resolve(snapshot.exists);
@@ -556,6 +564,7 @@ var Pring;
             });
         };
         ReferenceCollection.prototype.forEach = function (callbackfn, thisArg) {
+            this.parent._init();
             this.objects.forEach(callbackfn);
         };
         ReferenceCollection.prototype.count = function () {
@@ -660,10 +669,11 @@ var Pring;
         };
         NestedCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_5, key_5, count, result, batch, error_7;
+                var reference, parentRef_5, key_5, count, result, batch, value, error_7;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            this.parent._init();
                             if (!this.isSaved()) return [3 /*break*/, 5];
                             reference = this.reference.doc(newMember.id);
                             parentRef_5 = this.parent.reference;
@@ -686,7 +696,9 @@ var Pring;
                             result = _a.sent();
                             this._count = count;
                             batch = firestore.batch();
-                            batch.create(reference, newMember.value()).commit();
+                            value = newMember.value();
+                            value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp();
+                            batch.create(reference, value).commit();
                             return [3 /*break*/, 4];
                         case 3:
                             error_7 = _a.sent();
@@ -706,6 +718,7 @@ var Pring;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            this.parent._init();
                             if (!this.isSaved()) return [3 /*break*/, 5];
                             length_2 = newMembers.length;
                             if (!(length_2 > 0)) return [3 /*break*/, 4];
@@ -759,6 +772,7 @@ var Pring;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            this.parent._init();
                             if (!this.isSaved()) return [3 /*break*/, 5];
                             reference = this.reference.doc(member.id);
                             parentRef_7 = this.parent.reference;
@@ -850,9 +864,12 @@ var Pring;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, this.reference.get()];
+                            this.parent._init();
+                            _a.label = 1;
                         case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 2:
                             snapshot = _a.sent();
                             docs = snapshot.docs;
                             documents = docs.map(function (snapshot) {
@@ -862,16 +879,17 @@ var Pring;
                             });
                             this.objects = documents;
                             return [2 /*return*/, documents];
-                        case 2:
+                        case 3:
                             error_11 = _a.sent();
                             throw error_11;
-                        case 3: return [2 /*return*/];
+                        case 4: return [2 /*return*/];
                     }
                 });
             });
         };
         NestedCollection.prototype.contains = function (id) {
             var _this = this;
+            this.parent._init();
             return new Promise(function (resolve, reject) {
                 _this.reference.doc(id).get().then(function (snapshot) {
                     resolve(snapshot.exists);
@@ -881,6 +899,7 @@ var Pring;
             });
         };
         NestedCollection.prototype.forEach = function (callbackfn, thisArg) {
+            this.parent._init();
             this.objects.forEach(callbackfn);
         };
         NestedCollection.prototype.count = function () {
