@@ -666,7 +666,9 @@ export module Pring {
                     })
                     this._count = count
                     var batch = firestore.batch()
-                    batch.create(reference, newMember.value()).commit()
+                    var value = newMember.value()
+                    value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                    batch.create(reference, value).commit()
                 } catch (error) {
                     return error
                 }

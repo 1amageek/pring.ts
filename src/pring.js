@@ -660,7 +660,7 @@ var Pring;
         };
         NestedCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_5, key_5, count, result, batch, error_7;
+                var reference, parentRef_5, key_5, count, result, batch, value, error_7;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -686,7 +686,9 @@ var Pring;
                             result = _a.sent();
                             this._count = count;
                             batch = firestore.batch();
-                            batch.create(reference, newMember.value()).commit();
+                            value = newMember.value();
+                            value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp();
+                            batch.create(reference, value).commit();
                             return [3 /*break*/, 4];
                         case 3:
                             error_7 = _a.sent();
