@@ -386,7 +386,6 @@ export module Pring {
                     this._count = count
                     var batch = firestore.batch()
                     const collectionReference = this.reference.doc(newMember.id)
-                    console.log(collectionReference.path) 
                     const value = {
                         createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                         updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
