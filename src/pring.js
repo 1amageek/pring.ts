@@ -367,7 +367,6 @@ var Pring;
                             this._count = count;
                             batch = firestore.batch();
                             collectionReference = this.reference.doc(newMember.id);
-                            console.log(collectionReference.path);
                             value = {
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
@@ -523,9 +522,9 @@ var Pring;
                 });
             });
         };
-        ReferenceCollection.prototype.get = function (type) {
+        ReferenceCollection.prototype.get = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var snapshot, docs, documents, error_6;
+                var snapshot, docs, error_6;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -537,13 +536,7 @@ var Pring;
                         case 2:
                             snapshot = _a.sent();
                             docs = snapshot.docs;
-                            documents = docs.map(function (snapshot) {
-                                var document = new type();
-                                document.init(snapshot);
-                                return document;
-                            });
-                            this.objects = documents;
-                            return [2 /*return*/, documents];
+                            return [2 /*return*/, docs];
                         case 3:
                             error_6 = _a.sent();
                             throw error_6;

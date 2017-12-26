@@ -87,9 +87,7 @@ export declare module Pring {
         merge(newMembers: T[]): Promise<any>;
         delete(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
         deleteAll(): Promise<FirebaseFirestore.WriteResult[]>;
-        get(type: {
-            new (): T;
-        }): Promise<T[]>;
+        get(): Promise<FirebaseFirestore.DocumentSnapshot[]>;
         contains(id: string): Promise<Boolean>;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
         count(): number;

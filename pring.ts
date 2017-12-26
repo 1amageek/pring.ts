@@ -137,6 +137,7 @@ export module Pring {
 
             let properties = this.getProperties()
             let data = snapshot.data()
+
             for (var prop in properties) {
                 let key = properties[prop]
                 let descriptor = Object.getOwnPropertyDescriptor(this, key)
@@ -506,18 +507,12 @@ export module Pring {
             }
         }
 
-        async get(type: { new(): T; }) {
+        async get() {
             this.parent._init()
             try {
                 const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
-                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
-                const documents: T[] = docs.map((snapshot) => {
-                    let document: T = new type()
-                    document.init(snapshot)
-                    return document
-                })
-                this.objects = documents                
-                return documents
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs              
+                return docs
             } catch (error) {
                 throw error
             }
