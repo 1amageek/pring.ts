@@ -509,6 +509,7 @@ var Pring;
                         case 4:
                             result = _a.sent();
                             this.objects = [];
+                            this._count = 0;
                             return [2 /*return*/, result];
                         case 5:
                             error_5 = _a.sent();
@@ -838,6 +839,7 @@ var Pring;
                         case 4:
                             result = _a.sent();
                             this.objects = [];
+                            this._count = 0;
                             return [2 /*return*/, result];
                         case 5:
                             error_10 = _a.sent();
