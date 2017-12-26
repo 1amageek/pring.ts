@@ -1,6 +1,6 @@
 import * as FirebaseFirestore from '@google-cloud/firestore';
 import "reflect-metadata";
-export declare const property: (target: any, propertyKey: any) => void;
+export declare const property: <T extends Pring.Document>(target: T, propertyKey: any) => void;
 export declare module Pring {
     function initialize(options?: any): void;
     enum BatchType {
@@ -45,6 +45,7 @@ export declare module Pring {
         createdAt: Date;
         updatedAt: Date;
         isSaved: Boolean;
+        isLocalSaved: Boolean;
         constructor(id?: string);
         self(): this;
         _init(): void;
@@ -82,10 +83,13 @@ export declare module Pring {
         didSaved(): void;
         getPath(): string;
         getReference(): FirebaseFirestore.CollectionReference;
-        get(): Promise<FirebaseFirestore.DocumentSnapshot[]>;
         insert(newMember: T): Promise<any>;
         merge(newMembers: T[]): Promise<any>;
-        remove(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
+        delete(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
+        deleteAll(): Promise<FirebaseFirestore.WriteResult[]>;
+        get(type: {
+            new (): T;
+        }): Promise<T[]>;
         contains(id: string): Promise<Boolean>;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
         count(): number;
@@ -106,10 +110,13 @@ export declare module Pring {
         didSaved(): void;
         getPath(): string;
         getReference(): FirebaseFirestore.CollectionReference;
-        get(): Promise<FirebaseFirestore.DocumentSnapshot[]>;
         insert(newMember: T): Promise<any>;
         merge(newMembers: T[]): Promise<any>;
-        remove(member: T): Promise<any>;
+        delete(member: T): Promise<any>;
+        deleteAll(): Promise<FirebaseFirestore.WriteResult[]>;
+        get(type: {
+            new (): T;
+        }): Promise<T[]>;
         contains(id: string): Promise<Boolean>;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
         count(): number;

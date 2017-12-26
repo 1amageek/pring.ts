@@ -339,7 +339,7 @@ var Pring;
         };
         ReferenceCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_1, key_1, count, result, batch, error_3;
+                var reference, parentRef_1, key_1, count, batch, collectionReference, value, error_3;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -362,16 +362,16 @@ var Pring;
                                     });
                                 })];
                         case 2:
-                            result = _a.sent();
+                            _a.sent();
                             this._count = count;
                             batch = firestore.batch();
-                            if (newMember.isSaved) {
-                                return [2 /*return*/, batch.update(reference, newMember.value()).commit()];
-                            }
-                            else {
-                                return [2 /*return*/, batch.create(reference, newMember.value()).commit()];
-                            }
-                            return [3 /*break*/, 4];
+                            collectionReference = this.reference.doc(newMember.id);
+                            value = {
+                                createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
+                                updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
+                            };
+                            batch.create(collectionReference, value);
+                            return [2 /*return*/, batch.update(reference, newMember.value()).commit()];
                         case 3:
                             error_3 = _a.sent();
                             return [2 /*return*/, error_3];

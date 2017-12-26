@@ -1,6 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import "reflect-metadata"
-import { Document } from './test/test_document';
 
 const propertyMetadataKey = "property"//Symbol("property")
 
@@ -374,7 +373,7 @@ export module Pring {
                 let key = this.key
                 var count = 0
                 try {
-                    const result = await firestore.runTransaction((transaction) => {
+                    await firestore.runTransaction((transaction) => {
                         return transaction.get(parentRef).then((document) => {
                             const data = document.data()
                             const subCollection = data[key] || { "count": 0 }
@@ -385,11 +384,13 @@ export module Pring {
                     })
                     this._count = count
                     var batch = firestore.batch()
-                    if (newMember.isSaved) {
-                        return batch.update(reference, newMember.value()).commit()
-                    } else {
-                        return batch.create(reference, newMember.value()).commit()
+                    const collectionReference = this.reference.doc(newMember.id)   
+                    const value = {
+                        createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
+                        updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                     }
+                    batch.create(collectionReference, value)                                      
+                    return batch.update(reference, newMember.value()).commit()
                 } catch (error) {
                     return error
                 }
