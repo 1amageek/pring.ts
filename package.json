@@ -30,7 +30,7 @@
   ],
   "homepage": "https://github.com/1amageek/pring.ts#readme",
   "dependencies": {
-    "@google-cloud/firestore": "^0.10.0",
+    "@google-cloud/firestore": "^0.11.1",
     "reflect-metadata": "^0.1.10"
   },
   "contributors": [
