@@ -1,4 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore';
+import { DeltaDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import "reflect-metadata";
 export declare const property: <T extends Pring.Document>(target: T, propertyKey: any) => void;
 export declare module Pring {
@@ -23,7 +24,7 @@ export declare module Pring {
         reference: FirebaseFirestore.DocumentReference;
         createdAt: Date;
         updatedAt: Date;
-        init(snapshot: FirebaseFirestore.DocumentSnapshot): any;
+        init(snapshot: FirebaseFirestore.DocumentSnapshot | DeltaDocumentSnapshot): any;
         getVersion(): number;
         getModelName(): string;
         getPath(): string;
@@ -49,7 +50,7 @@ export declare module Pring {
         constructor(id?: string);
         self(): this;
         _init(): void;
-        init(snapshot: FirebaseFirestore.DocumentSnapshot): void;
+        init(snapshot: FirebaseFirestore.DocumentSnapshot | DeltaDocumentSnapshot): void;
         getVersion(): number;
         getModelName(): string;
         getPath(): string;
