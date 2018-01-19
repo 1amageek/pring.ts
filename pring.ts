@@ -1,4 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
+import * as FirebaseFunctions from 'firebase-functions'
 import "reflect-metadata"
 
 const propertyMetadataKey = "property"//Symbol("property")
@@ -39,7 +40,7 @@ export module Pring {
         reference: FirebaseFirestore.DocumentReference
         createdAt: Date
         updatedAt: Date
-        init(snapshot: FirebaseFirestore.DocumentSnapshot)
+        init(snapshot: FirebaseFirestore.DocumentSnapshot | FirebaseFunctions.firestore.DeltaDocumentSnapshot)
         getVersion(): number
         getModelName(): string
         getPath(): string
@@ -125,7 +126,7 @@ export module Pring {
             }
         }
 
-        init(snapshot: FirebaseFirestore.DocumentSnapshot) {
+        init(snapshot: FirebaseFirestore.DocumentSnapshot | FirebaseFunctions.firestore.DeltaDocumentSnapshot) {
             // ID
             let id = snapshot.id
             Object.defineProperty(this, "id", {
