@@ -2,11 +2,11 @@ process.env.NODE_ENV = 'test';
 
 import { Pring } from "../pring"
 import * as FirebaseFirestore from '@google-cloud/firestore'
-import { Document } from './document.test'
+import { Document } from './document'
 
 Pring.initialize({
-    projectId: 'sandbox-329fc',
-    keyFilename: './sandbox-329fc-firebase-adminsdk-8kgnw-3a2693f6cb.json'
+    projectId: 'salada-f825d',
+    keyFilename: './salada-f825d-firebase-adminsdk-19k25-ded6604978.json'
 })
 
 describe("SubCollection pack", () => {
@@ -33,6 +33,7 @@ describe("SubCollection pack", () => {
         doc1.referenceCollection.insert(doc2)
         doc1.referenceCollection.insert(doc2_other)
         await doc0.save()
+        await doc1.update()
     });
 
     describe("ReferenceCollection", async () => {
@@ -42,8 +43,8 @@ describe("SubCollection pack", () => {
                 try {
                     const doc: Document = await Document.get(doc0_id) as Document
                     expect(doc).not.toBeNull()
-                    expect(doc.referenceCollection.count()).toEqual(3)
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -53,6 +54,7 @@ describe("SubCollection pack", () => {
                     const doc = await Document.get(doc1_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -62,6 +64,7 @@ describe("SubCollection pack", () => {
                     const doc = await Document.get(doc2_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -71,6 +74,7 @@ describe("SubCollection pack", () => {
                     const doc = await Document.get(doc1_other_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -80,6 +84,7 @@ describe("SubCollection pack", () => {
                     const doc = await Document.get(doc2_other_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -93,6 +98,7 @@ describe("SubCollection pack", () => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -104,6 +110,7 @@ describe("SubCollection pack", () => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -115,6 +122,7 @@ describe("SubCollection pack", () => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -128,6 +136,7 @@ describe("SubCollection pack", () => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -139,6 +148,7 @@ describe("SubCollection pack", () => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -150,6 +160,7 @@ describe("SubCollection pack", () => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })

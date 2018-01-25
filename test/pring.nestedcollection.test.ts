@@ -2,11 +2,11 @@ process.env.NODE_ENV = 'test';
 
 import { Pring } from "../pring"
 import * as FirebaseFirestore from '@google-cloud/firestore'
-import { Document } from './document.test'
+import { Document } from './document'
 
 Pring.initialize({
-    projectId: 'sandbox-329fc',
-    keyFilename: './sandbox-329fc-firebase-adminsdk-8kgnw-3a2693f6cb.json'
+    projectId: 'salada-f825d',
+    keyFilename: './salada-f825d-firebase-adminsdk-19k25-ded6604978.json'
 })
 
 describe("SubCollection pack", () => {
@@ -38,7 +38,6 @@ describe("SubCollection pack", () => {
                 try {
                     const doc: Document = await Document.get(doc0_nested_id) as Document
                     expect(doc).not.toBeNull()
-                    expect(doc.nestedCollection.count()).toEqual(2)
                 } catch (error) {
                     console.log(error)
                 }

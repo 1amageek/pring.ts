@@ -1,4 +1,14 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -36,6 +46,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var FirebaseFirestore = require("@google-cloud/firestore");
+var UUID = require("uuid");
 require("reflect-metadata");
 var propertyMetadataKey = "property"; //Symbol("property")
 exports.property = function (target, propertyKey) {
@@ -138,7 +149,10 @@ var Pring;
                     if (isCollection(descriptor.value)) {
                         var collection = descriptor.value;
                         collection.setParent(this, key);
-                        collection.setValue(value, key);
+                        if (isValuable(collection)) {
+                            var v = descriptor.value;
+                            v.setValue(value, key);
+                        }
                     }
                     else {
                         Object.defineProperty(this, key, {
@@ -191,8 +205,10 @@ var Pring;
                 if (descriptor) {
                     var value = descriptor.value;
                     if (isCollection(value)) {
-                        var collection = value;
-                        values[key] = collection.value();
+                        if (isValuable(value)) {
+                            var collection = value;
+                            values[key] = collection.value();
+                        }
                     }
                     else if (isFile(value)) {
                         var file = value;
@@ -258,9 +274,29 @@ var Pring;
                     return batch;
             }
         };
+        Base.prototype.batch = function (type, batchID) {
+            if (batchID == this.batchID) {
+                return;
+            }
+            this.batchID = batchID;
+            var properties = this.getProperties();
+            this.isSaved = true;
+            for (var prop in properties) {
+                var key = properties[prop];
+                var descriptor = Object.getOwnPropertyDescriptor(this, key);
+                if (descriptor) {
+                    var value = descriptor.value;
+                    if (isCollection(value)) {
+                        var collection = value;
+                        collection.setParent(this, key);
+                        collection.batch(type, batchID);
+                    }
+                }
+            }
+        };
         Base.prototype.save = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var batch, result, properties, prop, key, descriptor, value, collection, error_2;
+                var batch, result, error_2;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -272,19 +308,7 @@ var Pring;
                             return [4 /*yield*/, batch.commit()];
                         case 2:
                             result = _a.sent();
-                            this.isSaved = true;
-                            properties = this.getProperties();
-                            for (prop in properties) {
-                                key = properties[prop];
-                                descriptor = Object.getOwnPropertyDescriptor(this, key);
-                                if (descriptor) {
-                                    value = descriptor.value;
-                                    if (isCollection(value)) {
-                                        collection = value;
-                                        collection.didSaved();
-                                    }
-                                }
-                            }
+                            this.batch(BatchType.save, UUID.v4());
                             return [2 /*return*/, result];
                         case 3:
                             error_2 = _a.sent();
@@ -295,51 +319,334 @@ var Pring;
             });
         };
         Base.prototype.update = function () {
-            return this.reference.update(this.value());
+            return __awaiter(this, void 0, void 0, function () {
+                var batch, result, error_3;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this._init();
+                            batch = this.pack(BatchType.update);
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, batch.commit()];
+                        case 2:
+                            result = _a.sent();
+                            this.batch(BatchType.update, UUID.v4());
+                            return [2 /*return*/, result];
+                        case 3:
+                            error_3 = _a.sent();
+                            throw error_3;
+                        case 4: return [2 /*return*/];
+                    }
+                });
+            });
         };
         Base.prototype["delete"] = function () {
-            return this.reference["delete"]();
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.reference["delete"]()];
+                        case 1: return [2 /*return*/, _a.sent()];
+                    }
+                });
+            });
+        };
+        Base.prototype.fetch = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var snapshot, error_4;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 1:
+                            snapshot = _a.sent();
+                            this.init(snapshot);
+                            return [3 /*break*/, 3];
+                        case 2:
+                            error_4 = _a.sent();
+                            throw error_4;
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
         };
         return Base;
     }());
     Pring.Base = Base;
     function isCollection(arg) {
-        return (arg instanceof ReferenceCollection) || (arg instanceof NestedCollection);
+        return (arg instanceof SubCollection) ||
+            (arg instanceof NestedCollection) ||
+            (arg instanceof ReferenceCollection) ||
+            (arg instanceof CountableNestedCollection) ||
+            (arg instanceof CountableReferenceCollection);
+    }
+    function isValuable(arg) {
+        return (arg instanceof CountableNestedCollection) ||
+            (arg instanceof CountableReferenceCollection);
     }
     function isFile(arg) {
         return (arg instanceof File);
     }
-    var ReferenceCollection = /** @class */ (function () {
-        function ReferenceCollection(parent) {
+    var SubCollection = /** @class */ (function () {
+        function SubCollection(parent) {
             this.objects = [];
-            this._count = 0;
+            this._insertions = [];
+            this._deletions = [];
             this.parent = parent;
             parent._init();
         }
-        ReferenceCollection.prototype.isSaved = function () {
+        SubCollection.prototype.isSaved = function () {
             return this.parent.isSaved;
         };
-        ReferenceCollection.prototype.setParent = function (parent, key) {
+        SubCollection.prototype.setParent = function (parent, key) {
             this.parent = parent;
             this.key = key;
             this.path = this.getPath();
             this.reference = this.getReference();
         };
-        ReferenceCollection.prototype.didSaved = function () {
-            this._count = this.objects.length;
-            this.forEach(function (value) {
-                value.isSaved = true;
-            });
-        };
-        ReferenceCollection.prototype.getPath = function () {
+        SubCollection.prototype.getPath = function () {
             return this.parent.path + "/" + this.key;
         };
-        ReferenceCollection.prototype.getReference = function () {
+        SubCollection.prototype.getReference = function () {
             return firestore.collection(this.getPath());
         };
-        ReferenceCollection.prototype.insert = function (newMember) {
+        SubCollection.prototype.insert = function (newMember) {
+            this.parent._init();
+            newMember.reference = this.reference.doc(newMember.id);
+            this.objects.push(newMember);
+            if (this.isSaved()) {
+                this._insertions.push(newMember);
+            }
+        };
+        SubCollection.prototype["delete"] = function (member) {
+            var _this = this;
+            this.parent._init();
+            this.objects.some(function (v, i) {
+                if (v.id == member.id) {
+                    _this.objects.splice(i, 1);
+                    return true;
+                }
+                return false;
+            });
+            if (this.isSaved()) {
+                this._deletions.push(member);
+            }
+            member.reference = member.getReference();
+        };
+        SubCollection.prototype.get = function (type) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_1, key_1, count, batch, collectionReference, value, error_3;
+                var snapshot, docs, documents, error_5;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.parent._init();
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 2:
+                            snapshot = _a.sent();
+                            docs = snapshot.docs;
+                            documents = docs.map(function (snapshot) {
+                                var document = new type();
+                                document.init(snapshot);
+                                return document;
+                            });
+                            this.objects = documents;
+                            return [2 /*return*/, documents];
+                        case 3:
+                            error_5 = _a.sent();
+                            throw error_5;
+                        case 4: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        SubCollection.prototype.contains = function (id) {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    this.parent._init();
+                    return [2 /*return*/, new Promise(function (resolve, reject) {
+                            _this.reference.doc(id).get().then(function (snapshot) {
+                                resolve(snapshot.exists);
+                            })["catch"](function (error) {
+                                reject(error);
+                            });
+                        })];
+                });
+            });
+        };
+        SubCollection.prototype.forEach = function (callbackfn, thisArg) {
+            this.parent._init();
+            this.objects.forEach(callbackfn);
+        };
+        SubCollection.prototype.pack = function (type, batch) {
+            var _this = this;
+            var batch = batch || firestore.batch();
+            var self = this;
+            switch (type) {
+                case BatchType.save:
+                    this.forEach(function (document) {
+                        var doc = document;
+                        var reference = self.reference.doc(document.id);
+                        batch.set(reference, document.value());
+                    });
+                    return batch;
+                case BatchType.update:
+                    var insertions = this._insertions.filter(function (item) { return _this._deletions.indexOf(item) < 0; });
+                    insertions.forEach(function (document) {
+                        var reference = self.reference.doc(document.id);
+                        batch.set(reference, document.value());
+                    });
+                    var deletions = this._deletions.filter(function (item) { return _this._insertions.indexOf(item) < 0; });
+                    deletions.forEach(function (document) {
+                        var reference = self.reference.doc(document.id);
+                        batch["delete"](reference);
+                    });
+                    return batch;
+                case BatchType["delete"]:
+                    this.forEach(function (document) {
+                        var reference = self.reference.doc(document.id);
+                        batch["delete"](reference);
+                    });
+                    return batch;
+            }
+        };
+        SubCollection.prototype.batch = function (type, batchID) {
+            this.forEach(function (document) {
+                document.batch(type, batchID);
+            });
+        };
+        return SubCollection;
+    }());
+    Pring.SubCollection = SubCollection;
+    var NestedCollection = /** @class */ (function (_super) {
+        __extends(NestedCollection, _super);
+        function NestedCollection() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return NestedCollection;
+    }(SubCollection));
+    Pring.NestedCollection = NestedCollection;
+    var ReferenceCollection = /** @class */ (function (_super) {
+        __extends(ReferenceCollection, _super);
+        function ReferenceCollection() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ReferenceCollection.prototype.insert = function (newMember) {
+            this.parent._init();
+            newMember.reference = this.reference.doc(newMember.id);
+            this.objects.push(newMember);
+            if (this.isSaved()) {
+                this._insertions.push(newMember);
+            }
+        };
+        ReferenceCollection.prototype["delete"] = function (member) {
+            var _this = this;
+            this.parent._init();
+            this.objects.some(function (v, i) {
+                if (v.id == member.id) {
+                    _this.objects.splice(i, 1);
+                    return true;
+                }
+                return false;
+            });
+            if (this.isSaved()) {
+                this._deletions.push(member);
+            }
+            member.reference = member.getReference();
+        };
+        ReferenceCollection.prototype.pack = function (type, batch) {
+            var _this = this;
+            var batch = batch || firestore.batch();
+            var self = this;
+            switch (type) {
+                case BatchType.save:
+                    this.forEach(function (document) {
+                        var doc = document;
+                        var reference = self.reference.doc(document.id);
+                        batch.set(reference, document.value());
+                    });
+                    return batch;
+                case BatchType.update:
+                    var insertions = this._insertions.filter(function (item) { return _this._deletions.indexOf(item) < 0; });
+                    insertions.forEach(function (document) {
+                        var reference = self.reference.doc(document.id);
+                        batch.set(reference, document.value());
+                    });
+                    var deletions = this._deletions.filter(function (item) { return _this._insertions.indexOf(item) < 0; });
+                    deletions.forEach(function (document) {
+                        var reference = self.reference.doc(document.id);
+                        batch["delete"](reference);
+                    });
+                    return batch;
+                case BatchType["delete"]:
+                    this.forEach(function (document) {
+                        var reference = self.reference.doc(document.id);
+                        batch["delete"](reference);
+                    });
+                    return batch;
+            }
+        };
+        ReferenceCollection.prototype.get = function (type) {
+            return __awaiter(this, void 0, void 0, function () {
+                var snapshot, docs, documents, error_6;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.parent._init();
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, this.reference.get()];
+                        case 2:
+                            snapshot = _a.sent();
+                            docs = snapshot.docs;
+                            documents = docs.map(function (snapshot) {
+                                var document = new type(snapshot.id);
+                                return document;
+                            });
+                            this.objects = documents;
+                            return [2 /*return*/, documents];
+                        case 3:
+                            error_6 = _a.sent();
+                            throw error_6;
+                        case 4: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        return ReferenceCollection;
+    }(SubCollection));
+    Pring.ReferenceCollection = ReferenceCollection;
+    var CountableReferenceCollection = /** @class */ (function () {
+        function CountableReferenceCollection(parent) {
+            this.objects = [];
+            this._count = 0;
+            this.parent = parent;
+            parent._init();
+        }
+        CountableReferenceCollection.prototype.isSaved = function () {
+            return this.parent.isSaved;
+        };
+        CountableReferenceCollection.prototype.setParent = function (parent, key) {
+            this.parent = parent;
+            this.key = key;
+            this.path = this.getPath();
+            this.reference = this.getReference();
+        };
+        CountableReferenceCollection.prototype.getPath = function () {
+            return this.parent.path + "/" + this.key;
+        };
+        CountableReferenceCollection.prototype.getReference = function () {
+            return firestore.collection(this.getPath());
+        };
+        CountableReferenceCollection.prototype.insert = function (newMember) {
+            return __awaiter(this, void 0, void 0, function () {
+                var reference, parentRef_1, key_1, count, batch, collectionReference, value, error_7;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -367,7 +674,6 @@ var Pring;
                             this._count = count;
                             batch = firestore.batch();
                             collectionReference = this.reference.doc(newMember.id);
-                            console.log(collectionReference.path);
                             value = {
                                 createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                                 updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
@@ -375,8 +681,8 @@ var Pring;
                             batch.create(collectionReference, value);
                             return [2 /*return*/, batch.update(reference, newMember.value()).commit()];
                         case 3:
-                            error_3 = _a.sent();
-                            return [2 /*return*/, error_3];
+                            error_7 = _a.sent();
+                            return [2 /*return*/, error_7];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.push(newMember);
@@ -386,9 +692,9 @@ var Pring;
                 });
             });
         };
-        ReferenceCollection.prototype.merge = function (newMembers) {
+        CountableReferenceCollection.prototype.merge = function (newMembers) {
             return __awaiter(this, void 0, void 0, function () {
-                var length_1, parentRef_2, key_2, count, result, batch, i, newMember, reference, error_4;
+                var length_1, parentRef_2, key_2, count, result, batch, i, newMember, reference, error_8;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -428,8 +734,8 @@ var Pring;
                             }
                             return [2 /*return*/, batch.commit()];
                         case 3:
-                            error_4 = _a.sent();
-                            return [2 /*return*/, error_4];
+                            error_8 = _a.sent();
+                            return [2 /*return*/, error_8];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.concat(newMembers);
@@ -439,7 +745,7 @@ var Pring;
                 });
             });
         };
-        ReferenceCollection.prototype["delete"] = function (member) {
+        CountableReferenceCollection.prototype["delete"] = function (member) {
             var _this = this;
             this.parent._init();
             if (this.isSaved()) {
@@ -479,10 +785,10 @@ var Pring;
                 });
             }
         };
-        ReferenceCollection.prototype.deleteAll = function () {
+        CountableReferenceCollection.prototype.deleteAll = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
-                var snapshot, docs, batch_1, key_4, parentRef_4, result, error_5;
+                var snapshot, docs, batch_1, key_4, parentRef_4, result, error_9;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -516,16 +822,16 @@ var Pring;
                             this._count = 0;
                             return [2 /*return*/, result];
                         case 5:
-                            error_5 = _a.sent();
-                            throw error_5;
+                            error_9 = _a.sent();
+                            throw error_9;
                         case 6: return [2 /*return*/];
                     }
                 });
             });
         };
-        ReferenceCollection.prototype.get = function (type) {
+        CountableReferenceCollection.prototype.get = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var snapshot, docs, documents, error_6;
+                var snapshot, docs, error_10;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -537,22 +843,16 @@ var Pring;
                         case 2:
                             snapshot = _a.sent();
                             docs = snapshot.docs;
-                            documents = docs.map(function (snapshot) {
-                                var document = new type();
-                                document.init(snapshot);
-                                return document;
-                            });
-                            this.objects = documents;
-                            return [2 /*return*/, documents];
+                            return [2 /*return*/, docs];
                         case 3:
-                            error_6 = _a.sent();
-                            throw error_6;
+                            error_10 = _a.sent();
+                            throw error_10;
                         case 4: return [2 /*return*/];
                     }
                 });
             });
         };
-        ReferenceCollection.prototype.contains = function (id) {
+        CountableReferenceCollection.prototype.contains = function (id) {
             var _this = this;
             this.parent._init();
             return new Promise(function (resolve, reject) {
@@ -563,20 +863,20 @@ var Pring;
                 });
             });
         };
-        ReferenceCollection.prototype.forEach = function (callbackfn, thisArg) {
+        CountableReferenceCollection.prototype.forEach = function (callbackfn, thisArg) {
             this.parent._init();
             this.objects.forEach(callbackfn);
         };
-        ReferenceCollection.prototype.count = function () {
+        CountableReferenceCollection.prototype.count = function () {
             return this.isSaved() ? this._count : this.objects.length;
         };
-        ReferenceCollection.prototype.value = function () {
+        CountableReferenceCollection.prototype.value = function () {
             return { "count": this.count() };
         };
-        ReferenceCollection.prototype.setValue = function (value, key) {
+        CountableReferenceCollection.prototype.setValue = function (value, key) {
             this._count = value["count"] || 0;
         };
-        ReferenceCollection.prototype.pack = function (type, batch) {
+        CountableReferenceCollection.prototype.pack = function (type, batch) {
             var batch = batch || firestore.batch();
             var self = this;
             switch (type) {
@@ -636,40 +936,39 @@ var Pring;
                     return batch;
             }
         };
-        return ReferenceCollection;
+        CountableReferenceCollection.prototype.batch = function (type, batchID) {
+            this.forEach(function (document) {
+                document.batch(type, batchID);
+            });
+        };
+        return CountableReferenceCollection;
     }());
-    Pring.ReferenceCollection = ReferenceCollection;
-    var NestedCollection = /** @class */ (function () {
-        function NestedCollection(parent) {
+    Pring.CountableReferenceCollection = CountableReferenceCollection;
+    var CountableNestedCollection = /** @class */ (function () {
+        function CountableNestedCollection(parent) {
             this.objects = [];
             this._count = 0;
             this.parent = parent;
             parent._init();
         }
-        NestedCollection.prototype.isSaved = function () {
+        CountableNestedCollection.prototype.isSaved = function () {
             return this.parent.isSaved;
         };
-        NestedCollection.prototype.setParent = function (parent, key) {
+        CountableNestedCollection.prototype.setParent = function (parent, key) {
             this.parent = parent;
             this.key = key;
             this.path = this.getPath();
             this.reference = this.getReference();
         };
-        NestedCollection.prototype.didSaved = function () {
-            this._count = this.objects.length;
-            this.forEach(function (value) {
-                value.isSaved = true;
-            });
-        };
-        NestedCollection.prototype.getPath = function () {
+        CountableNestedCollection.prototype.getPath = function () {
             return this.parent.path + "/" + this.key;
         };
-        NestedCollection.prototype.getReference = function () {
+        CountableNestedCollection.prototype.getReference = function () {
             return firestore.collection(this.getPath());
         };
-        NestedCollection.prototype.insert = function (newMember) {
+        CountableNestedCollection.prototype.insert = function (newMember) {
             return __awaiter(this, void 0, void 0, function () {
-                var reference, parentRef_5, key_5, count, result, batch, value, error_7;
+                var reference, parentRef_5, key_5, count, result, batch, value, error_11;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -701,8 +1000,8 @@ var Pring;
                             batch.create(reference, value).commit();
                             return [3 /*break*/, 4];
                         case 3:
-                            error_7 = _a.sent();
-                            return [2 /*return*/, error_7];
+                            error_11 = _a.sent();
+                            return [2 /*return*/, error_11];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.push(newMember);
@@ -712,9 +1011,9 @@ var Pring;
                 });
             });
         };
-        NestedCollection.prototype.merge = function (newMembers) {
+        CountableNestedCollection.prototype.merge = function (newMembers) {
             return __awaiter(this, void 0, void 0, function () {
-                var length_2, parentRef_6, key_6, count, result, batch, i, newMember, reference, error_8;
+                var length_2, parentRef_6, key_6, count, result, batch, i, newMember, reference, error_12;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -754,8 +1053,8 @@ var Pring;
                             }
                             return [2 /*return*/, batch.commit()];
                         case 3:
-                            error_8 = _a.sent();
-                            return [2 /*return*/, error_8];
+                            error_12 = _a.sent();
+                            return [2 /*return*/, error_12];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.concat(newMembers);
@@ -765,10 +1064,10 @@ var Pring;
                 });
             });
         };
-        NestedCollection.prototype["delete"] = function (member) {
+        CountableNestedCollection.prototype["delete"] = function (member) {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
-                var reference, parentRef_7, key_7, count, result, batch, error_9;
+                var reference, parentRef_7, key_7, count, result, batch, error_13;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -797,8 +1096,8 @@ var Pring;
                             batch = firestore.batch();
                             return [2 /*return*/, batch["delete"](reference).commit()];
                         case 3:
-                            error_9 = _a.sent();
-                            return [2 /*return*/, error_9];
+                            error_13 = _a.sent();
+                            return [2 /*return*/, error_13];
                         case 4: return [3 /*break*/, 6];
                         case 5:
                             this.objects.some(function (v, i) {
@@ -814,10 +1113,10 @@ var Pring;
                 });
             });
         };
-        NestedCollection.prototype.deleteAll = function () {
+        CountableNestedCollection.prototype.deleteAll = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
-                var snapshot, docs, batch_2, key_8, parentRef_8, result, error_10;
+                var snapshot, docs, batch_2, key_8, parentRef_8, result, error_14;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -851,16 +1150,16 @@ var Pring;
                             this._count = 0;
                             return [2 /*return*/, result];
                         case 5:
-                            error_10 = _a.sent();
-                            throw error_10;
+                            error_14 = _a.sent();
+                            throw error_14;
                         case 6: return [2 /*return*/];
                     }
                 });
             });
         };
-        NestedCollection.prototype.get = function (type) {
+        CountableNestedCollection.prototype.get = function (type) {
             return __awaiter(this, void 0, void 0, function () {
-                var snapshot, docs, documents, error_11;
+                var snapshot, docs, documents, error_15;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -880,14 +1179,14 @@ var Pring;
                             this.objects = documents;
                             return [2 /*return*/, documents];
                         case 3:
-                            error_11 = _a.sent();
-                            throw error_11;
+                            error_15 = _a.sent();
+                            throw error_15;
                         case 4: return [2 /*return*/];
                     }
                 });
             });
         };
-        NestedCollection.prototype.contains = function (id) {
+        CountableNestedCollection.prototype.contains = function (id) {
             var _this = this;
             this.parent._init();
             return new Promise(function (resolve, reject) {
@@ -898,20 +1197,20 @@ var Pring;
                 });
             });
         };
-        NestedCollection.prototype.forEach = function (callbackfn, thisArg) {
+        CountableNestedCollection.prototype.forEach = function (callbackfn, thisArg) {
             this.parent._init();
             this.objects.forEach(callbackfn);
         };
-        NestedCollection.prototype.count = function () {
+        CountableNestedCollection.prototype.count = function () {
             return this.isSaved() ? this._count : this.objects.length;
         };
-        NestedCollection.prototype.value = function () {
+        CountableNestedCollection.prototype.value = function () {
             return { "count": this.count() };
         };
-        NestedCollection.prototype.setValue = function (value, key) {
+        CountableNestedCollection.prototype.setValue = function (value, key) {
             this._count = value["count"] || 0;
         };
-        NestedCollection.prototype.pack = function (type, batch) {
+        CountableNestedCollection.prototype.pack = function (type, batch) {
             var batch = batch || firestore.batch();
             var self = this;
             switch (type) {
@@ -943,9 +1242,14 @@ var Pring;
                     return batch;
             }
         };
-        return NestedCollection;
+        CountableNestedCollection.prototype.batch = function (type, batchID) {
+            this.forEach(function (document) {
+                document.batch(type, batchID);
+            });
+        };
+        return CountableNestedCollection;
     }());
-    Pring.NestedCollection = NestedCollection;
+    Pring.CountableNestedCollection = CountableNestedCollection;
     var File = /** @class */ (function () {
         function File(name, url, mimeType) {
             this.name = name;
