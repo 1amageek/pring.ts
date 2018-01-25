@@ -1,4 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
+import * as UUID from 'uuid'
 import { DeltaDocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 import "reflect-metadata"
 
@@ -9,7 +10,7 @@ export const property = <T extends Pring.Document>(target: T, propertyKey) => {
     properties.push(propertyKey)
     Reflect.defineMetadata(propertyMetadataKey, properties, target)
 }
-  
+
 var firestore: FirebaseFirestore.Firestore
 export module Pring {
 
@@ -24,7 +25,9 @@ export module Pring {
     }
 
     export interface Batchable {
+        batchID?: string
         pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch
+        batch(type: BatchType, batchID: string)
     }
 
     export interface ValueProtocol {
@@ -99,6 +102,8 @@ export module Pring {
 
         public isLocalSaved: Boolean = false
 
+        public batchID?: string
+
         constructor(id?: string) {
             this.version = this.getVersion()
             this.modelName = this.getModelName()
@@ -119,7 +124,7 @@ export module Pring {
                 if (descriptor) {
                     const value = descriptor.value
                     if (isCollection(value)) {
-                        let collection: SubCollection = value as SubCollection
+                        let collection: AnySubCollection = value as AnySubCollection
                         collection.setParent(this, key)
                     }
                 }
@@ -139,31 +144,35 @@ export module Pring {
             let properties = this.getProperties()
             let data = snapshot.data()
 
-            for (var prop in properties) {
-                let key = properties[prop]
-                let descriptor = Object.getOwnPropertyDescriptor(this, key)
-                let value = data[key]
-                if (descriptor) {
-                    if (isCollection(descriptor.value)) {
-                        let collection: SubCollection = descriptor.value as SubCollection
-                        collection.setParent(this, key)
-                        collection.setValue(value, key)
+            if (data) {
+                for (var key of properties) {
+                    let descriptor = Object.getOwnPropertyDescriptor(this, key)
+                    let value = data[key]
+                    if (descriptor) {                    
+                        if (isCollection(descriptor.value)) {
+                            let collection: AnySubCollection = descriptor.value as AnySubCollection
+                            collection.setParent(this, key)
+                            if (isValuable(collection)) {
+                                let v: ValueProtocol = descriptor.value as ValueProtocol
+                                v.setValue(value, key)
+                            }
+                        } else {
+                            Object.defineProperty(this, key, {
+                                value: value,
+                                writable: true,
+                                enumerable: true,
+                                configurable: true
+                            })
+                        }
                     } else {
-                        Object.defineProperty(this, key, {
-                            value: value,
-                            writable: true,
-                            enumerable: true,
-                            configurable: true
-                        })
-                    }
-                } else {
-                    if (value) {
-                        Object.defineProperty(this, key, {
-                            value: value,
-                            writable: true,
-                            enumerable: true,
-                            configurable: true
-                        })
+                        if (value) {
+                            Object.defineProperty(this, key, {
+                                value: value,
+                                writable: true,
+                                enumerable: true,
+                                configurable: true
+                            })
+                        }
                     }
                 }
             }
@@ -207,8 +216,10 @@ export module Pring {
                 if (descriptor) {
                     let value = descriptor.value
                     if (isCollection(value)) {
-                        let collection: ValueProtocol = value as ValueProtocol
-                        values[key] = collection.value()
+                        if (isValuable(value)) {
+                            let collection: ValueProtocol = value as ValueProtocol
+                            values[key] = collection.value()
+                        }
                     } else if (isFile(value)) {
                         let file: ValueProtocol = value as ValueProtocol
                         values[key] = file.value()
@@ -244,7 +255,7 @@ export module Pring {
                         if (descriptor) {
                             let value = descriptor.value
                             if (isCollection(value)) {
-                                var collection: SubCollection = value as SubCollection
+                                var collection: AnySubCollection = value as AnySubCollection
                                 collection.setParent(this, key)
                                 var batchable: Batchable = value as Batchable
                                 batchable.pack(BatchType.save, batch)
@@ -260,7 +271,7 @@ export module Pring {
                         if (descriptor) {
                             let value = descriptor.value
                             if (isCollection(value)) {
-                                var collection: SubCollection = value as SubCollection
+                                var collection: AnySubCollection = value as AnySubCollection
                                 collection.setParent(this, key)
                                 var batchable: Batchable = value as Batchable
                                 batchable.pack(BatchType.update, batch)
@@ -274,56 +285,90 @@ export module Pring {
             }
         }
 
+        batch(type: BatchType, batchID: string) {
+            if (batchID == this.batchID) {
+                return
+            }
+            this.batchID = batchID
+            const properties = this.getProperties()
+            this.isSaved = true
+            for (var prop in properties) {
+                let key = properties[prop]
+                let descriptor = Object.getOwnPropertyDescriptor(this, key)
+                if (descriptor) {
+                    let value = descriptor.value
+                    if (isCollection(value)) {
+                        var collection: AnySubCollection = value as AnySubCollection
+                        collection.setParent(this, key)
+                        collection.batch(type, batchID)
+                    }
+                }
+            }
+        }
+
         async save() {
             this._init()
             var batch = this.pack(BatchType.save)
             try {
                 const result = await batch.commit()
-                this.isSaved = true
-                const properties = this.getProperties()
-                for (var prop in properties) {
-                    let key = properties[prop]
-                    let descriptor = Object.getOwnPropertyDescriptor(this, key)
-                    if (descriptor) {
-                        let value = descriptor.value
-                        if (isCollection(value)) {
-                            var collection: SubCollection = value as SubCollection
-                            collection.didSaved()
-                        }
-                    }
-                }
+                this.batch(BatchType.save, UUID.v4())
                 return result
             } catch (error) {
                 throw error
             }
         }
 
-        update(): Promise<FirebaseFirestore.WriteResult> {
-            return this.reference.update(this.value())
+        async update() {
+            this._init()
+            let batch = this.pack(BatchType.update)
+            try {
+                const result = await batch.commit()
+                this.batch(BatchType.update, UUID.v4())
+                return result
+            } catch (error) {
+                throw error
+            }
         }
 
-        delete(): Promise<FirebaseFirestore.WriteResult> {
-            return this.reference.delete()
+        async delete() {
+            return await this.reference.delete()
+        }
+
+        async fetch() {
+            try {
+                const snapshot = await this.reference.get()
+                this.init(snapshot)
+            } catch (error) {
+                throw error
+            }
         }
     }
 
-    export interface SubCollection extends ValueProtocol {
+    export interface AnySubCollection extends Batchable {
         path: string
         reference: FirebaseFirestore.CollectionReference
         key: string
         setParent(parent: Base, key: string)
-        didSaved()
     }
 
     function isCollection(arg): Boolean {
-        return (arg instanceof ReferenceCollection) || (arg instanceof NestedCollection)
+        return (arg instanceof SubCollection) ||
+            (arg instanceof NestedCollection) ||
+            (arg instanceof ReferenceCollection) ||
+            (arg instanceof CountableNestedCollection) ||
+            (arg instanceof CountableReferenceCollection)
+    }
+
+    function isValuable(arg): Boolean {
+        return (arg instanceof CountableNestedCollection) ||
+            (arg instanceof CountableReferenceCollection)
     }
 
     function isFile(arg): Boolean {
         return (arg instanceof File)
     }
 
-    export class ReferenceCollection<T extends Base> implements SubCollection, Batchable {
+    export class SubCollection<T extends Base> implements AnySubCollection {
 
         public path: string
 
@@ -332,6 +377,237 @@ export module Pring {
         public parent: Base
 
         public key: string
+
+        public batchID?: string
+
+        public objects: T[] = []
+
+        constructor(parent: Base) {
+            this.parent = parent
+            parent._init()
+        }
+
+        protected _insertions: T[] = []
+
+        protected _deletions: T[] = []
+
+        isSaved(): Boolean {
+            return this.parent.isSaved
+        }
+
+        setParent(parent: Base, key: string) {
+            this.parent = parent
+            this.key = key
+            this.path = this.getPath()
+            this.reference = this.getReference()
+        }
+
+        getPath(): string {
+            return `${this.parent.path}/${this.key}`
+        }
+
+        getReference(): FirebaseFirestore.CollectionReference {
+            return firestore.collection(this.getPath())
+        }
+
+        insert(newMember: T) {
+            this.parent._init()
+            newMember.reference = this.reference.doc(newMember.id)
+            this.objects.push(newMember)
+            if (this.isSaved()) {
+                this._insertions.push(newMember)
+            }
+        }
+
+        delete(member: T) {
+            this.parent._init()
+            this.objects.some((v, i) => {
+                if (v.id == member.id) {
+                    this.objects.splice(i, 1)
+                    return true
+                }
+                return false
+            })
+            if (this.isSaved()) {
+                this._deletions.push(member)
+            }
+            member.reference = member.getReference()
+        }
+
+        async get(type: { new(): T; }) {
+            this.parent._init()
+            try {
+                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+                const documents: T[] = docs.map((snapshot) => {
+                    let document: T = new type()
+                    document.init(snapshot)
+                    return document
+                })
+                this.objects = documents
+                return documents
+            } catch (error) {
+                throw error
+            }
+        }
+
+        async contains(id: string) {
+            this.parent._init()
+            return new Promise<Boolean>((resolve, reject) => {
+                this.reference.doc(id).get().then((snapshot) => {
+                    resolve(snapshot.exists)
+                }).catch((error) => {
+                    reject(error)
+                })
+            })
+        }
+
+        forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any) {
+            this.parent._init()
+            this.objects.forEach(callbackfn)
+        }
+
+        pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
+            var batch = batch || firestore.batch()
+            const self = this
+            switch (type) {
+                case BatchType.save:
+                    this.forEach(document => {
+                        let doc: T = document as T
+                        let reference = self.reference.doc(document.id)
+                        batch.set(reference, document.value())
+                    })
+                    return batch
+                case BatchType.update:
+                    let insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
+                    insertions.forEach(document => {
+                        let reference = self.reference.doc(document.id)
+                        batch.set(reference, document.value())
+                    })
+                    let deletions = this._deletions.filter(item => this._insertions.indexOf(item) < 0)
+                    deletions.forEach(document => {
+                        let reference = self.reference.doc(document.id)
+                        batch.delete(reference)
+                    })
+                    return batch
+                case BatchType.delete:
+                    this.forEach(document => {
+                        let reference = self.reference.doc(document.id)
+                        batch.delete(reference)
+                    })
+                    return batch
+            }
+        }
+
+        batch(type: BatchType, batchID: string) {
+            this.forEach(document => {
+                document.batch(type, batchID)
+            })
+        }
+    }
+
+
+    export class NestedCollection<T extends Base> extends SubCollection<T> {
+
+    }
+
+    export class ReferenceCollection<T extends Base> extends SubCollection<T> {
+
+        insert(newMember: T) {
+            this.parent._init()
+            this.objects.push(newMember)
+            if (this.isSaved()) {
+                this._insertions.push(newMember)
+            }
+        }
+
+        delete(member: T) {
+            this.parent._init()
+            this.objects.some((v, i) => {
+                if (v.id == member.id) {
+                    this.objects.splice(i, 1)
+                    return true
+                }
+                return false
+            })
+            if (this.isSaved()) {
+                this._deletions.push(member)
+            }
+        }
+
+        pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
+            var batch = batch || firestore.batch()
+            const self = this
+            switch (type) {
+                case BatchType.save:
+                    var value = {
+                        createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
+                        updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
+                    }
+                    this.forEach(document => {
+                        if (!document.isSaved) {
+                            batch.set(document.reference, document.value())
+                        }
+                        let reference = self.reference.doc(document.id)
+                        batch.set(reference, value)
+                    })
+                    return batch
+                case BatchType.update:
+                    let insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
+                    insertions.forEach(document => {
+                        var value = {
+                            updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
+                        }
+                        if (!document.isSaved) {
+                            value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                            batch.set(document.reference, document.value())
+                        }
+                        let reference = self.reference.doc(document.id)
+                        batch.set(reference, value)
+                    })
+                    let deletions = this._deletions.filter(item => this._insertions.indexOf(item) < 0)
+                    deletions.forEach(document => {
+                        let reference = self.reference.doc(document.id)
+                        batch.delete(reference)
+                    })
+                    return batch
+                case BatchType.delete:
+                    this.forEach(document => {
+                        let reference = self.reference.doc(document.id)
+                        batch.delete(reference)
+                    })
+                    return batch
+            }
+        }
+
+        async get(type: { new(id): T; }) {
+            this.parent._init()
+            try {
+                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+                const documents: T[] = docs.map((snapshot) => {
+                    let document: T = new type(snapshot.id)
+                    return document
+                })
+                this.objects = documents
+                return documents
+            } catch (error) {
+                throw error
+            }
+        }
+    }
+
+    export class CountableReferenceCollection<T extends Base> implements AnySubCollection, ValueProtocol, Batchable {
+
+        public path: string
+
+        public reference: FirebaseFirestore.CollectionReference
+
+        public parent: Base
+
+        public key: string
+
+        public batchID?: string
 
         public objects: T[] = []
 
@@ -351,13 +627,6 @@ export module Pring {
             this.key = key
             this.path = this.getPath()
             this.reference = this.getReference()
-        }
-
-        didSaved() {
-            this._count = this.objects.length
-            this.forEach((value) => {
-                value.isSaved = true
-            })
         }
 
         getPath(): string {
@@ -392,7 +661,7 @@ export module Pring {
                         createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
                         updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
                     }
-                    batch.create(collectionReference, value)                                      
+                    batch.create(collectionReference, value)
                     return batch.update(reference, newMember.value()).commit()
                 } catch (error) {
                     return error
@@ -495,15 +764,15 @@ export module Pring {
                         transaction.update(parentRef, { [key]: { "count": 0 } })
                     })
                 })
-                docs.forEach( doc => {
-                    const reference = this.reference.doc(doc.id)                    
+                docs.forEach(doc => {
+                    const reference = this.reference.doc(doc.id)
                     batch.delete(reference)
                 })
                 const result = await batch.commit()
                 this.objects = []
                 this._count = 0
                 return result
-            } catch(error) {
+            } catch (error) {
                 throw error
             }
         }
@@ -512,7 +781,7 @@ export module Pring {
             this.parent._init()
             try {
                 const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
-                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs              
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
                 return docs
             } catch (error) {
                 throw error
@@ -603,9 +872,15 @@ export module Pring {
                     return batch
             }
         }
+
+        batch(type: BatchType, batchID: string) {
+            this.forEach(document => {
+                document.batch(type, batchID)
+            })
+        }
     }
 
-    export class NestedCollection<T extends Base> implements SubCollection, Batchable {
+    export class CountableNestedCollection<T extends Base> implements AnySubCollection, ValueProtocol, Batchable {
 
         public path: string
 
@@ -614,6 +889,8 @@ export module Pring {
         public parent: Base
 
         public key: string
+
+        public batchID?: string
 
         public objects: T[] = []
 
@@ -633,13 +910,6 @@ export module Pring {
             this.key = key
             this.path = this.getPath()
             this.reference = this.getReference()
-        }
-
-        didSaved() {
-            this._count = this.objects.length
-            this.forEach((value) => {
-                value.isSaved = true
-            })
         }
 
         getPath(): string {
@@ -769,15 +1039,15 @@ export module Pring {
                         transaction.update(parentRef, { [key]: { "count": 0 } })
                     })
                 })
-                docs.forEach( doc => {
-                    const reference = this.reference.doc(doc.id)                    
+                docs.forEach(doc => {
+                    const reference = this.reference.doc(doc.id)
                     batch.delete(reference)
                 })
                 const result = await batch.commit()
                 this.objects = []
                 this._count = 0
                 return result
-            } catch(error) {
+            } catch (error) {
                 throw error
             }
         }
@@ -786,7 +1056,7 @@ export module Pring {
             this.parent._init()
             try {
                 const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
-                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs   
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
                 const documents: T[] = docs.map((snapshot) => {
                     let document: T = new type()
                     document.init(snapshot)
@@ -857,6 +1127,12 @@ export module Pring {
                     })
                     return batch
             }
+        }
+
+        batch(type: BatchType, batchID: string) {
+            this.forEach(document => {
+                document.batch(type, batchID)
+            })
         }
     }
 
