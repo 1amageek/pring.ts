@@ -144,34 +144,35 @@ export module Pring {
             let properties = this.getProperties()
             let data = snapshot.data()
 
-            for (var prop in properties) {
-                let key = properties[prop]
-                let descriptor = Object.getOwnPropertyDescriptor(this, key)
-                let value = data[key]
-                if (descriptor) {
-                    if (isCollection(descriptor.value)) {
-                        let collection: AnySubCollection = descriptor.value as AnySubCollection
-                        collection.setParent(this, key)
-                        if (isValuable(collection)) {
-                            let v: ValueProtocol = descriptor.value as ValueProtocol
-                            v.setValue(value, key)
+            if (data) {
+                for (var key of properties) {
+                    let descriptor = Object.getOwnPropertyDescriptor(this, key)
+                    let value = data[key]
+                    if (descriptor) {                    
+                        if (isCollection(descriptor.value)) {
+                            let collection: AnySubCollection = descriptor.value as AnySubCollection
+                            collection.setParent(this, key)
+                            if (isValuable(collection)) {
+                                let v: ValueProtocol = descriptor.value as ValueProtocol
+                                v.setValue(value, key)
+                            }
+                        } else {
+                            Object.defineProperty(this, key, {
+                                value: value,
+                                writable: true,
+                                enumerable: true,
+                                configurable: true
+                            })
                         }
                     } else {
-                        Object.defineProperty(this, key, {
-                            value: value,
-                            writable: true,
-                            enumerable: true,
-                            configurable: true
-                        })
-                    }
-                } else {
-                    if (value) {
-                        Object.defineProperty(this, key, {
-                            value: value,
-                            writable: true,
-                            enumerable: true,
-                            configurable: true
-                        })
+                        if (value) {
+                            Object.defineProperty(this, key, {
+                                value: value,
+                                writable: true,
+                                enumerable: true,
+                                configurable: true
+                            })
+                        }
                     }
                 }
             }
@@ -514,7 +515,6 @@ export module Pring {
 
         insert(newMember: T) {
             this.parent._init()
-            newMember.reference = this.reference.doc(newMember.id)
             this.objects.push(newMember)
             if (this.isSaved()) {
                 this._insertions.push(newMember)
@@ -533,7 +533,6 @@ export module Pring {
             if (this.isSaved()) {
                 this._deletions.push(member)
             }
-            member.reference = member.getReference()
         }
 
         pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
@@ -541,17 +540,30 @@ export module Pring {
             const self = this
             switch (type) {
                 case BatchType.save:
+                    var value = {
+                        createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
+                        updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
+                    }
                     this.forEach(document => {
-                        let doc: T = document as T
+                        if (!document.isSaved) {
+                            batch.set(document.reference, document.value())
+                        }
                         let reference = self.reference.doc(document.id)
-                        batch.set(reference, document.value())
+                        batch.set(reference, value)
                     })
                     return batch
                 case BatchType.update:
                     let insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
                     insertions.forEach(document => {
+                        var value = {
+                            updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
+                        }
+                        if (!document.isSaved) {
+                            value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                            batch.set(document.reference, document.value())
+                        }
                         let reference = self.reference.doc(document.id)
-                        batch.set(reference, document.value())
+                        batch.set(reference, value)
                     })
                     let deletions = this._deletions.filter(item => this._insertions.indexOf(item) < 0)
                     deletions.forEach(document => {

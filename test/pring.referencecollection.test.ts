@@ -37,12 +37,15 @@ describe("SubCollection pack", () => {
     });
 
     describe("ReferenceCollection", async () => {
+
         describe("Get ReferenceCollection's document", async () => {
 
             test("Root document", async () => {
                 try {
                     const doc: Document = await Document.get(doc0_id) as Document
                     expect(doc).not.toBeNull()
+                    expect(doc0.isSaved).toEqual(true)
+                    expect(doc1.isSaved).toEqual(true)
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -51,6 +54,7 @@ describe("SubCollection pack", () => {
     
             test("doc0's ReferenceCollection", async () => {
                 try {
+                    console.log(doc1_id)
                     const doc = await Document.get(doc1_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
@@ -93,7 +97,7 @@ describe("SubCollection pack", () => {
         describe("Document get reference", async () => {
             test("doc 1 reference", async () => {
                 try {
-                    const docs = await new Document(doc0_id).referenceCollection.get() 
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document) 
                     expect( docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
@@ -105,7 +109,7 @@ describe("SubCollection pack", () => {
     
             test("doc 2 reference", async () => {
                 try {
-                    const docs = await new Document(doc1_id).referenceCollection.get() 
+                    const docs = await new Document(doc1_id).referenceCollection.get(Document) 
                     expect( docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
@@ -117,7 +121,7 @@ describe("SubCollection pack", () => {
     
             test("doc 1 reference before saved document", async () => {
                 try {
-                    const docs = await new Document(doc0_id).referenceCollection.get() 
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document) 
                     expect( docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
@@ -131,7 +135,7 @@ describe("SubCollection pack", () => {
         describe("Document get reference", async () => {
             test("doc 1 reference", async () => {
                 try {
-                    const docs = await new Document(doc0_id).referenceCollection.get() 
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document) 
                     expect( docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
@@ -143,7 +147,7 @@ describe("SubCollection pack", () => {
     
             test("doc 2 reference", async () => {
                 try {
-                    const docs = await new Document(doc1_id).referenceCollection.get() 
+                    const docs = await new Document(doc1_id).referenceCollection.get(Document) 
                     expect( docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
@@ -155,7 +159,7 @@ describe("SubCollection pack", () => {
     
             test("doc 1 reference before saved document", async () => {
                 try {
-                    const docs = await new Document(doc0_id).referenceCollection.get() 
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document) 
                     expect( docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()

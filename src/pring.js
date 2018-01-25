@@ -141,36 +141,38 @@ var Pring;
             });
             var properties = this.getProperties();
             var data = snapshot.data();
-            for (var prop in properties) {
-                var key = properties[prop];
-                var descriptor = Object.getOwnPropertyDescriptor(this, key);
-                var value = data[key];
-                if (descriptor) {
-                    if (isCollection(descriptor.value)) {
-                        var collection = descriptor.value;
-                        collection.setParent(this, key);
-                        if (isValuable(collection)) {
-                            var v = descriptor.value;
-                            v.setValue(value, key);
+            if (data) {
+                for (var _i = 0, properties_1 = properties; _i < properties_1.length; _i++) {
+                    var key = properties_1[_i];
+                    var descriptor = Object.getOwnPropertyDescriptor(this, key);
+                    var value = data[key];
+                    if (descriptor) {
+                        if (isCollection(descriptor.value)) {
+                            var collection = descriptor.value;
+                            collection.setParent(this, key);
+                            if (isValuable(collection)) {
+                                var v = descriptor.value;
+                                v.setValue(value, key);
+                            }
+                        }
+                        else {
+                            Object.defineProperty(this, key, {
+                                value: value,
+                                writable: true,
+                                enumerable: true,
+                                configurable: true
+                            });
                         }
                     }
                     else {
-                        Object.defineProperty(this, key, {
-                            value: value,
-                            writable: true,
-                            enumerable: true,
-                            configurable: true
-                        });
-                    }
-                }
-                else {
-                    if (value) {
-                        Object.defineProperty(this, key, {
-                            value: value,
-                            writable: true,
-                            enumerable: true,
-                            configurable: true
-                        });
+                        if (value) {
+                            Object.defineProperty(this, key, {
+                                value: value,
+                                writable: true,
+                                enumerable: true,
+                                configurable: true
+                            });
+                        }
                     }
                 }
             }
@@ -538,7 +540,6 @@ var Pring;
         }
         ReferenceCollection.prototype.insert = function (newMember) {
             this.parent._init();
-            newMember.reference = this.reference.doc(newMember.id);
             this.objects.push(newMember);
             if (this.isSaved()) {
                 this._insertions.push(newMember);
@@ -557,7 +558,6 @@ var Pring;
             if (this.isSaved()) {
                 this._deletions.push(member);
             }
-            member.reference = member.getReference();
         };
         ReferenceCollection.prototype.pack = function (type, batch) {
             var _this = this;
@@ -565,17 +565,30 @@ var Pring;
             var self = this;
             switch (type) {
                 case BatchType.save:
+                    var value = {
+                        createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
+                        updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
+                    };
                     this.forEach(function (document) {
-                        var doc = document;
+                        if (!document.isSaved) {
+                            batch.set(document.reference, document.value());
+                        }
                         var reference = self.reference.doc(document.id);
-                        batch.set(reference, document.value());
+                        batch.set(reference, value);
                     });
                     return batch;
                 case BatchType.update:
                     var insertions = this._insertions.filter(function (item) { return _this._deletions.indexOf(item) < 0; });
                     insertions.forEach(function (document) {
+                        var value = {
+                            updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
+                        };
+                        if (!document.isSaved) {
+                            value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp();
+                            batch.set(document.reference, document.value());
+                        }
                         var reference = self.reference.doc(document.id);
-                        batch.set(reference, document.value());
+                        batch.set(reference, value);
                     });
                     var deletions = this._deletions.filter(function (item) { return _this._insertions.indexOf(item) < 0; });
                     deletions.forEach(function (document) {
