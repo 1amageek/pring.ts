@@ -106,7 +106,7 @@ export declare module Pring {
         delete(member: T): void;
         pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
         get(type: {
-            new (id): T;
+            new (id: string): T;
         }): Promise<T[]>;
     }
     class CountableReferenceCollection<T extends Base> implements AnySubCollection, ValueProtocol, Batchable {
