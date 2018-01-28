@@ -580,7 +580,7 @@ export module Pring {
             }
         }
 
-        async get(type: { new(id): T; }) {
+        async get(type: { new(id: string): T; }) {
             this.parent._init()
             try {
                 const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
