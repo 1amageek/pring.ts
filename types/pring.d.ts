@@ -109,60 +109,6 @@ export declare module Pring {
             new (id: string): T;
         }): Promise<T[]>;
     }
-    class CountableReferenceCollection<T extends Base> implements AnySubCollection, ValueProtocol, Batchable {
-        path: string;
-        reference: FirebaseFirestore.CollectionReference;
-        parent: Base;
-        key: string;
-        batchID?: string;
-        objects: T[];
-        private _count;
-        constructor(parent: Base);
-        isSaved(): Boolean;
-        setParent(parent: Base, key: string): void;
-        getPath(): string;
-        getReference(): FirebaseFirestore.CollectionReference;
-        insert(newMember: T): Promise<any>;
-        merge(newMembers: T[]): Promise<any>;
-        delete(member: T): Promise<Promise<FirebaseFirestore.WriteResult[] | null>>;
-        deleteAll(): Promise<FirebaseFirestore.WriteResult[]>;
-        get(): Promise<FirebaseFirestore.DocumentSnapshot[]>;
-        contains(id: string): Promise<Boolean>;
-        forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
-        count(): number;
-        value(): any;
-        setValue(value: any, key: string): void;
-        pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
-        batch(type: BatchType, batchID: string): void;
-    }
-    class CountableNestedCollection<T extends Base> implements AnySubCollection, ValueProtocol, Batchable {
-        path: string;
-        reference: FirebaseFirestore.CollectionReference;
-        parent: Base;
-        key: string;
-        batchID?: string;
-        objects: T[];
-        private _count;
-        constructor(parent: Base);
-        isSaved(): Boolean;
-        setParent(parent: Base, key: string): void;
-        getPath(): string;
-        getReference(): FirebaseFirestore.CollectionReference;
-        insert(newMember: T): Promise<any>;
-        merge(newMembers: T[]): Promise<any>;
-        delete(member: T): Promise<any>;
-        deleteAll(): Promise<FirebaseFirestore.WriteResult[]>;
-        get(type: {
-            new (): T;
-        }): Promise<T[]>;
-        contains(id: string): Promise<Boolean>;
-        forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
-        count(): number;
-        value(): any;
-        setValue(value: any, key: string): void;
-        pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
-        batch(type: BatchType, batchID: string): void;
-    }
     class File implements ValueProtocol {
         mimeType: string;
         name: string;

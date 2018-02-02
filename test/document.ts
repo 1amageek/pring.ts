@@ -15,6 +15,4 @@ export class Document extends Pring.Base {
 
     @property referenceCollection: Pring.ReferenceCollection<Document> = new Pring.ReferenceCollection(this)
     @property nestedCollection: Pring.NestedCollection<Document> = new Pring.NestedCollection(this)
-    @property countableReferenceCollection: Pring.CountableReferenceCollection<Document> = new Pring.CountableReferenceCollection(this)
-    @property countableNestedCollection: Pring.CountableNestedCollection<Document> = new Pring.CountableNestedCollection(this)
 }
