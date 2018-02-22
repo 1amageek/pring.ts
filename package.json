@@ -1,13 +1,23 @@
 {
+  "private": false,
   "name": "pring",
-  "version": "0.5.2",
-  "description": "Cloud Firestore model framework for TypeScript - Google",
-  "main": "./src/pring.js",
-  "types": "./types/pring.d.ts",
+  "version": "0.6.0",
   "scripts": {
-    "build": "tsc --outDir src pring.ts -d && mv src/pring.d.ts ./types/.",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "./node_modules/.bin/tslint -p tslint.json",
+    "build": "./node_modules/.bin/tsc",
+    "serve": "npm run build && firebase serve --only functions",
+    "shell": "npm run build && firebase experimental:functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
   },
+  "description": "Cloud Firestore model framework for TypeScript - Google",
+  "contributors": [
+    {
+      "name": "Norikazu Muramoto",
+      "email": "tmy0x3@icloud.com"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/1amageek/pring.ts.git"
@@ -24,30 +34,20 @@
   "bugs": {
     "url": "https://github.com/1amageek/pring.ts/issues"
   },
-  "files": [
-    "src",
-    "types"
-  ],
-  "homepage": "https://github.com/1amageek/pring.ts#readme",
+  "main": "lib/index.js",
+  "types": "./types/index.d.ts",
   "dependencies": {
     "@google-cloud/firestore": "^0.11.1",
-    "@types/uuid": "^3.4.3",
     "firebase-functions": "^0.8.1",
+    "uuid": "^3.2.1",
     "reflect-metadata": "^0.1.10"
   },
-  "contributors": [
-    {
-      "name": "Norikazu Muramoto",
-      "email": "tmy0x3@icloud.com"
-    }
-  ],
   "devDependencies": {
-    "@types/es6-promise": "0.0.33",
     "@types/jest": "^21.1.9",
-    "@types/node": "^8.5.2",
     "jest": "^22.0.3",
     "ts-jest": "^22.0.0",
-    "typings": "^2.1.1"
+    "tslint": "^5.8.0",
+    "typescript": "^2.5.3"
   },
   "jest": {
     "transform": {

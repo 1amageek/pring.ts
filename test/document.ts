@@ -1,5 +1,7 @@
-import { Pring, property } from "../pring"
+import * as Pring from "../src/index"
 import * as FirebaseFirestore from '@google-cloud/firestore'
+
+const property = Pring.property
 
 export class Document extends Pring.Base {
     @property array: string[]                         = ["array"]

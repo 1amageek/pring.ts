@@ -1,14 +1,15 @@
 {
-    "compilerOptions": {
-        "target": "es2017",
-        "lib": ["es2017"],
-        "module": "commonjs",
-        "experimentalDecorators": true,
-        "sourceMap": true
-    },
-    "exclude": [
-        "node_modules",
-        "**/*.test.ts",
-        // "test/*"
-    ]
+  "compilerOptions": {
+    "lib": ["es6"],
+    "module": "commonjs",
+    "noImplicitReturns": true,
+    "outDir": "lib",
+    "sourceMap": true,
+    "target": "es6",
+    "experimentalDecorators": true,
+  },
+  "compileOnSave": true,
+  "include": [
+    "src"
+  ]
 }
