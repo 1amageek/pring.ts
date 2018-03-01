@@ -1,10 +1,9 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import "reflect-metadata"
-
+import { BatchType } from './batchable'
 import { firestore } from './index'
-import { Base, BatchType } from './base'
+import { Base } from './base'
 import { SubCollection } from './subCollection'
-
 
 export class ReferenceCollection<T extends Base> extends SubCollection<T> {
 

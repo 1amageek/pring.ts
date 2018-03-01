@@ -1,17 +1,8 @@
 import * as FirebaseFirestore from '@google-cloud/firestore';
 import { DeltaDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import "reflect-metadata";
+import { Batchable, BatchType } from './batchable';
 export declare const property: <T extends Document>(target: T, propertyKey: any) => void;
-export declare enum BatchType {
-    save = 0,
-    update = 1,
-    delete = 2,
-}
-export interface Batchable {
-    batchID?: string;
-    pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
-    batch(type: BatchType, batchID: string): any;
-}
 export interface ValueProtocol {
     value(): any;
     setValue(value: any, key: string): any;

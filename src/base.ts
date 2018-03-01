@@ -4,10 +4,12 @@ import { DeltaDocumentSnapshot } from 'firebase-functions/lib/providers/firestor
 import "reflect-metadata"
 
 import { firestore } from './index'
-import { AnySubCollection, SubCollection } from './subCollection'
+import { AnySubCollection } from './anySubCollection'
+import { SubCollection } from './subCollection'
 import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
 import { File } from './file'
+import { Batchable, BatchType } from './batchable'
 
 const propertyMetadataKey = "property"//Symbol("property")
 
@@ -15,18 +17,6 @@ export const property = <T extends Document>(target: T, propertyKey) => {
     const properties = Reflect.getMetadata(propertyMetadataKey, target) || []
     properties.push(propertyKey)
     Reflect.defineMetadata(propertyMetadataKey, properties, target)
-}
-
-export enum BatchType {
-    save,
-    update,
-    delete
-}
-
-export interface Batchable {
-    batchID?: string
-    pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch
-    batch(type: BatchType, batchID: string)
 }
 
 export interface ValueProtocol {
