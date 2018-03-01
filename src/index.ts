@@ -2,7 +2,7 @@ import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as firebase from 'firebase-admin'
 
 // pring export
-import { Base, property} from './base'
+import { Base, property } from './base'
 import { SubCollection } from './subCollection'
 import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
