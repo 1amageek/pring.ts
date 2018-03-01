@@ -1,5 +1,6 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
+import * as functions from 'firebase-functions'
 import { DeltaDocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 import "reflect-metadata"
 
@@ -23,6 +24,20 @@ export interface ValueProtocol {
     value(): any
     setValue(value: any, key: string)
 }
+
+// export interface Triggerable {
+//     getTriggerPath(): string
+
+//     getTriggerDocument(): functions.firestore.DocumentBuilder
+//     /** Respond to all document writes (creates, updates, or deletes). */
+//     onWrite(handler: (event: functions.Event<DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<DeltaDocumentSnapshot>
+//     /** Respond only to document creations. */
+//     onCreate(handler: (event: functions.Event<DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<DeltaDocumentSnapshot>
+//     /** Respond only to document updates. */
+//     onUpdate(handler: (event: functions.Event<DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<DeltaDocumentSnapshot>
+//     /** Respond only to document deletions. */
+//     onDelete(handler: (event: functions.Event<DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<DeltaDocumentSnapshot>
+// }
 
 export interface Document extends Batchable, ValueProtocol {
     version: number
@@ -51,6 +66,31 @@ export function isFile(arg): Boolean {
 }
 
 export class Base implements Document {
+
+    static getTriggerPath(): string {
+        return `version/{version}/${this.getModelName()}/{id}/`
+    }
+
+    static getTriggerDocument(): functions.firestore.DocumentBuilder {
+        return functions.firestore.document(this.getTriggerPath())
+    }
+
+    /** Respond to all document writes (creates, updates, or deletes). */
+    static onWrite(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
+        return this.getTriggerDocument().onWrite(handler)
+    }
+    /** Respond only to document creations. */
+    static onCreate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
+        return this.getTriggerDocument().onCreate(handler)
+    }
+    /** Respond only to document updates. */
+    static onUpdate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
+        return this.getTriggerDocument().onUpdate(handler)
+    }
+    /** Respond only to document deletions. */
+    static onDelete(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
+        return this.getTriggerDocument().onDelete(handler)
+    }
 
     static getReference(): FirebaseFirestore.CollectionReference {
         return firestore.collection(this.getPath())
