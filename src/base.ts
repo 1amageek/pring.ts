@@ -68,11 +68,11 @@ export function isFile(arg): Boolean {
 export class Base implements Document {
 
     static getTriggerPath(): string {
-        return `version/{version}/${this.getModelName()}/{id}/`
+        return `version/{version}`//`version/{version}/${this.getModelName()}/{id}/`
     }
 
     static getTriggerDocument(): functions.firestore.DocumentBuilder {
-        return functions.firestore.document(this.getTriggerPath())
+        return functions.firestore.document(`version/{version}`)
     }
 
     /** Respond to all document writes (creates, updates, or deletes). */
