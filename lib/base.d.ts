@@ -31,7 +31,7 @@ export declare class Base implements Document {
     /** Respond to all document writes (creates, updates, or deletes). */
     static onWrite(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot>;
     /** Respond only to document creations. */
-    static onCreate(firestore: functions.firestore.NamespaceBuilder, handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot>;
+    static onCreate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot>;
     /** Respond only to document updates. */
     static onUpdate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot>;
     /** Respond only to document deletions. */

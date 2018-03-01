@@ -72,7 +72,7 @@ export class Base implements Document {
     }
 
     static getTriggerDocument(): functions.firestore.DocumentBuilder {
-        return functions.firestore.document(`version/{version}`)
+        return functions.firestore.document(this.getTriggerPath())
     }
 
     /** Respond to all document writes (creates, updates, or deletes). */
@@ -80,7 +80,7 @@ export class Base implements Document {
         return this.getTriggerDocument().onWrite(handler)
     }
     /** Respond only to document creations. */
-    static onCreate(firestore: functions.firestore.NamespaceBuilder, handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
+    static onCreate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
         return this.getTriggerDocument().onCreate(handler)
     }
     /** Respond only to document updates. */
