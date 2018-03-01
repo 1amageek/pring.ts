@@ -1,4 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore';
+import * as functions from 'firebase-functions';
 import { DeltaDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import "reflect-metadata";
 import { Batchable, BatchType } from './batchable';
@@ -25,6 +26,16 @@ export interface Document extends Batchable, ValueProtocol {
 export declare function isCollection(arg: any): Boolean;
 export declare function isFile(arg: any): Boolean;
 export declare class Base implements Document {
+    static getTriggerPath(): string;
+    static getTriggerDocument(): functions.firestore.DocumentBuilder;
+    /** Respond to all document writes (creates, updates, or deletes). */
+    static onWrite(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot>;
+    /** Respond only to document creations. */
+    static onCreate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot>;
+    /** Respond only to document updates. */
+    static onUpdate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot>;
+    /** Respond only to document deletions. */
+    static onDelete(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot>;
     static getReference(): FirebaseFirestore.CollectionReference;
     static getVersion(): number;
     static getModelName(): string;
