@@ -67,8 +67,8 @@ export function isFile(arg): Boolean {
 
 export class Base implements Document {
 
-    static getTriggerPath(): string {
-        return `/version/{version}/${this.getModelName()}/{id}/`
+    static getTriggerPath(): string {        
+        return `/version/{version}/${this.getModelName()}/{id}`
     }
 
     static getTriggerDocument(): functions.firestore.DocumentBuilder {
