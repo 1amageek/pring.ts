@@ -81,7 +81,7 @@ export class Base implements Document {
     }
     /** Respond only to document creations. */
     static onCreate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
-        return this.getTriggerDocument().onCreate(handler)
+        return functions.firestore.document(`version/{version}`).onCreate(handler)//this.getTriggerDocument().onCreate(handler)
     }
     /** Respond only to document updates. */
     static onUpdate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
