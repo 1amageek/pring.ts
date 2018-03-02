@@ -1,5 +1,4 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
-import * as functions from 'firebase-functions'
 import * as UUID from 'uuid'
 import { DeltaDocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 import "reflect-metadata"
@@ -11,6 +10,8 @@ import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
 import { File } from './file'
 import { Batchable, BatchType } from './batchable'
+
+const functions = module.parent.exports.functions || require('firebase-functions')
 
 const propertyMetadataKey = "property"//Symbol("property")
 
