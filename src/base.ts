@@ -11,7 +11,7 @@ import { ReferenceCollection } from './referenceCollection'
 import { File } from './file'
 import { Batchable, BatchType } from './batchable'
 
-const functions = module.parent.exports.functions || require('firebase-functions')
+const functions = module.parent.exports.functions
 
 const propertyMetadataKey = "property"//Symbol("property")
 
