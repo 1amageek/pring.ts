@@ -1,4 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
+import * as functions from 'firebase-functions'
 import * as UUID from 'uuid'
 import { DeltaDocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 import "reflect-metadata"
@@ -11,8 +12,6 @@ import { ReferenceCollection } from './referenceCollection'
 import { File } from './file'
 import { Batchable, BatchType } from './batchable'
 
-const functions = module.parent.exports.functions
-
 const propertyMetadataKey = "property"//Symbol("property")
 
 export const property = <T extends Document>(target: T, propertyKey) => {
@@ -24,6 +23,14 @@ export const property = <T extends Document>(target: T, propertyKey) => {
 export interface ValueProtocol {
     value(): any
     setValue(value: any, key: string)
+}
+
+try {
+    let path = process.env.CLOUD_RUNTIME_CONFIG || require("path").resolve(__dirname) + '/../.runtimeconfig.json';
+    let json = require(path)
+    console.log("oo", json)
+} catch (e) {
+    console.log(e)
 }
 
 // export interface Triggerable {
