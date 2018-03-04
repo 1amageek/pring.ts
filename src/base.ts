@@ -25,14 +25,6 @@ export interface ValueProtocol {
     setValue(value: any, key: string)
 }
 
-try {
-    let path = process.env.CLOUD_RUNTIME_CONFIG || require("path").resolve(__dirname) + '/../.runtimeconfig.json';
-    let json = require(path)
-    console.log("oo", json)
-} catch (e) {
-    console.log(e)
-}
-
 // export interface Triggerable {
 //     getTriggerPath(): string
 
@@ -75,7 +67,16 @@ export function isFile(arg): Boolean {
 
 export class Base implements Document {
 
-    static getTriggerPath(): string {        
+    static getTriggerPath(): string {   
+        
+        try {
+            let path = process.env.CLOUD_RUNTIME_CONFIG || require("path").resolve(__dirname) + '/../.runtimeconfig.json';
+            let json = require(path)
+            console.log("oo", json)
+        } catch (e) {
+            console.log(e)
+        }
+        
         return `/version/{version}/${this.getModelName()}/{id}`
     }
 
