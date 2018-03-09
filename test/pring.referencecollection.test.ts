@@ -1,7 +1,6 @@
 process.env.NODE_ENV = 'test';
 
 import * as Pring from "../src/index"
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import { Document } from './document'
 
 Pring.initialize({

@@ -1,6 +1,4 @@
-import * as FirebaseFirestore from '@google-cloud/firestore';
 import * as functions from 'firebase-functions';
-import { DeltaDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import "reflect-metadata";
 import { Batchable, BatchType } from './batchable';
 export declare const property: <T extends Document>(target: T, propertyKey: any) => void;
@@ -16,7 +14,7 @@ export interface Document extends Batchable, ValueProtocol {
     reference: FirebaseFirestore.DocumentReference;
     createdAt: Date;
     updatedAt: Date;
-    init(snapshot: FirebaseFirestore.DocumentSnapshot | DeltaDocumentSnapshot): any;
+    init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot): any;
     getVersion(): number;
     getModelName(): string;
     getPath(): string;
@@ -47,7 +45,7 @@ export declare class Base implements Document {
     constructor(id?: string);
     self(): this;
     _init(): void;
-    init(snapshot: FirebaseFirestore.DocumentSnapshot | DeltaDocumentSnapshot): void;
+    init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot): void;
     getVersion(): number;
     getModelName(): string;
     getPath(): string;

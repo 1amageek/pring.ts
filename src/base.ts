@@ -1,7 +1,5 @@
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as functions from 'firebase-functions'
 import * as UUID from 'uuid'
-import { DeltaDocumentSnapshot } from 'firebase-functions/lib/providers/firestore'
 import "reflect-metadata"
 
 import { firestore } from './index'
@@ -33,7 +31,7 @@ export interface Document extends Batchable, ValueProtocol {
     reference: FirebaseFirestore.DocumentReference
     createdAt: Date
     updatedAt: Date
-    init(snapshot: FirebaseFirestore.DocumentSnapshot | DeltaDocumentSnapshot)
+    init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot)
     getVersion(): number
     getModelName(): string
     getPath(): string
@@ -156,7 +154,7 @@ export class Base implements Document {
         }
     }
 
-    init(snapshot: FirebaseFirestore.DocumentSnapshot | DeltaDocumentSnapshot) {
+    init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot) {
         // ID
         const id = snapshot.id
         Object.defineProperty(this, "id", {

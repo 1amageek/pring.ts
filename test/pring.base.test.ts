@@ -1,7 +1,6 @@
 process.env.NODE_ENV = 'test';
 
 import * as Pring from "../src/index"
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import { Document } from './document'
 
 Pring.initialize({
@@ -37,9 +36,9 @@ describe("Document property", () => {
             expect(doc.date).toEqual(document.date)
         })
 
-        test("GeoPoint type", () => {
-            expect(doc.geoPoint).toEqual(document.geoPoint)
-        })
+        // test("GeoPoint type", () => {
+        //     expect(doc.geoPoint).toEqual(document.geoPoint)
+        // })
 
         test("Dicionary type", () => {
             expect(doc.dictionary).toEqual(document.dictionary)

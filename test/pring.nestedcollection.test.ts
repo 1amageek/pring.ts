@@ -1,7 +1,6 @@
 process.env.NODE_ENV = 'test';
 
 import * as Pring from "../src/index"
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import { Document } from './document'
 
 Pring.initialize({
@@ -79,7 +78,7 @@ describe("SubCollection pack", () => {
                 }
             })
         })
-
+    })
     //     describe("Document delete", async () => {
 
     //         test("doc 0", async () => {

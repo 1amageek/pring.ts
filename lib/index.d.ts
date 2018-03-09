@@ -1,4 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore';
 import * as firebase from 'firebase-admin';
 import { Base, property } from './base';
 import { SubCollection } from './subCollection';
