@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "pring",
-  "version": "0.7.18",
+  "version": "0.7.19",
   "scripts": {
     "lint": "./node_modules/.bin/tslint -p tslint.json",
     "build": "./node_modules/.bin/tsc -d",
