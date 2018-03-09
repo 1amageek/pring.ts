@@ -1,4 +1,5 @@
 import * as firebase from 'firebase-admin'
+import * as FirebaseFirestore from '@google-cloud/firestore'
 
 // pring export
 import { Base, property } from './base'

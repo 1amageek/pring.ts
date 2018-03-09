@@ -36,9 +36,9 @@ describe("Document property", () => {
             expect(doc.date).toEqual(document.date)
         })
 
-        // test("GeoPoint type", () => {
-        //     expect(doc.geoPoint).toEqual(document.geoPoint)
-        // })
+        test("GeoPoint type", () => {
+            expect(doc.geoPoint).toEqual(document.geoPoint)
+        })
 
         test("Dicionary type", () => {
             expect(doc.dictionary).toEqual(document.dictionary)

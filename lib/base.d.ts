@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import * as FirebaseFirestore from '@google-cloud/firestore';
 import "reflect-metadata";
 import { Batchable, BatchType } from './batchable';
 export declare const property: <T extends Document>(target: T, propertyKey: any) => void;
