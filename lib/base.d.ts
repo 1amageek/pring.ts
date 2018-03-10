@@ -27,6 +27,7 @@ export declare function isFile(arg: any): Boolean;
 export declare class Base implements Document {
     static getTriggerPath(): string;
     static getTriggerDocument(): functions.firestore.DocumentBuilder;
+    shouldBeReplicated(): boolean;
     static getReference(): FirebaseFirestore.CollectionReference;
     static getVersion(): number;
     static getModelName(): string;

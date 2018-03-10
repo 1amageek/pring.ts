@@ -34,31 +34,41 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         const self = this
         switch (type) {
             case BatchType.save: {
-                const updateValue = {
-                    createdAt: FirebaseFirestore.FieldValue.serverTimestamp(),
-                    updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
-                }
                 this.forEach(document => {
+                    let value = {}
+                    if (document.shouldBeReplicated()) {
+                        value = document.value()
+                    }
+                    value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                    value["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
                     if (!document.isSaved) {
                         _batch.set(document.reference, document.value())
                     }
                     const reference = self.reference.doc(document.id)
-                    _batch.set(reference, updateValue)
+                    _batch.set(reference, value)
                 })
                 return _batch
             }
             case BatchType.update:
                 const insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
                 insertions.forEach(document => {
-                    const updateValue = {
-                        updatedAt: FirebaseFirestore.FieldValue.serverTimestamp()
-                    }
-                    if (!document.isSaved) {
-                        updateValue["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                    let value = {}
+                    if (document.isSaved) {
+                        if (document.shouldBeReplicated()) {
+                            value = document.value()
+                        }
+                        value["createdAt"] = document.createdAt
+                        value["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
                         _batch.set(document.reference, document.value())
+                    } else {
+                        if (document.shouldBeReplicated()) {
+                            value = document.value()
+                        }
+                        value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                        value["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
                     }
                     const reference = self.reference.doc(document.id)
-                    _batch.set(reference, updateValue)
+                    _batch.set(reference, value)
                 })
                 const deletions = this._deletions.filter(item => this._insertions.indexOf(item) < 0)
                 deletions.forEach(document => {

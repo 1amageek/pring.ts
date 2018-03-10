@@ -77,6 +77,10 @@ export class Base implements Document {
     //     return this.getTriggerDocument().onDelete(handler)
     // }
 
+    shouldBeReplicated(): boolean {
+        return false
+    }
+
     static getReference(): FirebaseFirestore.CollectionReference {
         return firestore.collection(this.getPath())
     }
