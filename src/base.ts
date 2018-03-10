@@ -77,10 +77,6 @@ export class Base implements Document {
     //     return this.getTriggerDocument().onDelete(handler)
     // }
 
-    shouldBeReplicated(): boolean {
-        return false
-    }
-
     static getReference(): FirebaseFirestore.CollectionReference {
         return firestore.collection(this.getPath())
     }
@@ -138,6 +134,10 @@ export class Base implements Document {
         this.id = id || firestore.collection(`version/${this.version}/${this.modelName}`).doc().id
         this.path = this.getPath()
         this.reference = this.getReference()
+    }
+
+    shouldBeReplicated(): boolean {
+        return false
     }
 
     self(): this {
