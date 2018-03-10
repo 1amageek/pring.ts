@@ -117,24 +117,6 @@ try {
 }
 ```
 
-## CloudFunctions
-
-Support CloudFunctions
-
-``` typescript
-import * as functions from 'firebase-functions'
-import * as Pring from 'pring'
-import { User } from './model'
-
-Pring.initialize(functions.config().firebase)
-
-export const UserCreate = User.onCreate(event => {
-    const version = event.params.version
-    const id = event.params.id
-})
-```
-
-
 ## Test
 
 https://facebook.github.io/jest/
