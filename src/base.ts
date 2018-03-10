@@ -52,7 +52,7 @@ export function isFile(arg): Boolean {
 
 export class Base implements Document {
 
-    static getTriggerPath(): string {   
+    static getTriggerPath(): string {
         return `/version/{version}/${this.getModelName()}/{id}`
     }
 
@@ -100,9 +100,13 @@ export class Base implements Document {
     static async get(id: string) {
         try {
             const snapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
-            const document = new this()
-            document.init(snapshot)
-            return document
+            if (snapshot.exists) {
+                const document = new this()
+                document.init(snapshot)
+                return document
+            } else {
+                return undefined
+            }
         } catch (error) {
             throw error
         }
@@ -136,7 +140,7 @@ export class Base implements Document {
         this.reference = this.getReference()
         if (value) {
             for (const key in value) {
-                this[key] = value[key]                
+                this[key] = value[key]
             }
             this.isSaved = true
         }

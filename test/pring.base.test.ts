@@ -21,7 +21,6 @@ describe("Document property", () => {
     describe("properties", async () => {
 
         test("batch", () => {
-            console.log(Pring.batch())
             expect(Pring.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
         })
 
@@ -59,6 +58,13 @@ describe("Document property", () => {
 
         test("File type", () => {
             expect(doc.file).toEqual(document.file)
+        })
+    })
+
+    describe("Documents that do not exist", async () => {
+        test("not exist", async () => {
+            const doc = await Document.get("not")
+            expect(doc).toBeUndefined()
         })
     })
 
