@@ -43,7 +43,9 @@ export declare class Base implements Document {
     isSaved: Boolean;
     isLocalSaved: Boolean;
     batchID?: string;
-    constructor(id?: string);
+    constructor(id?: string, value?: {
+        [key: string]: any;
+    });
     shouldBeReplicated(): boolean;
     self(): this;
     _init(): void;

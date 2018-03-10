@@ -128,12 +128,18 @@ export class Base implements Document {
 
     public batchID?: string
 
-    constructor(id?: string) {
+    constructor(id?: string, value?: { [key: string]: any }) {
         this.version = this.getVersion()
         this.modelName = this.getModelName()
         this.id = id || firestore.collection(`version/${this.version}/${this.modelName}`).doc().id
         this.path = this.getPath()
         this.reference = this.getReference()
+        if (value) {
+            for (const key in value) {
+                this[key] = value[key]                
+            }
+            this.isSaved = true
+        }
     }
 
     shouldBeReplicated(): boolean {
