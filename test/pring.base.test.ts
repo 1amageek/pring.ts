@@ -1,5 +1,5 @@
 process.env.NODE_ENV = 'test';
-
+import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as Pring from "../src/index"
 import { Document } from './document'
 
@@ -19,6 +19,11 @@ describe("Document property", () => {
     });
 
     describe("properties", async () => {
+
+        test("batch", () => {
+            console.log(Pring.batch())
+            expect(Pring.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
+        })
 
         test("String type", () => {
             expect(doc.string).toEqual(document.string)

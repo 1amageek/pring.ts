@@ -13,3 +13,6 @@ export let firestore: FirebaseFirestore.Firestore
 export const initialize = (options?: firebase.AppOptions) => {
     firestore = new FirebaseFirestore.Firestore(options)
 }
+export const batch = (): FirebaseFirestore.WriteBatch => {
+    return firestore.batch()
+}

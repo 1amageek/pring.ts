@@ -8,3 +8,4 @@ import { File } from './file';
 export { Base, property, SubCollection, NestedCollection, ReferenceCollection, File };
 export declare let firestore: FirebaseFirestore.Firestore;
 export declare const initialize: (options?: firebase.AppOptions) => void;
+export declare const batch: () => FirebaseFirestore.WriteBatch;
