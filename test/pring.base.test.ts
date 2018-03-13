@@ -63,7 +63,7 @@ describe("Document property", () => {
 
     describe("Documents that do not exist", async () => {
         test("not exist", async () => {
-            const doc = await Document.get("not")
+            const doc = await Document.get("not") as Document
             expect(doc).toBeUndefined()
         })
     })

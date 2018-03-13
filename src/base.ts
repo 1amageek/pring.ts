@@ -132,6 +132,8 @@ export class Base implements Document {
 
     public batchID?: string
 
+    private _updateValues: { [key: string]: any } = {}
+
     constructor(id?: string, value?: { [key: string]: any }) {
         this.version = this.getVersion()
         this.modelName = this.getModelName()
@@ -169,6 +171,48 @@ export class Base implements Document {
         }
     }
 
+    private _defineProperty(key: string, value: any) {
+
+        let _value: any = value
+
+        const descriptor: PropertyDescriptor = {
+            // value: value,
+            // writable: true,
+            enumerable: true,
+            configurable: true,
+            get: () => {
+                return _value
+            },
+            set: (newValue) => {
+                if (_value === newValue) return
+
+                if (isCollection(newValue)) {
+                    // Nothing 
+                } else if (isFile(newValue)) {
+                    const file: ValueProtocol = newValue as ValueProtocol
+                    _value = file.value()
+                    this._updateValues[key] = _value
+                } else {
+                    _value = newValue
+                    this._updateValues[key] = _value
+                }
+            }
+        }
+
+        Object.defineProperty(this, key, descriptor)
+
+        // Object.defineProperty(this, key, {
+        //     value: value,
+        //     writable: true,
+        //     enumerable: true,
+        //     configurable: true,
+        //     set: (newValue) => {
+        //         this[key] = newValue
+        //         this._updateValues[key] = newValue
+        //     }
+        // })
+    }
+
     init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot) {
         // ID
         const id = snapshot.id
@@ -191,21 +235,11 @@ export class Base implements Document {
                         const collection: AnySubCollection = descriptor.value as AnySubCollection
                         collection.setParent(this, key)
                     } else {
-                        Object.defineProperty(this, key, {
-                            value: value,
-                            writable: true,
-                            enumerable: true,
-                            configurable: true
-                        })
+                        this._defineProperty(key, value)
                     }
                 } else {
                     if (value) {
-                        Object.defineProperty(this, key, {
-                            value: value,
-                            writable: true,
-                            enumerable: true,
-                            configurable: true
-                        })
+                        this._defineProperty(key, value)
                     }
                 }
             }
@@ -295,7 +329,9 @@ export class Base implements Document {
                 }
                 return _batch
             case BatchType.update:
-                _batch.update(reference, this.value())
+                let updateValues = this._updateValues
+                updateValues["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                _batch.update(reference, updateValues)
                 for (const prop in properties) {
                     const key = properties[prop]
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
@@ -355,6 +391,7 @@ export class Base implements Document {
         try {
             const result = await batch.commit()
             this.batch(BatchType.update, UUID.v4())
+            this._updateValues = {}
             return result
         } catch (error) {
             throw error
@@ -369,6 +406,7 @@ export class Base implements Document {
         try {
             const snapshot = await this.reference.get()
             this.init(snapshot)
+            this._updateValues = {}
         } catch (error) {
             throw error
         }
