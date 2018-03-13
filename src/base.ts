@@ -172,12 +172,8 @@ export class Base implements Document {
     }
 
     private _defineProperty(key: string, value: any) {
-
         let _value: any = value
-
         const descriptor: PropertyDescriptor = {
-            // value: value,
-            // writable: true,
             enumerable: true,
             configurable: true,
             get: () => {
@@ -198,19 +194,7 @@ export class Base implements Document {
                 }
             }
         }
-
         Object.defineProperty(this, key, descriptor)
-
-        // Object.defineProperty(this, key, {
-        //     value: value,
-        //     writable: true,
-        //     enumerable: true,
-        //     configurable: true,
-        //     set: (newValue) => {
-        //         this[key] = newValue
-        //         this._updateValues[key] = newValue
-        //     }
-        // })
     }
 
     init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot) {
