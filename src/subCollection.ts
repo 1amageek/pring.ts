@@ -71,7 +71,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         member.reference = member.getReference()
     }
 
-    async get(type: { new(id: string, value?: { [key: string]: any }): T; }) {
+    async get(type: { new(id?: string, value?: { [key: string]: any }): T; }) {
         this.parent._init()
         try {
             const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()

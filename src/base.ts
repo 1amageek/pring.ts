@@ -97,7 +97,7 @@ export class Base implements Document {
         return new this()
     }
 
-    static async get<T extends Document>(id: string, type: { new(id: string, value?: { [key: string]: any }): T }) {
+    static async get<T extends Document>(id: string, type: { new(id?: string, value?: { [key: string]: any }): T }) {
         try {
             const snapshot: FirebaseFirestore.DocumentSnapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
             if (snapshot.exists) {

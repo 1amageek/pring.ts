@@ -33,7 +33,7 @@ export declare class Base implements Document {
     static getPath(): string;
     static self(): any;
     static get<T extends Document>(id: string, type: {
-        new (id: string, value?: {
+        new (id?: string, value?: {
             [key: string]: any;
         }): T;
     }): Promise<T>;

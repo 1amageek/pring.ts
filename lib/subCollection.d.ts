@@ -20,7 +20,7 @@ export declare class SubCollection<T extends Base> implements AnySubCollection {
     insert(newMember: T): void;
     delete(member: T): void;
     get(type: {
-        new (id: string, value?: {
+        new (id?: string, value?: {
             [key: string]: any;
         }): T;
     }): Promise<T[]>;
