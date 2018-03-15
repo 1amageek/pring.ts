@@ -98,7 +98,7 @@ describe("SubCollection pack", () => {
                     const docs = await new Document(doc0_id).referenceCollection.get(Document) 
                     for (const doc of docs) {
                         await doc.fetch()
-                    }                    
+                    }
                     expect( docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
