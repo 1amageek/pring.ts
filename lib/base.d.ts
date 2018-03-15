@@ -32,7 +32,9 @@ export declare class Base implements Document {
     static getModelName(): string;
     static getPath(): string;
     static self(): any;
-    static get(id: string): Promise<Base>;
+    static get<T extends Document>(id: string, type: {
+        new (): T;
+    }): Promise<T>;
     version: number;
     modelName: string;
     path: string;

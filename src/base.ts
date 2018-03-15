@@ -97,11 +97,11 @@ export class Base implements Document {
         return new this()
     }
 
-    static async get(id: string) {
+    static async get<T extends Document>(id: string, type: { new(): T }) {
         try {
             const snapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
             if (snapshot.exists) {
-                const document = new this()
+                const document: T = new type()
                 document.init(snapshot)
                 return document
             } else {
@@ -313,7 +313,7 @@ export class Base implements Document {
                 }
                 return _batch
             case BatchType.update:
-                let updateValues = this._updateValues
+                const updateValues = this._updateValues
                 updateValues["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
                 _batch.update(reference, updateValues)
                 for (const prop in properties) {

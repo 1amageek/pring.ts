@@ -15,7 +15,7 @@ describe("Document property", () => {
 
     beforeAll(async () => {
         await document.save()
-        doc = await Document.get(document.id) as Document
+        doc = await Document.get(document.id, Document)
     });
 
     describe("properties", async () => {
@@ -63,7 +63,7 @@ describe("Document property", () => {
 
     describe("Documents that do not exist", async () => {
         test("not exist", async () => {
-            const doc = await Document.get("not") as Document
+            const doc = await Document.get("not", Document)
             expect(doc).toBeUndefined()
         })
     })
@@ -73,7 +73,7 @@ describe("Document property", () => {
             try {
                 const document_id = doc.id
                 await doc.delete()
-                await Document.get(document_id)
+                await Document.get(document_id, Document)
             } catch (error) {
                 expect(error).not.toBeNull()
             }

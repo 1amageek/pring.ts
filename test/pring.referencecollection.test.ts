@@ -41,7 +41,7 @@ describe("SubCollection pack", () => {
 
             test("Root document", async () => {
                 try {
-                    const doc: Document = await Document.get(doc0_id) as Document
+                    const doc: Document = await Document.get(doc0_id, Document)
                     expect(doc).not.toBeNull()
                     expect(doc0.isSaved).toEqual(true)
                     expect(doc1.isSaved).toEqual(true)
@@ -53,7 +53,7 @@ describe("SubCollection pack", () => {
     
             test("doc0's ReferenceCollection", async () => {
                 try {
-                    const doc = await Document.get(doc1_id)
+                    const doc = await Document.get(doc1_id, Document)
                     expect(doc).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
@@ -63,7 +63,7 @@ describe("SubCollection pack", () => {
     
             test("doc1's ReferenceCollection", async () => {
                 try {
-                    const doc = await Document.get(doc2_id)
+                    const doc = await Document.get(doc2_id, Document)
                     expect(doc).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
@@ -73,7 +73,7 @@ describe("SubCollection pack", () => {
     
             test("A ReferenceCollection saved before doc0 is saved", async () => {
                 try {
-                    const doc = await Document.get(doc1_other_id)
+                    const doc = await Document.get(doc1_other_id, Document)
                     expect(doc).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
@@ -83,7 +83,7 @@ describe("SubCollection pack", () => {
 
             test("This doc2_other is saved in another ReferenceCollection", async () => {
                 try {
-                    const doc = await Document.get(doc2_other_id)
+                    const doc = await Document.get(doc2_other_id, Document)
                     expect(doc).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
