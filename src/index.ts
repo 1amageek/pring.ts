@@ -11,7 +11,7 @@ import { File } from './file'
 
 export { BatchType, Base, property, SubCollection, NestedCollection, ReferenceCollection, File }
 export let firestore: FirebaseFirestore.Firestore
-export const initialize = (options?: firebase.AppOptions) => {
+export const initialize = (options?: firebase.AppOptions & any) => {
     firestore = new FirebaseFirestore.Firestore(options)
 }
 export const batch = (): FirebaseFirestore.WriteBatch => {

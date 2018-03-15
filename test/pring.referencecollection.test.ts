@@ -53,7 +53,6 @@ describe("SubCollection pack", () => {
     
             test("doc0's ReferenceCollection", async () => {
                 try {
-                    console.log(doc1_id)
                     const doc = await Document.get(doc1_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
