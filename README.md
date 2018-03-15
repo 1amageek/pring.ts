@@ -74,19 +74,19 @@ await user.save()
 
 #### Get
 ``` typescript
-let user: User = await User.get("USER_ID")
+let user: User = await User.get("USER_ID", User)
 ```
 
 #### Update
 ``` typescript
-let user: User = await User.get("USER_ID")
+let user: User = await User.get("USER_ID", User)
 user.name = "UPDATE NAME"
 await user.update()
 ```
 
 #### Delete
 ``` typescript
-let user: User = await User.get("USER_ID")
+let user: User = await User.get("USER_ID", User)
 await user.delete()
 ```
 
