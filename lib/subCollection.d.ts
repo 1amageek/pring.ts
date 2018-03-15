@@ -20,7 +20,9 @@ export declare class SubCollection<T extends Base> implements AnySubCollection {
     insert(newMember: T): void;
     delete(member: T): void;
     get(type: {
-        new (): T;
+        new (id: string, value?: {
+            [key: string]: any;
+        }): T;
     }): Promise<T[]>;
     contains(id: string): Promise<Boolean>;
     forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
