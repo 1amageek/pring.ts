@@ -96,6 +96,9 @@ describe("SubCollection pack", () => {
             test("doc 1 reference", async () => {
                 try {
                     const docs = await new Document(doc0_id).referenceCollection.get(Document) 
+                    for (const doc of docs) {
+                        await doc.fetch()
+                    }                    
                     expect( docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
@@ -108,6 +111,9 @@ describe("SubCollection pack", () => {
             test("doc 2 reference", async () => {
                 try {
                     const docs = await new Document(doc1_id).referenceCollection.get(Document) 
+                    for (const doc of docs) {
+                        await doc.fetch()
+                    } 
                     expect( docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
@@ -120,6 +126,9 @@ describe("SubCollection pack", () => {
             test("doc 1 reference before saved document", async () => {
                 try {
                     const docs = await new Document(doc0_id).referenceCollection.get(Document) 
+                    for (const doc of docs) {
+                        await doc.fetch()
+                    } 
                     expect( docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
