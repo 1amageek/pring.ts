@@ -134,16 +134,14 @@ export class Base implements Document {
 
     private _updateValues: { [key: string]: any } = {}
 
-    constructor(id?: string, value?: { [key: string]: any }) {
+    constructor(id?: string, data?: { [key: string]: any }) {
         this.version = this.getVersion()
         this.modelName = this.getModelName()
         this.id = id || firestore.collection(`version/${this.version}/${this.modelName}`).doc().id
         this.path = this.getPath()
         this.reference = this.getReference()
-        if (value) {
-            for (const key in value) {
-                this[key] = value[key]
-            }
+        if (data) {
+            this._setData(data)
             this.isSaved = true
         }
     }
@@ -197,20 +195,9 @@ export class Base implements Document {
         Object.defineProperty(this, key, descriptor)
     }
 
-    init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot) {
-        // ID
-        const id = snapshot.id
-        Object.defineProperty(this, "id", {
-            value: id,
-            writable: true,
-            enumerable: true,
-            configurable: true
-        })
-
-        const properties = this.getProperties()
-        const data = snapshot.data()
-
+    private _setData(data: { [key: string]: any }) {
         if (data) {
+            const properties = this.getProperties()
             for (const key of properties) {
                 const descriptor = Object.getOwnPropertyDescriptor(this, key)
                 const value = data[key]
@@ -227,6 +214,24 @@ export class Base implements Document {
                     }
                 }
             }
+        }
+    }
+
+    init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot) {
+        // ID
+        const id = snapshot.id
+        Object.defineProperty(this, "id", {
+            value: id,
+            writable: true,
+            enumerable: true,
+            configurable: true
+        })
+
+        const properties = this.getProperties()
+        const data = snapshot.data()
+
+        if (data) {
+            this._setData(data)
         }
 
         // Properties

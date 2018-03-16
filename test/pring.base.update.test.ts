@@ -10,7 +10,104 @@ Pring.initialize({
 
 describe("Document property", () => {
 
-    describe("properties", async () => {
+    describe("properties before get", async () => {
+
+        test("batch", () => {
+            expect(Pring.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
+        })
+
+        test("String type", async () => {
+            const document = new Document()
+            await document.save()
+            const doc = await Document.get(document.id, Document)
+            doc.string = "update"
+            await doc.update()
+            expect(doc.string).toEqual("update")
+            await doc.delete()
+        })
+
+        test("Number type", async () => {
+            const document = new Document()
+            await document.save()
+            const doc = await Document.get(document.id, Document)
+            doc.number = 100
+            await doc.update()
+            expect(doc.number).toEqual(100)
+            await doc.delete()
+        })
+
+        test("Boolean type", async () => {
+            const document = new Document()
+            await document.save()
+            const doc = await Document.get(document.id, Document)
+            doc.bool = false
+            await doc.update()
+            expect(doc.bool).toEqual(false)
+            await doc.delete()
+        })
+
+        test("Date type", async () => {
+            const document = new Document()
+            await document.save()
+            const doc = await Document.get(document.id, Document)
+            doc.date = new Date(1000)
+            await doc.update()
+            expect(doc.date).toEqual(new Date(1000))
+            await doc.delete()
+        })
+
+        test("GeoPoint type", async () => {
+            const document = new Document()
+            await document.save()
+            const doc = await Document.get(document.id, Document)
+            doc.geoPoint = new FirebaseFirestore.GeoPoint(10, 10)
+            await doc.update()
+            expect(doc.geoPoint).toEqual(new FirebaseFirestore.GeoPoint(10, 10))
+            await doc.delete()
+        })
+
+        test("Dicionary type", async () => {
+            const document = new Document()
+            await document.save()
+            const doc = await Document.get(document.id, Document)
+            doc.dictionary = { "key": "update" }
+            await doc.update()
+            expect(doc.dictionary).toEqual({ "key": "update" })
+            await doc.delete()
+        })
+
+        test("Array type", async () => {
+            const document = new Document()
+            await document.save()
+            const doc = await Document.get(document.id, Document)
+            doc.array = ["update"]
+            await doc.update()
+            expect(doc.array).toEqual(["update"])
+            await doc.delete()
+        })
+
+        test("Set type", async () => {
+            const document = new Document()
+            await document.save()
+            const doc = await Document.get(document.id, Document)
+            doc.set = { "update": true }
+            await doc.update()
+            expect(doc.set).toEqual({ "update": true })
+            await doc.delete()
+        })
+
+        test("File type", async () => {
+            const document = new Document()
+            await document.save()
+            const doc = await Document.get(document.id, Document)
+            doc.file = new Pring.File("update.jpg", "https://file", "image/png")
+            await doc.update()
+            expect(doc.file).toEqual(new Pring.File("update.jpg", "https://file", "image/png"))
+            await doc.delete()
+        })
+    })
+
+    describe("properties after get", async () => {
 
         test("batch", () => {
             expect(Pring.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
