@@ -48,13 +48,14 @@ export declare class Base implements Document {
     isLocalSaved: Boolean;
     batchID?: string;
     private _updateValues;
-    constructor(id?: string, value?: {
+    constructor(id?: string, data?: {
         [key: string]: any;
     });
     shouldBeReplicated(): boolean;
     self(): this;
     _init(): void;
     private _defineProperty(key, value);
+    private _setData(data);
     init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot): void;
     getVersion(): number;
     getModelName(): string;

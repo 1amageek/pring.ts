@@ -226,10 +226,8 @@ export class Base implements Document {
             enumerable: true,
             configurable: true
         })
-
-        const properties = this.getProperties()
+        
         const data = snapshot.data()
-
         if (data) {
             this._setData(data)
         }
