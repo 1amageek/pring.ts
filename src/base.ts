@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions'
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
-import { } from "reflect-metadata"
+import "reflect-metadata"
 
 import { firestore } from './index'
 import { SubCollection } from './subCollection'
