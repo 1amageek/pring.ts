@@ -66,7 +66,7 @@ export declare class Base implements Document {
     setValue(value: any, key: string): void;
     rawValue(): any;
     value(): any;
-    pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
+    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
     batch(type: BatchType, batchID: string): void;
     save(): Promise<FirebaseFirestore.WriteResult[]>;
     update(): Promise<FirebaseFirestore.WriteResult[]>;

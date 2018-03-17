@@ -97,14 +97,18 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         this.objects.forEach(callbackfn)
     }
 
-    pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
+    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
         const _batch = batch || firestore.batch()
         const self = this
         switch (type) {
             case BatchType.save:
                 this.forEach(document => {
                     const reference = self.reference.doc(document.id)
-                    _batch.set(reference, document.value())
+                    if (document.isSaved) {
+                        _batch.create(reference, document.value())
+                    } else {                        
+                        _batch.set(reference, document.value())
+                    }
                 })
                 return _batch
             case BatchType.update:

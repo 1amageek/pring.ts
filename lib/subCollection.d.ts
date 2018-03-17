@@ -24,6 +24,6 @@ export declare class SubCollection<T extends Base> implements AnySubCollection {
     }): Promise<T[]>;
     contains(id: string): Promise<Boolean>;
     forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
-    pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
+    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
     batch(type: BatchType, batchID: string): void;
 }

@@ -5,7 +5,7 @@ import { SubCollection } from './subCollection';
 export declare class ReferenceCollection<T extends Base> extends SubCollection<T> {
     insert(newMember: T): void;
     delete(member: T): void;
-    pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
+    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
     get(type: {
         new (id?: string, value?: {
             [key: string]: any;

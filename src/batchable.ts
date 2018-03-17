@@ -8,6 +8,6 @@ export enum BatchType {
 
 export interface Batchable {
     batchID?: string
-    pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch
+    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch
     batch(type: BatchType, batchID: string)
 }

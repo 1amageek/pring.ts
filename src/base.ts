@@ -245,8 +245,12 @@ export class Base implements Document {
         return values
     }
 
-    pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
+    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
         const _batch = batch || firestore.batch()
+        if (batchID === this.batchID) {
+            return _batch
+        }
+        this.batchID = batchID
         const reference = this.reference
         const properties = this.getProperties()
         switch (type) {
@@ -260,7 +264,7 @@ export class Base implements Document {
                             const collection: AnySubCollection = value as AnySubCollection
                             collection.setParent(this, key)
                             const batchable: Batchable = value as Batchable
-                            batchable.pack(BatchType.save, _batch)
+                            batchable.pack(BatchType.save, batchID, _batch)
                         }
                     }
                 }
@@ -277,7 +281,7 @@ export class Base implements Document {
                             const collection: AnySubCollection = value as AnySubCollection
                             collection.setParent(this, key)
                             const batchable: Batchable = value as Batchable
-                            batchable.pack(BatchType.update, _batch)
+                            batchable.pack(BatchType.update, batchID, _batch)
                         }
                     }
                 }
@@ -309,7 +313,7 @@ export class Base implements Document {
     }
 
     async save() {
-        const batch = this.pack(BatchType.save)
+        const batch = this.pack(BatchType.save, UUID.v4())
         try {
             const result = await batch.commit()
             this.batch(BatchType.save, UUID.v4())
@@ -321,7 +325,7 @@ export class Base implements Document {
     }
 
     async update() {
-        const batch = this.pack(BatchType.update)
+        const batch = this.pack(BatchType.update, UUID.v4())
         try {
             const result = await batch.commit()
             this.batch(BatchType.update, UUID.v4())

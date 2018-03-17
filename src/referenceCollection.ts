@@ -27,7 +27,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         }
     }
 
-    pack(type: BatchType, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
+    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
         const _batch = batch || firestore.batch()
         const self = this
         switch (type) {
