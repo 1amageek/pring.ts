@@ -1,10 +1,9 @@
 import * as functions from 'firebase-functions'
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
-import "reflect-metadata"
+import { } from "reflect-metadata"
 
 import { firestore } from './index'
-import { AnySubCollection } from './anySubCollection'
 import { SubCollection } from './subCollection'
 import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
@@ -32,12 +31,18 @@ export interface Document extends Batchable, ValueProtocol {
     reference: FirebaseFirestore.DocumentReference
     createdAt: Date
     updatedAt: Date
-    init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot)
     getVersion(): number
     getModelName(): string
     getPath(): string
     value(): any
     rawValue(): any
+}
+
+export interface AnySubCollection extends Batchable {
+    path: string
+    reference: FirebaseFirestore.CollectionReference
+    key: string
+    setParent(parent: Base, key: string)
 }
 
 export function isCollection(arg): Boolean {
@@ -50,6 +55,13 @@ export function isFile(arg): Boolean {
     return (arg instanceof File)
 }
 
+export type DocumentData = { [key: string]: any } | FirebaseFirestore.DocumentData | any
+
+export type Snapshot = FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot
+
+export type DataOrSnapshot = DocumentData | Snapshot
+
+/// Pring Base class
 export class Base implements Document {
 
     static getTriggerPath(): string {
@@ -59,23 +71,6 @@ export class Base implements Document {
     static getTriggerDocument(): functions.firestore.DocumentBuilder {
         return functions.firestore.document(this.getTriggerPath())
     }
-
-    // /** Respond to all document writes (creates, updates, or deletes). */
-    // static onWrite(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
-    //     return this.getTriggerDocument().onWrite(handler)
-    // }
-    // /** Respond only to document creations. */
-    // static onCreate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
-    //     return this.getTriggerDocument().onCreate(handler)
-    // }
-    // /** Respond only to document updates. */
-    // static onUpdate(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
-    //     return this.getTriggerDocument().onUpdate(handler)
-    // }
-    // /** Respond only to document deletions. */
-    // static onDelete(handler: (event: functions.Event<functions.firestore.DeltaDocumentSnapshot>) => PromiseLike<any> | any): functions.CloudFunction<functions.firestore.DeltaDocumentSnapshot> {
-    //     return this.getTriggerDocument().onDelete(handler)
-    // }
 
     static getReference(): FirebaseFirestore.CollectionReference {
         return firestore.collection(this.getPath())
@@ -93,16 +88,13 @@ export class Base implements Document {
         return `version/${this.getVersion()}/${this.getModelName()}`
     }
 
-    static self(): any {
-        return new this()
-    }
-
-    static async get<T extends Document>(id: string, type: { new(id?: string, value?: { [key: string]: any }): T }) {
+    static async get<T extends Base>(id: string, type: { new(snapshot: DataOrSnapshot): T }) {
         try {
             const snapshot: FirebaseFirestore.DocumentSnapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
             if (snapshot.exists) {
                 const document: T = new type(snapshot.id)
-                document.init(snapshot)
+                document.setData(snapshot.data())
+                document._updateValues = {}
                 return document
             } else {
                 return undefined
@@ -132,44 +124,11 @@ export class Base implements Document {
 
     public batchID?: string
 
+    // - basic 
+
     private _updateValues: { [key: string]: any } = {}
 
-    constructor(id?: string, data?: { [key: string]: any }) {
-        this.version = this.getVersion()
-        this.modelName = this.getModelName()
-        this.id = id || firestore.collection(`version/${this.version}/${this.modelName}`).doc().id
-        this.path = this.getPath()
-        this.reference = this.getReference()
-        if (data) {
-            this._setData(data)
-            this.isSaved = true
-        }
-    }
-
-    shouldBeReplicated(): boolean {
-        return false
-    }
-
-    self(): this {
-        return this
-    }
-
-    _init() {
-        const properties = this.getProperties()
-        for (const prop in properties) {
-            const key = properties[prop]
-            const descriptor = Object.getOwnPropertyDescriptor(this, key)
-            if (descriptor) {
-                const value = descriptor.value
-                if (isCollection(value)) {
-                    const collection: AnySubCollection = value as AnySubCollection
-                    collection.setParent(this, key)
-                }
-            }
-        }
-    }
-
-    private _defineProperty(key: string, value: any) {
+    private _defineProperty(key: string, value?: any) {
         let _value: any = value
         const descriptor: PropertyDescriptor = {
             enumerable: true,
@@ -178,64 +137,55 @@ export class Base implements Document {
                 return _value
             },
             set: (newValue) => {
-                if (_value === newValue) return
-
+                _value = newValue
                 if (isCollection(newValue)) {
-                    // Nothing 
+                    const collection: AnySubCollection = newValue as AnySubCollection
+                    collection.setParent(this, key)
                 } else if (isFile(newValue)) {
                     const file: ValueProtocol = newValue as ValueProtocol
-                    _value = file.value()
-                    this._updateValues[key] = _value
+                    this._updateValues[key] = file.value()
                 } else {
-                    _value = newValue
-                    this._updateValues[key] = _value
+                    this._updateValues[key] = newValue
                 }
             }
         }
         Object.defineProperty(this, key, descriptor)
     }
 
-    private _setData(data: { [key: string]: any }) {
+    constructor(id?: string, data?: DocumentData) {
+
+        // set pring object base data
+        this.version = this.getVersion()
+        this.modelName = this.getModelName()
+        
+        // Set reference
+        this.id = id || firestore.collection(`version/${this.version}/${this.modelName}`).doc().id
+        this.path = this.getPath()
+        this.reference = this.getReference()
+
+        // Pring properties define 
+        const properties: string[] = Reflect.getMetadata(propertyMetadataKey, this) || []
         if (data) {
-            const properties = this.getProperties()
             for (const key of properties) {
-                const descriptor = Object.getOwnPropertyDescriptor(this, key)
-                const value = data[key]
-                if (descriptor) {
-                    if (isCollection(descriptor.value)) {
-                        const collection: AnySubCollection = descriptor.value as AnySubCollection
-                        collection.setParent(this, key)
-                    } else {
-                        this._defineProperty(key, value)
-                    }
-                } else {
-                    if (value) {
-                        this._defineProperty(key, value)
-                    }
-                }
+                this._defineProperty(key, data[key])
+            }
+            this.isSaved = true
+        } else {
+            for (const key of properties) {
+                this._defineProperty(key)
             }
         }
     }
 
-    init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot) {
-        // ID
-        const id = snapshot.id
-        Object.defineProperty(this, "id", {
-            value: id,
-            writable: true,
-            enumerable: true,
-            configurable: true
-        })
-        
-        const data = snapshot.data()
-        if (data) {
-            this._setData(data)
+    setData(data: DocumentData) {
+        const properties: string[] = this.getProperties()
+        for (const key of properties) {
+            this._defineProperty(key, data[key])
         }
+    }
 
-        // Properties
-        this.path = this.getPath()
-        this.reference = this.getReference()
-        this.isSaved = true
+    shouldBeReplicated(): boolean {
+        return false
     }
 
     getVersion(): number {
@@ -265,18 +215,19 @@ export class Base implements Document {
     rawValue(): any {
         const properties = this.getProperties()
         const values = {}
-        for (const prop in properties) {
-            const key = properties[prop]
+        for (const key of properties) {
             const descriptor = Object.getOwnPropertyDescriptor(this, key)
             if (descriptor) {
-                const value = descriptor.value
-                if (isCollection(value)) {
-                    // Nothing 
-                } else if (isFile(value)) {
-                    const file: ValueProtocol = value as ValueProtocol
-                    values[key] = file.value()
-                } else {
-                    values[key] = value
+                const value = descriptor.get()
+                if ((value !== null) && (value !== undefined)) {
+                    if (isCollection(value)) {
+                        // Nothing 
+                    } else if (isFile(value)) {
+                        const file: ValueProtocol = value as ValueProtocol
+                        values[key] = file.value()
+                    } else {
+                        values[key] = value
+                    }
                 }
             }
         }
@@ -301,11 +252,10 @@ export class Base implements Document {
         switch (type) {
             case BatchType.save:
                 _batch.set(reference, this.value())
-                for (const prop in properties) {
-                    const key = properties[prop]
+                for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
                     if (descriptor) {
-                        const value = descriptor.value
+                        const value = descriptor.get()
                         if (isCollection(value)) {
                             const collection: AnySubCollection = value as AnySubCollection
                             collection.setParent(this, key)
@@ -319,11 +269,10 @@ export class Base implements Document {
                 const updateValues = this._updateValues
                 updateValues["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
                 _batch.update(reference, updateValues)
-                for (const prop in properties) {
-                    const key = properties[prop]
+                for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
                     if (descriptor) {
-                        const value = descriptor.value
+                        const value = descriptor.get()
                         if (isCollection(value)) {
                             const collection: AnySubCollection = value as AnySubCollection
                             collection.setParent(this, key)
@@ -346,11 +295,10 @@ export class Base implements Document {
         this.batchID = batchID
         const properties = this.getProperties()
         this.isSaved = true
-        for (const prop in properties) {
-            const key = properties[prop]
+        for (const key of properties) {
             const descriptor = Object.getOwnPropertyDescriptor(this, key)
             if (descriptor) {
-                const value = descriptor.value
+                const value = descriptor.get()
                 if (isCollection(value)) {
                     const collection: AnySubCollection = value as AnySubCollection
                     collection.setParent(this, key)
@@ -361,11 +309,11 @@ export class Base implements Document {
     }
 
     async save() {
-        this._init()
         const batch = this.pack(BatchType.save)
         try {
             const result = await batch.commit()
             this.batch(BatchType.save, UUID.v4())
+            this._updateValues = {}
             return result
         } catch (error) {
             throw error
@@ -373,7 +321,6 @@ export class Base implements Document {
     }
 
     async update() {
-        this._init()
         const batch = this.pack(BatchType.update)
         try {
             const result = await batch.commit()
@@ -391,8 +338,12 @@ export class Base implements Document {
 
     async fetch() {
         try {
-            const snapshot = await this.reference.get()
-            this.init(snapshot)
+            const snapshot = await this.reference.get()            
+            const data = snapshot.data()
+            if (data) {
+                this.setData(data)
+                this.isSaved = true
+            }
             this._updateValues = {}
         } catch (error) {
             throw error

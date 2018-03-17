@@ -1,8 +1,6 @@
 import * as FirebaseFirestore from '@google-cloud/firestore';
-import "reflect-metadata";
 import { BatchType } from './batchable';
-import { Base } from './base';
-import { AnySubCollection } from './anySubCollection';
+import { Base, AnySubCollection } from './base';
 export declare class SubCollection<T extends Base> implements AnySubCollection {
     path: string;
     reference: FirebaseFirestore.CollectionReference;

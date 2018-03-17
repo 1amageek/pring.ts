@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions';
 import * as FirebaseFirestore from '@google-cloud/firestore';
-import "reflect-metadata";
 import { Batchable, BatchType } from './batchable';
 export declare const property: <T extends Document>(target: T, propertyKey: any) => void;
 export interface ValueProtocol {
@@ -15,15 +14,25 @@ export interface Document extends Batchable, ValueProtocol {
     reference: FirebaseFirestore.DocumentReference;
     createdAt: Date;
     updatedAt: Date;
-    init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot): any;
     getVersion(): number;
     getModelName(): string;
     getPath(): string;
     value(): any;
     rawValue(): any;
 }
+export interface AnySubCollection extends Batchable {
+    path: string;
+    reference: FirebaseFirestore.CollectionReference;
+    key: string;
+    setParent(parent: Base, key: string): any;
+}
 export declare function isCollection(arg: any): Boolean;
 export declare function isFile(arg: any): Boolean;
+export declare type DocumentData = {
+    [key: string]: any;
+} | FirebaseFirestore.DocumentData | any;
+export declare type Snapshot = FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot;
+export declare type DataOrSnapshot = DocumentData | Snapshot;
 export declare class Base implements Document {
     static getTriggerPath(): string;
     static getTriggerDocument(): functions.firestore.DocumentBuilder;
@@ -31,11 +40,8 @@ export declare class Base implements Document {
     static getVersion(): number;
     static getModelName(): string;
     static getPath(): string;
-    static self(): any;
-    static get<T extends Document>(id: string, type: {
-        new (id?: string, value?: {
-            [key: string]: any;
-        }): T;
+    static get<T extends Base>(id: string, type: {
+        new (snapshot: DataOrSnapshot): T;
     }): Promise<T>;
     version: number;
     modelName: string;
@@ -48,15 +54,10 @@ export declare class Base implements Document {
     isLocalSaved: Boolean;
     batchID?: string;
     private _updateValues;
-    constructor(id?: string, data?: {
-        [key: string]: any;
-    });
+    private _defineProperty(key, value?);
+    constructor(id?: string, data?: DocumentData);
+    setData(data: DocumentData): void;
     shouldBeReplicated(): boolean;
-    self(): this;
-    _init(): void;
-    private _defineProperty(key, value);
-    private _setData(data);
-    init(snapshot: FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot): void;
     getVersion(): number;
     getModelName(): string;
     getPath(): string;

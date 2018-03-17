@@ -1,6 +1,7 @@
 import * as Pring from "../src/index"
 import * as functions from 'firebase-functions'
 import * as FirebaseFirestore from '@google-cloud/firestore'
+import "reflect-metadata"
 
 const property = Pring.property
 const File = Pring.File

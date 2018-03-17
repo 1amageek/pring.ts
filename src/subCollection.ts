@@ -1,9 +1,8 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
-import "reflect-metadata"
+import { } from "reflect-metadata"
 import { BatchType } from './batchable'
 import { firestore } from './index'
-import { Base } from './base'
-import { AnySubCollection } from './anySubCollection'
+import { Base, AnySubCollection } from './base'
 
 export class SubCollection<T extends Base> implements AnySubCollection {
 
@@ -21,7 +20,6 @@ export class SubCollection<T extends Base> implements AnySubCollection {
 
     constructor(parent: Base) {
         this.parent = parent
-        parent._init()
     }
 
     protected _insertions: T[] = []
@@ -48,7 +46,6 @@ export class SubCollection<T extends Base> implements AnySubCollection {
     }
 
     insert(newMember: T) {
-        this.parent._init()
         newMember.reference = this.reference.doc(newMember.id)
         this.objects.push(newMember)
         if (this.isSaved()) {
@@ -57,7 +54,6 @@ export class SubCollection<T extends Base> implements AnySubCollection {
     }
 
     delete(member: T) {
-        this.parent._init()
         this.objects.some((v, i) => {
             if (v.id === member.id) {
                 this.objects.splice(i, 1)
@@ -72,13 +68,12 @@ export class SubCollection<T extends Base> implements AnySubCollection {
     }
 
     async get(type: { new(id?: string, value?: { [key: string]: any }): T; }) {
-        this.parent._init()
         try {
             const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
             const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
                 const document: T = new type(documentSnapshot.id)
-                document.init(documentSnapshot)
+                document.setData(documentSnapshot.data())
                 return document
             })
             this.objects = documents
@@ -89,7 +84,6 @@ export class SubCollection<T extends Base> implements AnySubCollection {
     }
 
     async contains(id: string) {
-        this.parent._init()
         return new Promise<Boolean>((resolve, reject) => {
             this.reference.doc(id).get().then((snapshot) => {
                 resolve(snapshot.exists)
@@ -100,7 +94,6 @@ export class SubCollection<T extends Base> implements AnySubCollection {
     }
 
     forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any) {
-        this.parent._init()
         this.objects.forEach(callbackfn)
     }
 

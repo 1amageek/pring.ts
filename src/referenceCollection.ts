@@ -1,5 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
-import "reflect-metadata"
+import { } from "reflect-metadata"
 import { BatchType } from './batchable'
 import { firestore } from './index'
 import { Base } from './base'
@@ -8,7 +8,6 @@ import { SubCollection } from './subCollection'
 export class ReferenceCollection<T extends Base> extends SubCollection<T> {
 
     insert(newMember: T) {
-        this.parent._init()
         this.objects.push(newMember)
         if (this.isSaved()) {
             this._insertions.push(newMember)
@@ -16,7 +15,6 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
     }
 
     delete(member: T) {
-        this.parent._init()
         this.objects.some((v, i) => {
             if (v.id === member.id) {
                 this.objects.splice(i, 1)
@@ -86,7 +84,6 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
     }
 
     async get(type: { new(id?: string, value?: { [key: string]: any }): T; }) {
-        this.parent._init()
         try {
             const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
             const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
