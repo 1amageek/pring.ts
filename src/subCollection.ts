@@ -72,7 +72,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
             const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
             const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
-                const document: T = new type(documentSnapshot.id)
+                const document: T = new type(documentSnapshot.id, {})
                 document.setData(documentSnapshot.data())
                 return document
             })
