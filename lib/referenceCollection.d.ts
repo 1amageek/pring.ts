@@ -1,14 +1,12 @@
 import * as FirebaseFirestore from '@google-cloud/firestore';
 import { BatchType } from './batchable';
-import { Base } from './base';
+import { Base, DocumentData } from './base';
 import { SubCollection } from './subCollection';
 export declare class ReferenceCollection<T extends Base> extends SubCollection<T> {
     insert(newMember: T): void;
     delete(member: T): void;
     pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
     get(type: {
-        new (id?: string, value?: {
-            [key: string]: any;
-        }): T;
+        new (id?: string, data?: DocumentData): T;
     }): Promise<T[]>;
 }

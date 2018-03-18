@@ -1,6 +1,6 @@
 import * as FirebaseFirestore from '@google-cloud/firestore';
 import { BatchType } from './batchable';
-import { Base, AnySubCollection } from './base';
+import { Base, AnySubCollection, DocumentData } from './base';
 export declare class SubCollection<T extends Base> implements AnySubCollection {
     path: string;
     reference: FirebaseFirestore.CollectionReference;
@@ -18,9 +18,7 @@ export declare class SubCollection<T extends Base> implements AnySubCollection {
     insert(newMember: T): void;
     delete(member: T): void;
     get(type: {
-        new (id?: string, value?: {
-            [key: string]: any;
-        }): T;
+        new (id?: string, data?: DocumentData): T;
     }): Promise<T[]>;
     contains(id: string): Promise<Boolean>;
     forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;

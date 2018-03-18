@@ -29,9 +29,10 @@ describe("SubCollection pack", () => {
         doc0.referenceCollection.insert(doc1)
         doc0.referenceCollection.insert(doc1_other)
         doc0.referenceCollection.insert(doc2_other)
+        await doc0.save()
+        
         doc1.referenceCollection.insert(doc2)
         doc1.referenceCollection.insert(doc2_other)
-        await doc0.save()
         await doc1.update()
     });
 
@@ -95,10 +96,11 @@ describe("SubCollection pack", () => {
         describe("Document get reference", async () => {
             test("doc 1 reference", async () => {
                 try {
-                    const docs = await new Document(doc0_id).referenceCollection.get(Document) 
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
                     for (const doc of docs) {
                         await doc.fetch()
                     }
+                    expect(docs.length !== 0).toBeTruthy()
                     expect( docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
@@ -110,10 +112,11 @@ describe("SubCollection pack", () => {
     
             test("doc 2 reference", async () => {
                 try {
-                    const docs = await new Document(doc1_id).referenceCollection.get(Document) 
+                    const docs = await new Document(doc1_id).referenceCollection.get(Document)
                     for (const doc of docs) {
                         await doc.fetch()
                     } 
+                    expect(docs.length !== 0).toBeTruthy()
                     expect( docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
@@ -125,10 +128,11 @@ describe("SubCollection pack", () => {
     
             test("doc 1 reference before saved document", async () => {
                 try {
-                    const docs = await new Document(doc0_id).referenceCollection.get(Document) 
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
                     for (const doc of docs) {
                         await doc.fetch()
                     } 
+                    expect(docs.length !== 0).toBeTruthy()
                     expect( docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
@@ -142,7 +146,8 @@ describe("SubCollection pack", () => {
         describe("Document get reference", async () => {
             test("doc 1 reference", async () => {
                 try {
-                    const docs = await new Document(doc0_id).referenceCollection.get(Document) 
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
+                    expect(docs.length !== 0).toBeTruthy()
                     expect( docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
@@ -154,7 +159,8 @@ describe("SubCollection pack", () => {
     
             test("doc 2 reference", async () => {
                 try {
-                    const docs = await new Document(doc1_id).referenceCollection.get(Document) 
+                    const docs = await new Document(doc1_id).referenceCollection.get(Document)
+                    expect(docs.length !== 0).toBeTruthy()
                     expect( docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
@@ -166,7 +172,8 @@ describe("SubCollection pack", () => {
     
             test("doc 1 reference before saved document", async () => {
                 try {
-                    const docs = await new Document(doc0_id).referenceCollection.get(Document) 
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
+                    expect(docs.length !== 0).toBeTruthy()
                     expect( docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()

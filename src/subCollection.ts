@@ -2,7 +2,7 @@ import * as FirebaseFirestore from '@google-cloud/firestore'
 import { } from "reflect-metadata"
 import { BatchType } from './batchable'
 import { firestore } from './index'
-import { Base, AnySubCollection } from './base'
+import { Base, AnySubCollection, DocumentData } from './base'
 
 export class SubCollection<T extends Base> implements AnySubCollection {
 
@@ -67,7 +67,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         member.reference = member.getReference()
     }
 
-    async get(type: { new(id?: string, value?: { [key: string]: any }): T; }) {
+    async get(type: { new(id?: string, data?: DocumentData): T; }) {
         try {
             const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
             const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs

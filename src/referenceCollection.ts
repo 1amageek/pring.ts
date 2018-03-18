@@ -2,7 +2,7 @@ import * as FirebaseFirestore from '@google-cloud/firestore'
 import { } from "reflect-metadata"
 import { BatchType } from './batchable'
 import { firestore } from './index'
-import { Base } from './base'
+import { Base, DocumentData } from './base'
 import { SubCollection } from './subCollection'
 
 export class ReferenceCollection<T extends Base> extends SubCollection<T> {
@@ -29,7 +29,6 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
 
     pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
         const _batch = batch || firestore.batch()
-        const self = this
         switch (type) {
             case BatchType.save: {
                 this.forEach(document => {
@@ -42,7 +41,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                     if (!document.isSaved) {
                         _batch.set(document.reference, document.value())
                     }
-                    const reference = self.reference.doc(document.id)
+                    const reference = this.reference.doc(document.id)
                     _batch.set(reference, value)
                 })
                 return _batch
@@ -55,7 +54,9 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                         if (document.shouldBeReplicated()) {
                             value = document.value()
                         }
-                        value["createdAt"] = document.createdAt
+                        if (document.createdAt) {
+                            value["createdAt"] = document.createdAt
+                        }                        
                         value["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
                         _batch.set(document.reference, document.value())
                     } else {
@@ -65,25 +66,25 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                         value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
                         value["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
                     }
-                    const reference = self.reference.doc(document.id)
+                    const reference = this.reference.doc(document.id)
                     _batch.set(reference, value)
                 })
                 const deletions = this._deletions.filter(item => this._insertions.indexOf(item) < 0)
                 deletions.forEach(document => {
-                    const reference = self.reference.doc(document.id)
+                    const reference = this.reference.doc(document.id)
                     _batch.delete(reference)
                 })
                 return _batch
             case BatchType.delete:
                 this.forEach(document => {
-                    const reference = self.reference.doc(document.id)
+                    const reference = this.reference.doc(document.id)
                     _batch.delete(reference)
                 })
                 return _batch
         }
     }
 
-    async get(type: { new(id?: string, value?: { [key: string]: any }): T; }) {
+    async get(type: { new(id?: string, data?: DocumentData): T; }) {
         try {
             const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
             const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
