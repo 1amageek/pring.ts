@@ -55,6 +55,10 @@ export function isFile(arg): Boolean {
     return (arg instanceof File)
 }
 
+export const isUndefined = (value: any): boolean => {
+    return (value === null || value === undefined || value === NaN)
+}
+
 export type DocumentData = { [key: string]: any } | FirebaseFirestore.DocumentData | any
 
 export type Snapshot = FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot
@@ -180,7 +184,10 @@ export class Base implements Document {
     setData(data: DocumentData) {
         const properties: string[] = this.getProperties()
         for (const key of properties) {
-            this._defineProperty(key, data[key])
+            const value = data[key]
+            if (!isUndefined(value)) {
+                this._defineProperty(key, data[key])
+            }
         }
     }
 
@@ -219,7 +226,7 @@ export class Base implements Document {
             const descriptor = Object.getOwnPropertyDescriptor(this, key)
             if (descriptor) {
                 const value = descriptor.get()
-                if ((value !== null) && (value !== undefined)) {
+                if (!isUndefined(value)) {
                     if (isCollection(value)) {
                         // Nothing 
                     } else if (isFile(value)) {

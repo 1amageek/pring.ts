@@ -38,151 +38,151 @@ describe("SubCollection pack", () => {
 
     describe("ReferenceCollection", async () => {
 
-        // describe("Get ReferenceCollection's document", async () => {
+        describe("Get ReferenceCollection's document", async () => {
 
-        //     test("Root document", async () => {
-        //         try {
-        //             const doc: Document = await Document.get(doc0_id, Document)
-        //             expect(doc).not.toBeNull()
-        //             expect(doc0.isSaved).toEqual(true)
-        //             expect(doc1.isSaved).toEqual(true)
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
+            test("Root document", async () => {
+                try {
+                    const doc: Document = await Document.get(doc0_id, Document)
+                    expect(doc).not.toBeNull()
+                    expect(doc0.isSaved).toEqual(true)
+                    expect(doc1.isSaved).toEqual(true)
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
     
-        //     test("doc0's ReferenceCollection", async () => {
-        //         try {
-        //             const doc = await Document.get(doc1_id, Document)
-        //             expect(doc).not.toBeNull()
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
+            test("doc0's ReferenceCollection", async () => {
+                try {
+                    const doc = await Document.get(doc1_id, Document)
+                    expect(doc).not.toBeNull()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
     
-        //     test("doc1's ReferenceCollection", async () => {
-        //         try {
-        //             const doc = await Document.get(doc2_id, Document)
-        //             expect(doc).not.toBeNull()
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
+            test("doc1's ReferenceCollection", async () => {
+                try {
+                    const doc = await Document.get(doc2_id, Document)
+                    expect(doc).not.toBeNull()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
     
-        //     test("A ReferenceCollection saved before doc0 is saved", async () => {
-        //         try {
-        //             const doc = await Document.get(doc1_other_id, Document)
-        //             expect(doc).not.toBeNull()
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
+            test("A ReferenceCollection saved before doc0 is saved", async () => {
+                try {
+                    const doc = await Document.get(doc1_other_id, Document)
+                    expect(doc).not.toBeNull()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
 
-        //     test("This doc2_other is saved in another ReferenceCollection", async () => {
-        //         try {
-        //             const doc = await Document.get(doc2_other_id, Document)
-        //             expect(doc).not.toBeNull()
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
-        // })
+            test("This doc2_other is saved in another ReferenceCollection", async () => {
+                try {
+                    const doc = await Document.get(doc2_other_id, Document)
+                    expect(doc).not.toBeNull()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
+        })
     
-        // describe("Document get reference", async () => {
-        //     test("doc 1 reference", async () => {
-        //         try {
-        //             const docs = await new Document(doc0_id).referenceCollection.get(Document)
-        //             for (const doc of docs) {
-        //                 await doc.fetch()
-        //             }
-        //             expect(docs.length !== 0).toBeTruthy()
-        //             expect( docs.filter((value) => {
-        //                 return (value.id == doc1_id)
-        //             })).toBeTruthy()
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
+        describe("Document get reference", async () => {
+            test("doc 1 reference", async () => {
+                try {
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
+                    for (const doc of docs) {
+                        await doc.fetch()
+                    }
+                    expect(docs.length !== 0).toBeTruthy()
+                    expect( docs.filter((value) => {
+                        return (value.id == doc1_id)
+                    })).toBeTruthy()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
     
-        //     test("doc 2 reference", async () => {
-        //         try {
-        //             const docs = await new Document(doc1_id).referenceCollection.get(Document)
-        //             for (const doc of docs) {
-        //                 await doc.fetch()
-        //             } 
-        //             expect(docs.length !== 0).toBeTruthy()
-        //             expect( docs.filter((value) => {
-        //                 return (value.id == doc2_id)
-        //             })).toBeTruthy()
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
+            test("doc 2 reference", async () => {
+                try {
+                    const docs = await new Document(doc1_id).referenceCollection.get(Document)
+                    for (const doc of docs) {
+                        await doc.fetch()
+                    } 
+                    expect(docs.length !== 0).toBeTruthy()
+                    expect( docs.filter((value) => {
+                        return (value.id == doc2_id)
+                    })).toBeTruthy()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
     
-        //     test("doc 1 reference before saved document", async () => {
-        //         try {
-        //             const docs = await new Document(doc0_id).referenceCollection.get(Document)
-        //             for (const doc of docs) {
-        //                 await doc.fetch()
-        //             } 
-        //             expect(docs.length !== 0).toBeTruthy()
-        //             expect( docs.filter((value) => {
-        //                 return (value.id == doc1_other_id)
-        //             })).toBeTruthy()
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
-        // })
+            test("doc 1 reference before saved document", async () => {
+                try {
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
+                    for (const doc of docs) {
+                        await doc.fetch()
+                    } 
+                    expect(docs.length !== 0).toBeTruthy()
+                    expect( docs.filter((value) => {
+                        return (value.id == doc1_other_id)
+                    })).toBeTruthy()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
+        })
 
-        // describe("Initilizeed Document get reference", async () => {
-        //     test("doc 1 reference", async () => {
-        //         try {
-        //             const docs = await new Document(doc0_id).referenceCollection.get(Document)
-        //             expect(docs.length !== 0).toBeTruthy()
-        //             expect( docs.filter((value) => {
-        //                 return (value.id == doc1_id)
-        //             })).toBeTruthy()
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
+        describe("Initilizeed Document get reference", async () => {
+            test("doc 1 reference", async () => {
+                try {
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
+                    expect(docs.length !== 0).toBeTruthy()
+                    expect( docs.filter((value) => {
+                        return (value.id == doc1_id)
+                    })).toBeTruthy()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
     
-        //     test("doc 2 reference", async () => {
-        //         try {
-        //             const docs = await new Document(doc1_id).referenceCollection.get(Document)
-        //             expect(docs.length !== 0).toBeTruthy()
-        //             expect( docs.filter((value) => {
-        //                 return (value.id == doc2_id)
-        //             })).toBeTruthy()
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
+            test("doc 2 reference", async () => {
+                try {
+                    const docs = await new Document(doc1_id).referenceCollection.get(Document)
+                    expect(docs.length !== 0).toBeTruthy()
+                    expect( docs.filter((value) => {
+                        return (value.id == doc2_id)
+                    })).toBeTruthy()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
     
-        //     test("doc 1 reference before saved document", async () => {
-        //         try {
-        //             const docs = await new Document(doc0_id).referenceCollection.get(Document)
-        //             expect(docs.length !== 0).toBeTruthy()
-        //             expect( docs.filter((value) => {
-        //                 return (value.id == doc1_other_id)
-        //             })).toBeTruthy()
-        //         } catch (error) {
-        //             expect(error).toBeNull()
-        //             console.log(error)
-        //         }
-        //     })
-        // })
+            test("doc 1 reference before saved document", async () => {
+                try {
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
+                    expect(docs.length !== 0).toBeTruthy()
+                    expect( docs.filter((value) => {
+                        return (value.id == doc1_other_id)
+                    })).toBeTruthy()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
+        })
 
         describe("Document get reference", async () => {
             test("doc 1 reference", async () => {
