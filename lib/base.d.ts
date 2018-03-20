@@ -31,6 +31,9 @@ export declare function isCollection(arg: any): Boolean;
 export declare function isFile(arg: any): Boolean;
 export declare const isUndefined: (value: any) => boolean;
 export declare type DocumentData = {
+    createdAt: Date;
+    updatedAt: Date;
+} | {
     [key: string]: any;
 } | FirebaseFirestore.DocumentData | any;
 export declare type Snapshot = FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot;
