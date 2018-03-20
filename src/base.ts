@@ -59,7 +59,7 @@ export const isUndefined = (value: any): boolean => {
     return (value === null || value === undefined || value === NaN)
 }
 
-export type DocumentData = { [key: string]: any } | FirebaseFirestore.DocumentData | any
+export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | FirebaseFirestore.DocumentData | any
 
 export type Snapshot = FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot
 
@@ -182,6 +182,12 @@ export class Base implements Document {
     }
 
     setData(data: DocumentData) {
+        if (data.createdAt) {
+            this._defineProperty('createdAt', data.createdAt)
+        }
+        if (data.updatedAt) {
+            this._defineProperty('updatedAt', data.updatedAt)
+        }
         const properties: string[] = this.getProperties()
         for (const key of properties) {
             const value = data[key]
@@ -246,8 +252,8 @@ export class Base implements Document {
         if (this.isSaved) {
             values["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
         } else {
-            values["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
-            values["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+            values["createdAt"] = this.createdAt || FirebaseFirestore.FieldValue.serverTimestamp()
+            values["updatedAt"] = this.updatedAt || FirebaseFirestore.FieldValue.serverTimestamp()
         }
         return values
     }

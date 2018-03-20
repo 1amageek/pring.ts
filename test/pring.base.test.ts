@@ -14,6 +14,8 @@ describe("Document property", () => {
     var doc: Document
 
     beforeAll(async () => {
+        document.createdAt = new Date(100)
+        document.updatedAt = new Date(100)
         await document.save()
         doc = await Document.get(document.id, Document)
     });
@@ -22,6 +24,14 @@ describe("Document property", () => {
 
         test("batch", () => {
             expect(Pring.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
+        })
+
+        test("createdAt", () => {
+            expect(doc.createdAt).toEqual(new Date(100))
+        })
+
+        test("updatedAt", () => {
+            expect(doc.updatedAt).toEqual(new Date(100))
         })
 
         test("String type", () => {
@@ -68,15 +78,15 @@ describe("Document property", () => {
         })
     })
 
-    describe("delete document", async () => {
-        test("delete", async () => {
-            try {
-                const document_id = doc.id
-                await doc.delete()
-                await Document.get(document_id, Document)
-            } catch (error) {
-                expect(error).not.toBeNull()
-            }
-        })
-    })
+    // describe("delete document", async () => {
+    //     test("delete", async () => {
+    //         try {
+    //             const document_id = doc.id
+    //             await doc.delete()
+    //             await Document.get(document_id, Document)
+    //         } catch (error) {
+    //             expect(error).not.toBeNull()
+    //         }
+    //     })
+    // })
 })
