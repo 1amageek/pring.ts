@@ -78,15 +78,15 @@ describe("Document property", () => {
         })
     })
 
-    // describe("delete document", async () => {
-    //     test("delete", async () => {
-    //         try {
-    //             const document_id = doc.id
-    //             await doc.delete()
-    //             await Document.get(document_id, Document)
-    //         } catch (error) {
-    //             expect(error).not.toBeNull()
-    //         }
-    //     })
-    // })
+    describe("delete document", async () => {
+        test("delete", async () => {
+            try {
+                const document_id = doc.id
+                await doc.delete()
+                await Document.get(document_id, Document)
+            } catch (error) {
+                expect(error).not.toBeNull()
+            }
+        })
+    })
 })
