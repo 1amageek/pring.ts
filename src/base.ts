@@ -328,7 +328,7 @@ export class Base implements Document {
     setParent<T extends Base>(parent: NestedCollection<T>) {
         // Set reference
         this.path = `${parent.path}/${this.id}`
-        this.reference = this.getReference()
+        this.reference = firestore.doc(this.path)
     }
 
     async save() {
