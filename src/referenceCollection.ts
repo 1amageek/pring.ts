@@ -94,7 +94,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         }
     }
 
-    async get(type: { new(id?: string, data?: DocumentData): T; }, id?: string) {
+    async get(type: { new(id?: string, data?: DocumentData): T; }) {
         try {
             const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
             const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs

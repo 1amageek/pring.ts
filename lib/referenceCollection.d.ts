@@ -11,5 +11,5 @@ export declare class ReferenceCollection<T extends Base> extends SubCollection<T
     }): Promise<T>;
     get(type: {
         new (id?: string, data?: DocumentData): T;
-    }, id?: string): Promise<T[]>;
+    }): Promise<T[]>;
 }
