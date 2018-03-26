@@ -84,18 +84,33 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         }
     }
 
-    async get(type: { new(id?: string, data?: DocumentData): T; }) {
-        try {
-            const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
-            const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
-            const documents: T[] = docs.map((documentSnapshot) => {
-                const document: T = new type(documentSnapshot.id, {})
-                return document
-            })
-            this.objects = documents
-            return documents
-        } catch (error) {
-            throw error
-        }
+    async get(type: { new(id?: string, data?: DocumentData): T; }, id?: string) {
+        if (id) {
+            try {
+                const snapshot: FirebaseFirestore.DocumentSnapshot = await this.reference.doc(id).get()
+                if (snapshot.exists) {
+                    const document: T = new type(snapshot.id, {})
+                    document.setData(snapshot.data())
+                    return document
+                } else {
+                    return undefined
+                }
+            } catch (error) {
+                throw error
+            }
+        } else {
+            try {
+                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+                const documents: T[] = docs.map((documentSnapshot) => {
+                    const document: T = new type(documentSnapshot.id, {})
+                    return document
+                })
+                this.objects = documents
+                return documents
+            } catch (error) {
+                throw error
+            }
+        }        
     }
 }

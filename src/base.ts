@@ -92,11 +92,11 @@ export class Base implements Document {
         return `version/${this.getVersion()}/${this.getModelName()}`
     }
 
-    static async get<T extends Base>(id: string, type: { new(snapshot: DataOrSnapshot): T }) {
+    static async get<T extends Base>(id: string, type: { new(id?: string, data?: DocumentData): T }) {
         try {
             const snapshot: FirebaseFirestore.DocumentSnapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
             if (snapshot.exists) {
-                const document: T = new type(snapshot.id)
+                const document: T = new type(snapshot.id, {})
                 document.setData(snapshot.data())
                 return document
             } else {

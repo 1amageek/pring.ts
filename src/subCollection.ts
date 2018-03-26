@@ -72,7 +72,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
             try {
                 const snapshot: FirebaseFirestore.DocumentSnapshot = await this.reference.doc(id).get()
                 if (snapshot.exists) {
-                    const document: T = new type(snapshot.id)
+                    const document: T = new type(snapshot.id, {})
                     document.setData(snapshot.data())
                     return document
                 } else {

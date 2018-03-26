@@ -8,5 +8,5 @@ export declare class ReferenceCollection<T extends Base> extends SubCollection<T
     pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
     get(type: {
         new (id?: string, data?: DocumentData): T;
-    }): Promise<T[]>;
+    }, id?: string): Promise<T | T[]>;
 }

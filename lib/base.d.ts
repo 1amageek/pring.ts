@@ -47,7 +47,7 @@ export declare class Base implements Document {
     static getModelName(): string;
     static getPath(): string;
     static get<T extends Base>(id: string, type: {
-        new (snapshot: DataOrSnapshot): T;
+        new (id?: string, data?: DocumentData): T;
     }): Promise<T>;
     version: number;
     modelName: string;
