@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as FirebaseFirestore from '@google-cloud/firestore';
 import "reflect-metadata";
+import { NestedCollection } from './nestedCollection';
 import { Batchable, BatchType } from './batchable';
 export declare const property: <T extends Document>(target: T, propertyKey: any) => void;
 export interface ValueProtocol {
@@ -73,6 +74,7 @@ export declare class Base implements Document {
     value(): any;
     pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
     batch(type: BatchType, batchID: string): void;
+    setParent<T extends Base>(parent: NestedCollection<T>): void;
     save(): Promise<FirebaseFirestore.WriteResult[]>;
     update(): Promise<FirebaseFirestore.WriteResult[]>;
     delete(): Promise<FirebaseFirestore.WriteResult>;
