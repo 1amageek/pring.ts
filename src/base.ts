@@ -98,7 +98,6 @@ export class Base implements Document {
             if (snapshot.exists) {
                 const document: T = new type(snapshot.id)
                 document.setData(snapshot.data())
-                document._updateValues = {}
                 return document
             } else {
                 return undefined
@@ -195,6 +194,7 @@ export class Base implements Document {
                 this._defineProperty(key, data[key])
             }
         }
+        this._updateValues = {}
     }
 
     shouldBeReplicated(): boolean {
@@ -366,8 +366,7 @@ export class Base implements Document {
             if (data) {
                 this.setData(data)
                 this.isSaved = true
-            }
-            this._updateValues = {}
+            }            
         } catch (error) {
             throw error
         }
