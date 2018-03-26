@@ -15,6 +15,7 @@ describe("SubCollection pack", () => {
     const doc1_nested = new Document()
     const doc2_nested = new Document()
     const doc1_other_nested = new Document()
+    const child = new Document()
 
     const doc0_nested_id = doc0_nested.id
     const doc1_nested_id = doc1_nested.id
@@ -28,6 +29,9 @@ describe("SubCollection pack", () => {
         doc0_nested.nestedCollection.insert(doc1_other_nested)
         doc1_nested.nestedCollection.insert(doc2_nested)
         await doc0_nested.save()
+
+        child.setParent(doc0_nested.nestedCollection)
+        await child.save()
     });
 
     describe("NestedCollection", async () => {
@@ -77,6 +81,18 @@ describe("SubCollection pack", () => {
                     console.log(error)
                 }
             })
+
+            test("Document saved as a child can be get", async () => {
+                try {
+                    const docs = await new Document(doc0_nested_id).nestedCollection.get(Document)
+                    expect( docs.filter((value) => {
+                        return (value.id == child.id)
+                    })).toBeTruthy()
+                    expect(docs[0]).not.toBeNull()
+                } catch (error) {
+                    console.log(error)
+                }
+            })
         })
     })
     //     describe("Document delete", async () => {
@@ -122,7 +138,6 @@ describe("SubCollection pack", () => {
 
     describe("NestedCollection", async () => {
         describe("Get NestedCollection's document", async () => {
-
             test("Root document", async () => {
                 try {
                     const doc = await Document.get(doc0_nested_id, Document)

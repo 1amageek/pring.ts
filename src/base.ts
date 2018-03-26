@@ -161,7 +161,7 @@ export class Base implements Document {
         // set pring object base data
         this.version = this.getVersion()
         this.modelName = this.getModelName()
-        
+
         // Set reference
         this.id = id || firestore.collection(`version/${this.version}/${this.modelName}`).doc().id
         this.path = this.getPath()
@@ -325,6 +325,12 @@ export class Base implements Document {
         }
     }
 
+    setParent<T extends Base>(parent: NestedCollection<T>) {
+        // Set reference
+        this.path = `${parent.path}/${this.id}`
+        this.reference = this.getReference()
+    }
+
     async save() {
         const batch = this.pack(BatchType.save, UUID.v4())
         try {
@@ -355,7 +361,7 @@ export class Base implements Document {
 
     async fetch() {
         try {
-            const snapshot = await this.reference.get()            
+            const snapshot = await this.reference.get()
             const data = snapshot.data()
             if (data) {
                 this.setData(data)
