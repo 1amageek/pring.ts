@@ -73,6 +73,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
             if (snapshot.exists) {
                 const document: T = new type(snapshot.id, {})
                 document.setData(snapshot.data())
+                document.setParent(this)
                 return document
             } else {
                 return undefined
