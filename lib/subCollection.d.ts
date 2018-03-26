@@ -17,9 +17,12 @@ export declare class SubCollection<T extends Base> implements AnySubCollection {
     getReference(): FirebaseFirestore.CollectionReference;
     insert(newMember: T): void;
     delete(member: T): void;
+    doc(id: string, type: {
+        new (id?: string, data?: DocumentData): T;
+    }): Promise<T>;
     get(type: {
         new (id?: string, data?: DocumentData): T;
-    }, id?: string): Promise<T | T[]>;
+    }): Promise<T[]>;
     contains(id: string): Promise<Boolean>;
     forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
     pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;

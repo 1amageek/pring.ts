@@ -56,7 +56,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                         }
                         if (document.createdAt) {
                             value["createdAt"] = document.createdAt
-                        }                        
+                        }
                         value["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
                         _batch.set(document.reference, document.value())
                     } else {
@@ -84,33 +84,28 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         }
     }
 
+    async doc(id: string, type: { new(id?: string, data?: DocumentData): T; }) {
+        try {
+            const document: T = new type(id, {})
+            await document.fetch()
+            return document
+        } catch (error) {
+            throw error
+        }
+    }
+
     async get(type: { new(id?: string, data?: DocumentData): T; }, id?: string) {
-        if (id) {
-            try {
-                const snapshot: FirebaseFirestore.DocumentSnapshot = await this.reference.doc(id).get()
-                if (snapshot.exists) {
-                    const document: T = new type(snapshot.id, {})
-                    document.setData(snapshot.data())
-                    return document
-                } else {
-                    return undefined
-                }
-            } catch (error) {
-                throw error
-            }
-        } else {
-            try {
-                const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
-                const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
-                const documents: T[] = docs.map((documentSnapshot) => {
-                    const document: T = new type(documentSnapshot.id, {})
-                    return document
-                })
-                this.objects = documents
-                return documents
-            } catch (error) {
-                throw error
-            }
-        }        
+        try {
+            const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+            const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+            const documents: T[] = docs.map((documentSnapshot) => {
+                const document: T = new type(documentSnapshot.id, {})
+                return document
+            })
+            this.objects = documents
+            return documents
+        } catch (error) {
+            throw error
+        }
     }
 }
