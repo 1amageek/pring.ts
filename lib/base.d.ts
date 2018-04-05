@@ -37,7 +37,7 @@ export declare type DocumentData = {
 } | {
     [key: string]: any;
 } | FirebaseFirestore.DocumentData | any;
-export declare type Snapshot = FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot;
+export declare type Snapshot = FirebaseFirestore.DocumentSnapshot;
 export declare type DataOrSnapshot = DocumentData | Snapshot;
 export declare class Base implements Document {
     static getTriggerPath(): string;

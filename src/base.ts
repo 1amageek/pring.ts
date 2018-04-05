@@ -61,7 +61,7 @@ export const isUndefined = (value: any): boolean => {
 
 export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | FirebaseFirestore.DocumentData | any
 
-export type Snapshot = FirebaseFirestore.DocumentSnapshot | functions.firestore.DeltaDocumentSnapshot
+export type Snapshot = FirebaseFirestore.DocumentSnapshot
 
 export type DataOrSnapshot = DocumentData | Snapshot
 
