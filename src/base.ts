@@ -258,7 +258,7 @@ export class Base implements Document {
         return values
     }
 
-    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
+    pack(type: BatchType, batchID: string = UUID.v4(), batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
         const _batch = batch || firestore.batch()
         if (batchID === this.batchID) {
             return _batch
@@ -305,7 +305,7 @@ export class Base implements Document {
         }
     }
 
-    batch(type: BatchType, batchID: string) {
+    batch(type: BatchType, batchID: string = UUID.v4()) {
         if (batchID === this.batchID) {
             return
         }
@@ -332,10 +332,10 @@ export class Base implements Document {
     }
 
     async save() {
-        const batch = this.pack(BatchType.save, UUID.v4())
+        const batch = this.pack(BatchType.save)
         try {
             const result = await batch.commit()
-            this.batch(BatchType.save, UUID.v4())
+            this.batch(BatchType.save)
             this._updateValues = {}
             return result
         } catch (error) {
@@ -344,10 +344,10 @@ export class Base implements Document {
     }
 
     async update() {
-        const batch = this.pack(BatchType.update, UUID.v4())
+        const batch = this.pack(BatchType.update)
         try {
             const result = await batch.commit()
-            this.batch(BatchType.update, UUID.v4())
+            this.batch(BatchType.update)
             this._updateValues = {}
             return result
         } catch (error) {
