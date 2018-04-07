@@ -262,16 +262,14 @@ export class Base implements Document {
         const _batch = batch || firestore.batch()
 
         // If a batch ID is not specified, it is generated
-        if (batchID === null) {
-            batchID = UUID.v4()
-        }
-
+        const _batchID = batchID || UUID.v4()
+        
         // If you do not process already packed documents
-        if (batchID === this.batchID) {
+        if (_batchID === this.batchID) {
             return _batch
         }
 
-        this.batchID = batchID
+        this.batchID = _batchID
         const reference = this.reference
         const properties = this.getProperties()
         switch (type) {
@@ -285,7 +283,7 @@ export class Base implements Document {
                             const collection: AnySubCollection = value as AnySubCollection
                             collection.setParent(this, key)
                             const batchable: Batchable = value as Batchable
-                            batchable.pack(BatchType.save, batchID, _batch)
+                            batchable.pack(BatchType.save, _batchID, _batch)
                         }
                     }
                 }
