@@ -291,7 +291,7 @@ export class Base implements Document {
             case BatchType.update:
                 const updateValues = this._updateValues
                 updateValues["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
-                _batch.set(reference, updateValues)
+                _batch.set(reference, updateValues, {merge: true})
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
                     if (descriptor) {
