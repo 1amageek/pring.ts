@@ -258,11 +258,19 @@ export class Base implements Document {
         return values
     }
 
-    pack(type: BatchType, batchID: string = UUID.v4(), batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
+    pack(type: BatchType, batchID?: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
         const _batch = batch || firestore.batch()
+
+        // If a batch ID is not specified, it is generated
+        if (batchID === null) {
+            batchID = UUID.v4()
+        }
+
+        // If you do not process already packed documents
         if (batchID === this.batchID) {
             return _batch
         }
+
         this.batchID = batchID
         const reference = this.reference
         const properties = this.getProperties()
