@@ -198,7 +198,7 @@ describe("Document property", () => {
             await doc.update()
             const newDoc = await Document.get(document.id, Document)
             expect(newDoc.set).toEqual({ "update": true })
-            await newDoc.delete()
+            // await newDoc.delete()
         })
 
         test("File type", async () => {
