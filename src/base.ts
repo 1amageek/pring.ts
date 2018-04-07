@@ -300,7 +300,7 @@ export class Base implements Document {
                             const collection: AnySubCollection = value as AnySubCollection
                             collection.setParent(this, key)
                             const batchable: Batchable = value as Batchable
-                            batchable.pack(BatchType.update, batchID, _batch)
+                            batchable.pack(BatchType.update, _batchID, _batch)
                         }
                     }
                 }
