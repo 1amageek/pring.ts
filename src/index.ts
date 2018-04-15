@@ -1,4 +1,4 @@
-import * as firebase from 'firebase-admin'
+import * as admin from 'firebase-admin'
 import * as FirebaseFirestore from '@google-cloud/firestore'
 
 // pring export
@@ -10,9 +10,9 @@ import { ReferenceCollection } from './referenceCollection'
 import { File } from './file'
 
 export { BatchType, Base, property, SubCollection, NestedCollection, ReferenceCollection, File }
-export let firestore: FirebaseFirestore.Firestore
-export const initialize = (options?: firebase.AppOptions & any) => {
-    firestore = new FirebaseFirestore.Firestore(options)
+export let firestore: admin.firestore.Firestore
+export const initialize = (options?: any) => {
+    firestore = new admin.firestore.Firestore(options)
 }
 export const batch = (): FirebaseFirestore.WriteBatch => {
     return firestore.batch()
