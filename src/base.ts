@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions'
-import * as admin from 'firebase-admin'
-// import * as FirebaseFirestore from '@google-cloud/firestore'
+import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
 import "reflect-metadata"
 
@@ -29,7 +28,7 @@ export interface Document extends Batchable, ValueProtocol {
     modelName: string
     path: string
     id: string
-    reference: admin.firestore.DocumentReference
+    reference: FirebaseFirestore.DocumentReference
     createdAt: Date
     updatedAt: Date
     getVersion(): number
@@ -62,7 +61,7 @@ export const isUndefined = (value: any): boolean => {
 
 export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | FirebaseFirestore.DocumentData | any
 
-export type Snapshot = admin.firestore.DocumentSnapshot
+export type Snapshot = FirebaseFirestore.DocumentSnapshot
 
 export type DataOrSnapshot = DocumentData | Snapshot
 
@@ -95,7 +94,7 @@ export class Base implements Document {
 
     static async get<T extends Base>(id: string, type: { new(id?: string, data?: DocumentData): T }) {
         try {
-            const snapshot: admin.firestore.DocumentSnapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
+            const snapshot: FirebaseFirestore.DocumentSnapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
             if (snapshot.exists) {
                 const document: T = new type(snapshot.id, {})
                 document.setData(snapshot.data())
@@ -214,7 +213,7 @@ export class Base implements Document {
         return `version/${this.version}/${this.modelName}/${this.id}`
     }
 
-    getReference(): admin.firestore.DocumentReference {
+    getReference(): FirebaseFirestore.DocumentReference {
         return firestore.doc(this.getPath())
     }
 
@@ -251,10 +250,10 @@ export class Base implements Document {
     value(): any {
         const values: any = this.rawValue()
         if (this.isSaved) {
-            values["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
+            values["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
         } else {
-            values["createdAt"] = this.createdAt || admin.firestore.FieldValue.serverTimestamp()
-            values["updatedAt"] = this.updatedAt || admin.firestore.FieldValue.serverTimestamp()
+            values["createdAt"] = this.createdAt || FirebaseFirestore.FieldValue.serverTimestamp()
+            values["updatedAt"] = this.updatedAt || FirebaseFirestore.FieldValue.serverTimestamp()
         }
         return values
     }
@@ -291,7 +290,7 @@ export class Base implements Document {
                 return _batch
             case BatchType.update:
                 const updateValues = this._updateValues
-                updateValues["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
+                updateValues["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
                 _batch.update(reference, updateValues)
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)

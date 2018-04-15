@@ -2,6 +2,7 @@ process.env.NODE_ENV = 'test';
 
 import * as Pring from "../src/index"
 import { Document } from './document'
+import * as FirebaseFirestore from '@google-cloud/firestore'
 
 Pring.initialize({
     projectId: 'salada-f825d',

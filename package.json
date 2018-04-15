@@ -50,9 +50,6 @@
     "tslint": "^5.8.0",
     "typescript": "^2.8.1"
   },
-  "peerDependencies": {
-    "@google-cloud/firestore": "^0.13.0"
-  },
   "jest": {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"

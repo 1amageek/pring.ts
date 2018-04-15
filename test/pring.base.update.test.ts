@@ -13,7 +13,7 @@ describe("Document property", () => {
     describe("properties before get", async () => {
 
         test("batch", () => {
-            expect(Pring.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
+            expect(Pring.firestore.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
         })
 
         test("String type", async () => {
@@ -110,7 +110,7 @@ describe("Document property", () => {
     describe("properties after get", async () => {
 
         test("batch", () => {
-            expect(Pring.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
+            expect(Pring.firestore.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
         })
 
         test("String type", async () => {

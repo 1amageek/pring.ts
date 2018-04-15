@@ -23,7 +23,7 @@ describe("Document property", () => {
     describe("properties", async () => {
 
         test("batch", () => {
-            expect(Pring.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
+            expect(Pring.firestore.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
         })
 
         test("createdAt", () => {

@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin';
+import * as FirebaseFirestore from '@google-cloud/firestore';
 import "reflect-metadata";
 import { NestedCollection } from './nestedCollection';
 import { Batchable, BatchType } from './batchable';
@@ -13,7 +13,7 @@ export interface Document extends Batchable, ValueProtocol {
     modelName: string;
     path: string;
     id: string;
-    reference: admin.firestore.DocumentReference;
+    reference: FirebaseFirestore.DocumentReference;
     createdAt: Date;
     updatedAt: Date;
     getVersion(): number;
@@ -37,7 +37,7 @@ export declare type DocumentData = {
 } | {
     [key: string]: any;
 } | FirebaseFirestore.DocumentData | any;
-export declare type Snapshot = admin.firestore.DocumentSnapshot;
+export declare type Snapshot = FirebaseFirestore.DocumentSnapshot;
 export declare type DataOrSnapshot = DocumentData | Snapshot;
 export declare class Base implements Document {
     static getTriggerPath(): string;
@@ -67,7 +67,7 @@ export declare class Base implements Document {
     getVersion(): number;
     getModelName(): string;
     getPath(): string;
-    getReference(): admin.firestore.DocumentReference;
+    getReference(): FirebaseFirestore.DocumentReference;
     getProperties(): string[];
     setValue(value: any, key: string): void;
     rawValue(): any;
