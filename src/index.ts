@@ -11,6 +11,6 @@ export { BatchType, Base, property, SubCollection, NestedCollection, ReferenceCo
 
 export let firestore: FirebaseFirestore.Firestore
 
-export const initialize = (options?: any) => {
-    firestore = admin.firestore(options)
+export const initialize = (app: admin.app.App) => {
+    firestore = app.firestore()
 }

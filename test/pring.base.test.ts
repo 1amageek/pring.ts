@@ -1,12 +1,13 @@
 process.env.NODE_ENV = 'test';
+import * as admin from 'firebase-admin'
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as Pring from "../src/index"
 import { Document } from './document'
 
-Pring.initialize({
+Pring.initialize(admin.initializeApp({
     projectId: 'salada-f825d',
     keyFilename: './salada-f825d-firebase-adminsdk-19k25-ded6604978.json'
-})
+}))
 
 describe("Document property", () => {
 
