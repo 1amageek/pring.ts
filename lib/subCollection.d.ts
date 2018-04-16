@@ -1,4 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore';
 import { BatchType } from './batchable';
 import { Base, AnySubCollection, DocumentData } from './base';
 export declare class SubCollection<T extends Base> implements AnySubCollection {

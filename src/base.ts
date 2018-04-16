@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions'
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
 import "reflect-metadata"
 

@@ -1,4 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import { BatchType } from './batchable'
 import { Base, property } from './base'
 import { SubCollection } from './subCollection'

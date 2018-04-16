@@ -1,4 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore'
 
 export enum BatchType {
     save,

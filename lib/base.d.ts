@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions';
-import * as FirebaseFirestore from '@google-cloud/firestore';
 import "reflect-metadata";
 import { NestedCollection } from './nestedCollection';
 import { Batchable, BatchType } from './batchable';

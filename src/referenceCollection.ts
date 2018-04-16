@@ -1,4 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import { } from "reflect-metadata"
 import { BatchType } from './batchable'
 import { firestore } from './index'
