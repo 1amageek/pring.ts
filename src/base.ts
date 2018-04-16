@@ -247,7 +247,7 @@ export class Base implements Document {
         return values
     }
 
-    value(): any {
+    value(): FirebaseFirestore.DocumentData {
         const values: any = this.rawValue()
         if (this.isSaved) {
             values["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
@@ -274,7 +274,9 @@ export class Base implements Document {
         const properties = this.getProperties()
         switch (type) {
             case BatchType.save:
-                _batch.set(reference, this.value())
+                const value = this.value()
+                console.log(value)
+                _batch.set(reference, value)
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
                     if (descriptor) {

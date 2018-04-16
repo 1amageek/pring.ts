@@ -71,7 +71,7 @@ export declare class Base implements Document {
     getProperties(): string[];
     setValue(value: any, key: string): void;
     rawValue(): any;
-    value(): any;
+    value(): FirebaseFirestore.DocumentData;
     pack(type: BatchType, batchID?: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
     batch(type: BatchType, batchID?: string): void;
     setParent<T extends Base>(parent: NestedCollection<T>): void;
