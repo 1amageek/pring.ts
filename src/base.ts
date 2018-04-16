@@ -248,13 +248,13 @@ export class Base implements Document {
     }
 
     value(): FirebaseFirestore.DocumentData {
-        const values: any = this.rawValue()
-        if (this.isSaved) {
-            values["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
-        } else {
-            values["createdAt"] = this.createdAt || FirebaseFirestore.FieldValue.serverTimestamp()
-            values["updatedAt"] = this.updatedAt || FirebaseFirestore.FieldValue.serverTimestamp()
-        }
+        const values: FirebaseFirestore.DocumentData = this.rawValue()
+        // if (this.isSaved) {
+        //     values["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+        // } else {
+        //     values["createdAt"] = this.createdAt || FirebaseFirestore.FieldValue.serverTimestamp()
+        //     values["updatedAt"] = this.updatedAt || FirebaseFirestore.FieldValue.serverTimestamp()
+        // }
         return values
     }
 
