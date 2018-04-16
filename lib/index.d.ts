@@ -8,4 +8,5 @@ import { ReferenceCollection } from './referenceCollection';
 import { File } from './file';
 export { BatchType, Base, property, SubCollection, NestedCollection, ReferenceCollection, File };
 export declare let firestore: FirebaseFirestore.Firestore;
-export declare const initialize: (app: admin.app.App) => void;
+export declare let timestamp: admin.firestore.FieldValue;
+export declare const initialize: (app: admin.app.App, serverTimestamp: FirebaseFirestore.FieldValue) => void;

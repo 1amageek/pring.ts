@@ -4,7 +4,7 @@ import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
 import "reflect-metadata"
 
-import { firestore } from './index'
+import { firestore, timestamp } from './index'
 import { SubCollection } from './subCollection'
 import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
@@ -251,10 +251,10 @@ export class Base implements Document {
     value(): FirebaseFirestore.DocumentData {
         const values: FirebaseFirestore.DocumentData = this.rawValue()
         if (this.isSaved) {
-            values["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
+            values["updatedAt"] = timestamp
         } else {
-            values["createdAt"] = this.createdAt || admin.firestore.FieldValue.serverTimestamp()
-            values["updatedAt"] = this.updatedAt || admin.firestore.FieldValue.serverTimestamp()
+            values["createdAt"] = this.createdAt || timestamp
+            values["updatedAt"] = this.updatedAt || timestamp
         }
         return values
     }
@@ -291,7 +291,7 @@ export class Base implements Document {
                 return _batch
             case BatchType.update:
                 const updateValues = this._updateValues
-                updateValues["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
+                updateValues["updatedAt"] = timestamp
                 _batch.update(reference, updateValues)
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)

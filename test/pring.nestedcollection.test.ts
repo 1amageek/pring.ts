@@ -7,7 +7,7 @@ import * as FirebaseFirestore from '@google-cloud/firestore'
 Pring.initialize(admin.initializeApp({
     projectId: 'salada-f825d',
     keyFilename: './salada-f825d-firebase-adminsdk-19k25-ded6604978.json'
-}))
+}), admin.firestore.FieldValue.serverTimestamp())
 
 describe("SubCollection pack", () => {
 

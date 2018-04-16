@@ -2,7 +2,7 @@ import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as admin from 'firebase-admin'
 import { } from "reflect-metadata"
 import { BatchType } from './batchable'
-import { firestore } from './index'
+import { firestore, timestamp } from './index'
 import { Base, DocumentData } from './base'
 import { SubCollection } from './subCollection'
 
@@ -37,8 +37,8 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                     if (document.shouldBeReplicated()) {
                         value = document.value()
                     }
-                    value["createdAt"] = admin.firestore.FieldValue.serverTimestamp()
-                    value["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
+                    value["createdAt"] = timestamp
+                    value["updatedAt"] = timestamp
                     if (!document.isSaved) {
                         _batch.set(document.reference, document.value())
                     }
@@ -58,14 +58,14 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                         if (document.createdAt) {
                             value["createdAt"] = document.createdAt
                         }
-                        value["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
+                        value["updatedAt"] = timestamp
                         _batch.set(document.reference, document.value())
                     } else {
                         if (document.shouldBeReplicated()) {
                             value = document.value()
                         }
-                        value["createdAt"] = admin.firestore.FieldValue.serverTimestamp()
-                        value["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
+                        value["createdAt"] = timestamp
+                        value["updatedAt"] = timestamp
                     }
                     const reference = this.reference.doc(document.id)
                     _batch.set(reference, value)

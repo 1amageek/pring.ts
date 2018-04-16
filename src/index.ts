@@ -11,6 +11,9 @@ export { BatchType, Base, property, SubCollection, NestedCollection, ReferenceCo
 
 export let firestore: FirebaseFirestore.Firestore
 
-export const initialize = (app: admin.app.App) => {
+export let timestamp: admin.firestore.FieldValue
+
+export const initialize = (app: admin.app.App, serverTimestamp: admin.firestore.FieldValue) => {
     firestore = app.firestore()
+    timestamp = serverTimestamp
 }
