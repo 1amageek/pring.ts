@@ -1,4 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
+import * as admin from 'firebase-admin'
 import { BatchType } from './batchable'
 import { Base, property } from './base'
 import { SubCollection } from './subCollection'
@@ -11,5 +12,5 @@ export { BatchType, Base, property, SubCollection, NestedCollection, ReferenceCo
 export let firestore: FirebaseFirestore.Firestore
 
 export const initialize = (options?: any) => {
-    firestore = new FirebaseFirestore.Firestore(options)
+    firestore = admin.firestore(options)
 }
