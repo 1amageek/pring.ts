@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions'
+import * as admin from 'firebase-admin'
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
 import "reflect-metadata"
@@ -249,12 +250,12 @@ export class Base implements Document {
 
     value(): FirebaseFirestore.DocumentData {
         const values: FirebaseFirestore.DocumentData = this.rawValue()
-        // if (this.isSaved) {
-        //     values["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
-        // } else {
-        //     values["createdAt"] = this.createdAt || FirebaseFirestore.FieldValue.serverTimestamp()
-        //     values["updatedAt"] = this.updatedAt || FirebaseFirestore.FieldValue.serverTimestamp()
-        // }
+        if (this.isSaved) {
+            values["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
+        } else {
+            values["createdAt"] = this.createdAt || admin.firestore.FieldValue.serverTimestamp()
+            values["updatedAt"] = this.updatedAt || admin.firestore.FieldValue.serverTimestamp()
+        }
         return values
     }
 
@@ -274,9 +275,7 @@ export class Base implements Document {
         const properties = this.getProperties()
         switch (type) {
             case BatchType.save:
-                const value = this.value()
-                console.log(value)
-                _batch.set(reference, value)
+                _batch.set(reference, this.value())
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
                     if (descriptor) {
@@ -292,7 +291,7 @@ export class Base implements Document {
                 return _batch
             case BatchType.update:
                 const updateValues = this._updateValues
-                updateValues["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                updateValues["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
                 _batch.update(reference, updateValues)
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)

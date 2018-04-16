@@ -1,4 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
+import * as admin from 'firebase-admin'
 import { } from "reflect-metadata"
 import { BatchType } from './batchable'
 import { firestore } from './index'
@@ -36,8 +37,8 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                     if (document.shouldBeReplicated()) {
                         value = document.value()
                     }
-                    value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
-                    value["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                    value["createdAt"] = admin.firestore.FieldValue.serverTimestamp()
+                    value["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
                     if (!document.isSaved) {
                         _batch.set(document.reference, document.value())
                     }
@@ -57,14 +58,14 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                         if (document.createdAt) {
                             value["createdAt"] = document.createdAt
                         }
-                        value["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                        value["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
                         _batch.set(document.reference, document.value())
                     } else {
                         if (document.shouldBeReplicated()) {
                             value = document.value()
                         }
-                        value["createdAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
-                        value["updatedAt"] = FirebaseFirestore.FieldValue.serverTimestamp()
+                        value["createdAt"] = admin.firestore.FieldValue.serverTimestamp()
+                        value["updatedAt"] = admin.firestore.FieldValue.serverTimestamp()
                     }
                     const reference = this.reference.doc(document.id)
                     _batch.set(reference, value)
