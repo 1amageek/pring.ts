@@ -78,5 +78,5 @@ export declare class Base implements Document {
     save(): Promise<FirebaseFirestore.WriteResult[]>;
     update(): Promise<FirebaseFirestore.WriteResult[]>;
     delete(): Promise<FirebaseFirestore.WriteResult>;
-    fetch(): Promise<void>;
+    fetch(transaction?: FirebaseFirestore.Transaction): Promise<void>;
 }
