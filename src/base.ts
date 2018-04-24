@@ -366,9 +366,14 @@ export class Base implements Document {
         return await this.reference.delete()
     }
 
-    async fetch() {
+    async fetch(transaction?: FirebaseFirestore.Transaction) {
         try {
-            const snapshot = await this.reference.get()
+            let snapshot
+            if (transaction) {
+                snapshot = await transaction.get(this.reference)
+            } else {
+                snapshot = await this.reference.get()
+            }    
             const data = snapshot.data()
             if (data) {
                 this.setData(data)
