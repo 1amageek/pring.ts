@@ -67,9 +67,14 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         member.reference = member.getReference()
     }
 
-    async doc(id: string, type: { new(id?: string, data?: DocumentData): T; }) {
+    async doc(id: string, type: { new(id?: string, data?: DocumentData): T; }, transaction?: FirebaseFirestore.Transaction) {
         try {
-            const snapshot: FirebaseFirestore.DocumentSnapshot = await this.reference.doc(id).get()
+            let snapshot: FirebaseFirestore.DocumentSnapshot
+            if (transaction) {
+                snapshot = await transaction.get(this.reference.doc(id))
+            } else {
+                snapshot = await this.reference.doc(id).get()
+            }             
             if (snapshot.exists) {
                 const document: T = new type(snapshot.id, {})
                 document.setData(snapshot.data())
@@ -83,9 +88,14 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }     
     }
 
-    async get(type: { new(id?: string, data?: DocumentData): T; }) {
+    async get(type: { new(id?: string, data?: DocumentData): T; }, transaction?: FirebaseFirestore.Transaction) {
         try {
-            const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
+            let snapshot: FirebaseFirestore.QuerySnapshot
+            if (transaction) {
+                snapshot = await transaction.get(this.reference)
+            } else {
+                snapshot = await this.reference.get()
+            } 
             const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
                 const document: T = new type(documentSnapshot.id, {})
