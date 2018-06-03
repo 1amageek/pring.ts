@@ -34,15 +34,10 @@ Set `experimentalDecorators` to `true`.
 ``` typescript
 import { Pring, property } from "pring"
 
-// On your server
-const serviceAccount = require("path/to/serviceAccountKey.json");
- Pring.initialize({
-    projectId: 'YOUR_PROJECT_ID',
-    keyFilename: '/path/to/keyfile.json'
- })
+admin.initializeApp()
+const app = admin.app()
 
-// cloud functions
-Pring.initialize(functions.config().firebase)
+Pring.initialize(app, admin.firestore.FieldValue.serverTimestamp())
 ```
 
 ### Scheme
