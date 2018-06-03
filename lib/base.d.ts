@@ -60,7 +60,7 @@ export declare class Base implements Document {
     isLocalSaved: Boolean;
     batchID?: string;
     private _updateValues;
-    private _defineProperty(key, value?);
+    private _defineProperty;
     constructor(id?: string, data?: DocumentData);
     setData(data: DocumentData): void;
     shouldBeReplicated(): boolean;
