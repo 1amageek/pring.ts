@@ -133,7 +133,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                     if (document.isSaved) {
                         _batch.create(reference, document.value())
                     } else {                        
-                        _batch.set(reference, document.value())
+                        _batch.set(reference, document.value(), { merge: true })
                     }
                 })
                 return _batch
@@ -141,7 +141,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                 const insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
                 insertions.forEach(document => {
                     const reference = self.reference.doc(document.id)
-                    _batch.set(reference, document.value())
+                    _batch.set(reference, document.value(), { merge: true})
                 })
                 const deletions = this._deletions.filter(item => this._insertions.indexOf(item) < 0)
                 deletions.forEach(document => {

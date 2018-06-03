@@ -275,7 +275,7 @@ export class Base implements Document {
         const properties = this.getProperties()
         switch (type) {
             case BatchType.save:
-                _batch.set(reference, this.value())
+                _batch.set(reference, this.value(), { merge: true })
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
                     if (descriptor) {
