@@ -197,7 +197,6 @@ export class Base implements Document {
         const properties: string[] = this.getProperties()
         for (const key of properties) {
             const value = data[key]
-            // console.log(`key: ${key} value`, value)
             if (!isUndefined(value)) {
                 this._defineProperty(key, value)
             }
