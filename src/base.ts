@@ -1,17 +1,16 @@
 import * as functions from 'firebase-functions'
-import * as admin from 'firebase-admin'
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
 import "reflect-metadata"
 
-import { firestore, timestamp } from './index'
+import { firestore, timestamp } from './index';
 import { SubCollection } from './subCollection'
 import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
 import { File } from './file'
 import { Batchable, BatchType } from './batchable'
 
-const propertyMetadataKey = "property"//Symbol("property")
+const propertyMetadataKey = Symbol("property")
 
 export const property = <T extends Document>(target: T, propertyKey) => {
     const properties = Reflect.getMetadata(propertyMetadataKey, target) || []
@@ -54,6 +53,10 @@ export function isCollection(arg): Boolean {
 
 export function isFile(arg): Boolean {
     return (arg instanceof File)
+}
+
+export function isTimestamp(arg): Boolean {
+    return (arg instanceof FirebaseFirestore.Timestamp)
 }
 
 export const isUndefined = (value: any): boolean => {
@@ -138,10 +141,13 @@ export class Base implements Document {
             enumerable: true,
             configurable: true,
             get: () => {
+                if (isTimestamp(_value)) {
+                    return _value.toDate()
+                }
                 return _value
             },
             set: (newValue) => {
-                _value = newValue
+                _value = newValue                
                 if (isCollection(newValue)) {
                     const collection: AnySubCollection = newValue as AnySubCollection
                     collection.setParent(this, key)
@@ -191,8 +197,9 @@ export class Base implements Document {
         const properties: string[] = this.getProperties()
         for (const key of properties) {
             const value = data[key]
+            // console.log(`key: ${key} value`, value)
             if (!isUndefined(value)) {
-                this._defineProperty(key, data[key])
+                this._defineProperty(key, value)
             }
         }
         this._updateValues = {}

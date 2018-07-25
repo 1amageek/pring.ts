@@ -20,7 +20,11 @@ describe("Document property", () => {
         document.createdAt = new Date(100)
         document.updatedAt = new Date(100)
         await document.save()
+        console.log("!!!!!!!!")
         doc = await Document.get(document.id, Document)
+
+        console.log("!!", document.value())
+        console.log("##", doc.value())
     });
 
     describe("properties", async () => {
