@@ -30,6 +30,7 @@ export interface AnySubCollection extends Batchable {
 }
 export declare function isCollection(arg: any): Boolean;
 export declare function isFile(arg: any): Boolean;
+export declare function isTimestamp(arg: any): Boolean;
 export declare const isUndefined: (value: any) => boolean;
 export declare type DocumentData = {
     createdAt: Date;
