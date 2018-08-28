@@ -1,6 +1,8 @@
 import * as functions from 'firebase-functions'
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
+import * as admin from 'firebase-admin'
+import * as firebase from 'firebase'
 import "reflect-metadata"
 
 import { firestore, timestamp } from './index';
@@ -8,7 +10,20 @@ import { SubCollection } from './subCollection'
 import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
 import { File } from './file'
-import { Batchable, BatchType } from './batchable'
+import { Batchable, BatchType, Batch } from './batch'
+
+export type CollectionReference = FirebaseFirestore.CollectionReference | firebase.firestore.CollectionReference
+export type DocumentReference = FirebaseFirestore.DocumentReference | firebase.firestore.DocumentReference
+export type DocumentSnapshot = FirebaseFirestore.DocumentSnapshot | firebase.firestore.DocumentSnapshot
+export type Query = FirebaseFirestore.Query | firebase.firestore.Query
+export type QuerySnapshot = FirebaseFirestore.QuerySnapshot | firebase.firestore.QuerySnapshot
+export type WriteBatch = FirebaseFirestore.WriteBatch | firebase.firestore.WriteBatch
+export type SetOptions = FirebaseFirestore.SetOptions | firebase.firestore.SetOptions
+export type UpdateData = FirebaseFirestore.UpdateData | firebase.firestore.UpdateData
+export type FieldPath = FirebaseFirestore.FieldPath | firebase.firestore.FieldPath
+export type Transaction = FirebaseFirestore.Transaction | firebase.firestore.Transaction
+export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | FirebaseFirestore.DocumentData | firebase.firestore.DocumentData | any
+export type DataOrSnapshot = DocumentData | DocumentSnapshot
 
 const propertyMetadataKey = Symbol("property")
 
@@ -28,7 +43,7 @@ export interface Document extends Batchable, ValueProtocol {
     modelName: string
     path: string
     id: string
-    reference: FirebaseFirestore.DocumentReference
+    reference: DocumentReference
     createdAt: Date
     updatedAt: Date
     getVersion(): number
@@ -40,7 +55,7 @@ export interface Document extends Batchable, ValueProtocol {
 
 export interface AnySubCollection extends Batchable {
     path: string
-    reference: FirebaseFirestore.CollectionReference
+    reference: CollectionReference
     key: string
     setParent(parent: Base, key: string)
 }
@@ -63,12 +78,6 @@ export const isUndefined = (value: any): boolean => {
     return (value === null || value === undefined || value === NaN)
 }
 
-export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | FirebaseFirestore.DocumentData | any
-
-export type Snapshot = FirebaseFirestore.DocumentSnapshot
-
-export type DataOrSnapshot = DocumentData | Snapshot
-
 /// Pring Base class
 export class Base implements Document {
 
@@ -80,7 +89,7 @@ export class Base implements Document {
         return functions.firestore.document(this.getTriggerPath())
     }
 
-    static getReference(): FirebaseFirestore.CollectionReference {
+    static getReference(): CollectionReference {
         return firestore.collection(this.getPath())
     }
 
@@ -98,7 +107,7 @@ export class Base implements Document {
 
     static async get<T extends Base>(id: string, type: { new(id?: string, data?: DocumentData): T }) {
         try {
-            const snapshot: FirebaseFirestore.DocumentSnapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
+            const snapshot: DocumentSnapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
             if (snapshot.exists) {
                 const document: T = new type(snapshot.id, {})
                 document.setData(snapshot.data())
@@ -117,7 +126,7 @@ export class Base implements Document {
 
     public path: string
 
-    public reference: FirebaseFirestore.DocumentReference
+    public reference: DocumentReference
 
     public id: string
 
@@ -220,7 +229,7 @@ export class Base implements Document {
         return `version/${this.version}/${this.modelName}/${this.id}`
     }
 
-    getReference(): FirebaseFirestore.DocumentReference {
+    getReference(): DocumentReference {
         return firestore.doc(this.getPath())
     }
 
@@ -254,8 +263,8 @@ export class Base implements Document {
         return values
     }
 
-    value(): FirebaseFirestore.DocumentData {
-        const values: FirebaseFirestore.DocumentData = this.rawValue()
+    value(): DocumentData {
+        const values: DocumentData = this.rawValue()
         if (this.isSaved) {
             values["updatedAt"] = timestamp
         } else {
@@ -265,15 +274,16 @@ export class Base implements Document {
         return values
     }
 
-    pack(type: BatchType, batchID?: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
-        const _batch = batch || firestore.batch()
+    pack(type: BatchType, batchID?: string, writeBatch?: WriteBatch): WriteBatch {
+        const _writeBatch: WriteBatch = writeBatch || firestore.batch()
+        const _batch: Batch = new Batch(_writeBatch)
 
         // If a batch ID is not specified, it is generated
         const _batchID = batchID || UUID.v4()
         
         // If you do not process already packed documents
         if (_batchID === this.batchID) {
-            return _batch
+            return _batch.batch()
         }
 
         this.batchID = _batchID
@@ -290,11 +300,11 @@ export class Base implements Document {
                             const collection: AnySubCollection = value as AnySubCollection
                             collection.setParent(this, key)
                             const batchable: Batchable = value as Batchable
-                            batchable.pack(BatchType.save, _batchID, _batch)
+                            batchable.pack(BatchType.save, _batchID, _writeBatch)
                         }
                     }
                 }
-                return _batch
+                return _batch.batch()
             case BatchType.update:
                 const updateValues = this._updateValues
                 updateValues["updatedAt"] = timestamp
@@ -307,14 +317,14 @@ export class Base implements Document {
                             const collection: AnySubCollection = value as AnySubCollection
                             collection.setParent(this, key)
                             const batchable: Batchable = value as Batchable
-                            batchable.pack(BatchType.update, _batchID, _batch)
+                            batchable.pack(BatchType.update, _batchID, _writeBatch)
                         }
                     }
                 }
-                return _batch
+                return _batch.batch()
             case BatchType.delete:
                 _batch.delete(reference)
-                return _batch
+                return _batch.batch()
         }
     }
 
@@ -372,11 +382,16 @@ export class Base implements Document {
         return await this.reference.delete()
     }
 
-    async fetch(transaction?: FirebaseFirestore.Transaction) {
+    async fetch(transaction?: Transaction) {
         try {
             let snapshot
             if (transaction) {
-                snapshot = await transaction.get(this.reference)
+                if (transaction instanceof FirebaseFirestore.Transaction) {
+                    snapshot = await transaction.get(this.reference as FirebaseFirestore.DocumentReference)
+                }
+                if (transaction instanceof firebase.firestore.Transaction) {
+                    snapshot = await transaction.get(this.reference as firebase.firestore.DocumentReference)
+                }
             } else {
                 snapshot = await this.reference.get()
             }    

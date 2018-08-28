@@ -9,7 +9,7 @@ const app = admin.initializeApp({
     credential: admin.credential.cert(key)
 })
 
-Pring.initialize(app, admin.firestore.FieldValue.serverTimestamp())
+Pring.initializeAdmin(app, admin.firestore.FieldValue.serverTimestamp())
 
 describe("Document property", () => {
 
