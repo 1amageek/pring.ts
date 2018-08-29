@@ -14,14 +14,13 @@ export let firestore: admin.firestore.Firestore | firebase.firestore.Firestore
 
 export let timestamp: FirebaseFirestore.FieldValue
 
-export const initializeAdmin = (app: admin.app.App, serverTimestamp: admin.firestore.FieldValue) => {
+export const initialize = (app: admin.app.App | firebase.app.App, serverTimestamp: admin.firestore.FieldValue | firebase.firestore.FieldValue) => {
     firestore = app.firestore()
-    firestore.settings({timestampsInSnapshots: true})
-    timestamp = serverTimestamp
-}
-
-export const initialize = (app: firebase.app.App, serverTimestamp: firebase.firestore.FieldValue) => {
-    firestore = app.firestore()
-    firestore.settings({timestampsInSnapshots: true})
+    if (firestore instanceof admin.firestore.Firestore) {
+        firestore.settings({timestampsInSnapshots: true})
+    }
+    if (firestore instanceof firebase.firestore.Firestore) {
+        firestore.settings({timestampsInSnapshots: true})
+    }
     timestamp = serverTimestamp
 }

@@ -1,4 +1,3 @@
-import * as functions from 'firebase-functions'
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
 import * as admin from 'firebase-admin'
@@ -71,7 +70,7 @@ export function isFile(arg): Boolean {
 }
 
 export function isTimestamp(arg): Boolean {
-    return (arg instanceof FirebaseFirestore.Timestamp)
+    return (arg instanceof FirebaseFirestore.Timestamp) || (arg instanceof firebase.firestore.Timestamp)
 }
 
 export const isUndefined = (value: any): boolean => {
@@ -83,10 +82,6 @@ export class Base implements Document {
 
     static getTriggerPath(): string {
         return `/version/{version}/${this.getModelName()}/{id}`
-    }
-
-    static getTriggerDocument(): functions.firestore.DocumentBuilder {
-        return functions.firestore.document(this.getTriggerPath())
     }
 
     static getReference(): CollectionReference {
