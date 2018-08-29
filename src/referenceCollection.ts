@@ -6,17 +6,10 @@ import { firestore, timestamp } from './index'
 import { SubCollection } from './subCollection'
 import {
     Base,
-    CollectionReference,
-    DocumentReference, 
     DocumentSnapshot,
     QuerySnapshot,
     WriteBatch,
-    SetOptions, 
-    UpdateData, 
-    FieldPath, 
-    Transaction, 
-    DocumentData, 
-    DataOrSnapshot
+    DocumentData,
 } from './base'
 
 export class ReferenceCollection<T extends Base> extends SubCollection<T> {

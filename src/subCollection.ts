@@ -7,16 +7,11 @@ import {
     Base,
     AnySubCollection,
     CollectionReference,
-    DocumentReference, 
     DocumentSnapshot,
     QuerySnapshot,
     WriteBatch,
-    SetOptions, 
-    UpdateData, 
-    FieldPath, 
     Transaction, 
-    DocumentData, 
-    DataOrSnapshot
+    DocumentData
 } from './base'
 
 export class SubCollection<T extends Base> implements AnySubCollection {

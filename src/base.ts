@@ -1,6 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
-import * as admin from 'firebase-admin'
 import * as firebase from 'firebase'
 import "reflect-metadata"
 

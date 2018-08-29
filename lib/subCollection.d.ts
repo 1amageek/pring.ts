@@ -1,9 +1,8 @@
-import * as FirebaseFirestore from '@google-cloud/firestore';
-import { BatchType } from './batchable';
-import { Base, AnySubCollection, DocumentData } from './base';
+import { BatchType } from './batch';
+import { Base, AnySubCollection, CollectionReference, WriteBatch, Transaction, DocumentData } from './base';
 export declare class SubCollection<T extends Base> implements AnySubCollection {
     path: string;
-    reference: FirebaseFirestore.CollectionReference;
+    reference: CollectionReference;
     parent: Base;
     key: string;
     batchID?: string;
@@ -14,17 +13,17 @@ export declare class SubCollection<T extends Base> implements AnySubCollection {
     isSaved(): Boolean;
     setParent(parent: Base, key: string): void;
     getPath(): string;
-    getReference(): FirebaseFirestore.CollectionReference;
+    getReference(): CollectionReference;
     insert(newMember: T): void;
     delete(member: T): void;
     doc(id: string, type: {
         new (id?: string, data?: DocumentData): T;
-    }, transaction?: FirebaseFirestore.Transaction): Promise<T>;
+    }, transaction?: Transaction): Promise<T>;
     get(type: {
         new (id?: string, data?: DocumentData): T;
-    }, transaction?: FirebaseFirestore.Transaction): Promise<T[]>;
-    contains(id: string): Promise<Boolean>;
+    }, transaction?: Transaction): Promise<T[]>;
+    contains(id: string): Promise<boolean>;
     forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
-    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
+    pack(type: BatchType, batchID: string, writeBatch?: WriteBatch): WriteBatch;
     batch(type: BatchType, batchID: string): void;
 }

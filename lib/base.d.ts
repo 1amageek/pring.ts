@@ -1,8 +1,25 @@
-import * as functions from 'firebase-functions';
 import * as FirebaseFirestore from '@google-cloud/firestore';
+import * as firebase from 'firebase';
 import "reflect-metadata";
 import { NestedCollection } from './nestedCollection';
-import { Batchable, BatchType } from './batchable';
+import { Batchable, BatchType } from './batch';
+export declare type CollectionReference = FirebaseFirestore.CollectionReference | firebase.firestore.CollectionReference;
+export declare type DocumentReference = FirebaseFirestore.DocumentReference | firebase.firestore.DocumentReference;
+export declare type DocumentSnapshot = FirebaseFirestore.DocumentSnapshot | firebase.firestore.DocumentSnapshot;
+export declare type Query = FirebaseFirestore.Query | firebase.firestore.Query;
+export declare type QuerySnapshot = FirebaseFirestore.QuerySnapshot | firebase.firestore.QuerySnapshot;
+export declare type WriteBatch = FirebaseFirestore.WriteBatch | firebase.firestore.WriteBatch;
+export declare type SetOptions = FirebaseFirestore.SetOptions | firebase.firestore.SetOptions;
+export declare type UpdateData = FirebaseFirestore.UpdateData | firebase.firestore.UpdateData;
+export declare type FieldPath = FirebaseFirestore.FieldPath | firebase.firestore.FieldPath;
+export declare type Transaction = FirebaseFirestore.Transaction | firebase.firestore.Transaction;
+export declare type DocumentData = {
+    createdAt: Date;
+    updatedAt: Date;
+} | {
+    [key: string]: any;
+} | FirebaseFirestore.DocumentData | firebase.firestore.DocumentData | any;
+export declare type DataOrSnapshot = DocumentData | DocumentSnapshot;
 export declare const property: <T extends Document>(target: T, propertyKey: any) => void;
 export interface ValueProtocol {
     value(): any;
@@ -13,7 +30,7 @@ export interface Document extends Batchable, ValueProtocol {
     modelName: string;
     path: string;
     id: string;
-    reference: FirebaseFirestore.DocumentReference;
+    reference: DocumentReference;
     createdAt: Date;
     updatedAt: Date;
     getVersion(): number;
@@ -24,7 +41,7 @@ export interface Document extends Batchable, ValueProtocol {
 }
 export interface AnySubCollection extends Batchable {
     path: string;
-    reference: FirebaseFirestore.CollectionReference;
+    reference: CollectionReference;
     key: string;
     setParent(parent: Base, key: string): any;
 }
@@ -32,18 +49,9 @@ export declare function isCollection(arg: any): Boolean;
 export declare function isFile(arg: any): Boolean;
 export declare function isTimestamp(arg: any): Boolean;
 export declare const isUndefined: (value: any) => boolean;
-export declare type DocumentData = {
-    createdAt: Date;
-    updatedAt: Date;
-} | {
-    [key: string]: any;
-} | FirebaseFirestore.DocumentData | any;
-export declare type Snapshot = FirebaseFirestore.DocumentSnapshot;
-export declare type DataOrSnapshot = DocumentData | Snapshot;
 export declare class Base implements Document {
     static getTriggerPath(): string;
-    static getTriggerDocument(): functions.firestore.DocumentBuilder;
-    static getReference(): FirebaseFirestore.CollectionReference;
+    static getReference(): CollectionReference;
     static getVersion(): number;
     static getModelName(): string;
     static getPath(): string;
@@ -53,7 +61,7 @@ export declare class Base implements Document {
     version: number;
     modelName: string;
     path: string;
-    reference: FirebaseFirestore.DocumentReference;
+    reference: DocumentReference;
     id: string;
     createdAt: Date;
     updatedAt: Date;
@@ -68,16 +76,16 @@ export declare class Base implements Document {
     getVersion(): number;
     getModelName(): string;
     getPath(): string;
-    getReference(): FirebaseFirestore.DocumentReference;
+    getReference(): DocumentReference;
     getProperties(): string[];
     setValue(value: any, key: string): void;
     rawValue(): any;
-    value(): FirebaseFirestore.DocumentData;
-    pack(type: BatchType, batchID?: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch;
+    value(): DocumentData;
+    pack(type: BatchType, batchID?: string, writeBatch?: WriteBatch): WriteBatch;
     batch(type: BatchType, batchID?: string): void;
     setParent<T extends Base>(parent: NestedCollection<T>): void;
-    save(): Promise<FirebaseFirestore.WriteResult[]>;
-    update(): Promise<FirebaseFirestore.WriteResult[]>;
-    delete(): Promise<FirebaseFirestore.WriteResult>;
-    fetch(transaction?: FirebaseFirestore.Transaction): Promise<void>;
+    save(): Promise<void | FirebaseFirestore.WriteResult[]>;
+    update(): Promise<void | FirebaseFirestore.WriteResult[]>;
+    delete(): Promise<void | FirebaseFirestore.WriteResult>;
+    fetch(transaction?: Transaction): Promise<void>;
 }
