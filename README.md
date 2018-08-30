@@ -19,14 +19,22 @@ Set `experimentalDecorators` to `true`.
 
 ```JSON
 {
-    "compilerOptions": {
-        "target": "es2017",
-        "lib": ["es2017"],
-        "module": "commonjs",
-        "experimentalDecorators": true,
-        "sourceMap": true
-    }
+  "compilerOptions": {
+    "lib": ["es2018", "dom"],
+    "module": "commonjs",
+    "noImplicitReturns": true,
+    "outDir": "lib",
+    "sourceMap": true,
+    "target": "es2018",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "compileOnSave": true,
+  "include": [
+    "src"
+  ]
 }
+
 ```
 
 ### Initialize
