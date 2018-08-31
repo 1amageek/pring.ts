@@ -1,10 +1,16 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as admin from 'firebase-admin'
 import { } from "reflect-metadata"
-import { BatchType } from './batchable'
+import { BatchType, Batch } from './batch'
 import { firestore, timestamp } from './index'
-import { Base, DocumentData } from './base'
 import { SubCollection } from './subCollection'
+import {
+    Base,
+    DocumentSnapshot,
+    QuerySnapshot,
+    WriteBatch,
+    DocumentData,
+} from './base'
 
 export class ReferenceCollection<T extends Base> extends SubCollection<T> {
 
@@ -28,8 +34,9 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         }
     }
 
-    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
-        const _batch = batch || firestore.batch()
+    pack(type: BatchType, batchID?: string, writeBatch?: WriteBatch): WriteBatch {
+        const _writeBatch: WriteBatch = writeBatch || firestore.batch()
+        const _batch: Batch = new Batch(_writeBatch)
         switch (type) {
             case BatchType.save: {
                 this.forEach(document => {
@@ -45,7 +52,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                     const reference = this.reference.doc(document.id)
                     _batch.set(reference, value, { merge: true})
                 })
-                return _batch
+                return _batch.batch()
             }
             case BatchType.update:
                 const insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
@@ -75,13 +82,13 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                     const reference = this.reference.doc(document.id)
                     _batch.delete(reference)
                 })
-                return _batch
+                return _batch.batch()
             case BatchType.delete:
                 this.forEach(document => {
                     const reference = this.reference.doc(document.id)
                     _batch.delete(reference)
                 })
-                return _batch
+                return _batch.batch()
         }
     }
 
@@ -97,8 +104,8 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
 
     async get(type: { new(id?: string, data?: DocumentData): T; }) {
         try {
-            const snapshot: FirebaseFirestore.QuerySnapshot = await this.reference.get()
-            const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+            const snapshot: QuerySnapshot = await this.reference.get()
+            const docs: DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
                 const document: T = new type(documentSnapshot.id, {})
                 return document

@@ -1,14 +1,24 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import { } from "reflect-metadata"
-import { BatchType } from './batchable'
+import * as firebase from 'firebase'
+import { BatchType, Batch } from './batch'
 import { firestore } from './index'
-import { Base, AnySubCollection, DocumentData } from './base'
+import {
+    Base,
+    AnySubCollection,
+    CollectionReference,
+    DocumentSnapshot,
+    QuerySnapshot,
+    WriteBatch,
+    Transaction, 
+    DocumentData
+} from './base'
 
 export class SubCollection<T extends Base> implements AnySubCollection {
 
     public path: string
 
-    public reference: FirebaseFirestore.CollectionReference
+    public reference: CollectionReference
 
     public parent: Base
 
@@ -41,7 +51,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         return `${this.parent.path}/${this.key}`
     }
 
-    getReference(): FirebaseFirestore.CollectionReference {
+    getReference(): CollectionReference {
         return firestore.collection(this.getPath())
     }
 
@@ -67,11 +77,16 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         member.reference = member.getReference()
     }
 
-    async doc(id: string, type: { new(id?: string, data?: DocumentData): T; }, transaction?: FirebaseFirestore.Transaction) {
+    async doc(id: string, type: { new(id?: string, data?: DocumentData): T; }, transaction?: Transaction) {
         try {
-            let snapshot: FirebaseFirestore.DocumentSnapshot
+            let snapshot: DocumentSnapshot
             if (transaction) {
-                snapshot = await transaction.get(this.reference.doc(id))
+                if (transaction instanceof FirebaseFirestore.Transaction) {
+                    snapshot = await transaction.get(this.reference.doc(id) as FirebaseFirestore.DocumentReference)
+                }
+                if (transaction instanceof firebase.firestore.Transaction) {
+                    snapshot = await transaction.get(this.reference.doc(id) as firebase.firestore.DocumentReference)
+                }
             } else {
                 snapshot = await this.reference.doc(id).get()
             }             
@@ -88,15 +103,20 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }     
     }
 
-    async get(type: { new(id?: string, data?: DocumentData): T; }, transaction?: FirebaseFirestore.Transaction) {
+    async get(type: { new(id?: string, data?: DocumentData): T; }, transaction?: Transaction) {
         try {
-            let snapshot: FirebaseFirestore.QuerySnapshot
+            let snapshot: QuerySnapshot
             if (transaction) {
-                snapshot = await transaction.get(this.reference)
+                if (transaction instanceof FirebaseFirestore.Transaction) {
+                    snapshot = await transaction.get(this.reference as FirebaseFirestore.CollectionReference)
+                }
+                if (transaction instanceof firebase.firestore.Transaction) {
+                    console.log("[Pring] Firebase JS SDK Transaction not supported")
+                }
             } else {
                 snapshot = await this.reference.get()
             } 
-            const docs: FirebaseFirestore.DocumentSnapshot[] = snapshot.docs
+            const docs: DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
                 const document: T = new type(documentSnapshot.id, {})
                 document.setData(documentSnapshot.data())
@@ -110,33 +130,33 @@ export class SubCollection<T extends Base> implements AnySubCollection {
     }
 
     async contains(id: string) {
-        return new Promise<Boolean>((resolve, reject) => {
-            this.reference.doc(id).get().then((snapshot) => {
-                resolve(snapshot.exists)
-            }).catch((error) => {
-                reject(error)
-            })
-        })
+        try {
+            const snapshot = await this.reference.doc(id).get()
+            return snapshot.exists
+        } catch (error) {
+            throw error
+        }
     }
 
     forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any) {
         this.objects.forEach(callbackfn)
     }
 
-    pack(type: BatchType, batchID: string, batch?: FirebaseFirestore.WriteBatch): FirebaseFirestore.WriteBatch {
-        const _batch = batch || firestore.batch()
+    pack(type: BatchType, batchID: string, writeBatch?: WriteBatch): WriteBatch {
+        const _writeBatch: WriteBatch = writeBatch || firestore.batch()
+        const _batch: Batch = new Batch(_writeBatch)
         const self = this
         switch (type) {
             case BatchType.save:
                 this.forEach(document => {
                     const reference = self.reference.doc(document.id)
                     if (document.isSaved) {
-                        _batch.create(reference, document.value())
+                        _batch.set(reference, document.value())
                     } else {                        
                         _batch.set(reference, document.value(), { merge: true })
                     }
                 })
-                return _batch
+                return _batch.batch()
             case BatchType.update:
                 const insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
                 insertions.forEach(document => {
@@ -148,13 +168,13 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                     const reference = self.reference.doc(document.id)
                     _batch.delete(reference)
                 })
-                return _batch
+                return _batch.batch()
             case BatchType.delete:
                 this.forEach(document => {
                     const reference = self.reference.doc(document.id)
                     _batch.delete(reference)
                 })
-                return _batch
+                return _batch.batch()
         }
     }
 
