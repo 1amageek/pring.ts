@@ -1,4 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as UUID from 'uuid'
 import * as firebase from 'firebase'
 import "reflect-metadata"
@@ -10,17 +9,17 @@ import { ReferenceCollection } from './referenceCollection'
 import { File } from './file'
 import { Batchable, BatchType, Batch } from './batch'
 
-export type CollectionReference = FirebaseFirestore.CollectionReference | firebase.firestore.CollectionReference
-export type DocumentReference = FirebaseFirestore.DocumentReference | firebase.firestore.DocumentReference
-export type DocumentSnapshot = FirebaseFirestore.DocumentSnapshot | firebase.firestore.DocumentSnapshot
-export type Query = FirebaseFirestore.Query | firebase.firestore.Query
-export type QuerySnapshot = FirebaseFirestore.QuerySnapshot | firebase.firestore.QuerySnapshot
-export type WriteBatch = FirebaseFirestore.WriteBatch | firebase.firestore.WriteBatch
-export type SetOptions = FirebaseFirestore.SetOptions | firebase.firestore.SetOptions
-export type UpdateData = FirebaseFirestore.UpdateData | firebase.firestore.UpdateData
-export type FieldPath = FirebaseFirestore.FieldPath | firebase.firestore.FieldPath
-export type Transaction = FirebaseFirestore.Transaction | firebase.firestore.Transaction
-export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | FirebaseFirestore.DocumentData | firebase.firestore.DocumentData | any
+export type CollectionReference = firebase.firestore.CollectionReference
+export type DocumentReference =  firebase.firestore.DocumentReference
+export type DocumentSnapshot = firebase.firestore.DocumentSnapshot
+export type Query = firebase.firestore.Query
+export type QuerySnapshot = firebase.firestore.QuerySnapshot
+export type WriteBatch = firebase.firestore.WriteBatch
+export type SetOptions = firebase.firestore.SetOptions
+export type UpdateData = firebase.firestore.UpdateData
+export type FieldPath = firebase.firestore.FieldPath
+export type Transaction = firebase.firestore.Transaction
+export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | firebase.firestore.DocumentData | any
 export type DataOrSnapshot = DocumentData | DocumentSnapshot
 
 const propertyMetadataKey = Symbol("property")
@@ -69,7 +68,7 @@ export function isFile(arg): Boolean {
 }
 
 export function isTimestamp(arg): Boolean {
-    return (arg instanceof FirebaseFirestore.Timestamp) || (arg instanceof firebase.firestore.Timestamp)
+    return (arg instanceof firebase.firestore.Timestamp)
 }
 
 export const isUndefined = (value: any): boolean => {
@@ -380,12 +379,7 @@ export class Base implements Document {
         try {
             let snapshot
             if (transaction) {
-                if (transaction instanceof FirebaseFirestore.Transaction) {
-                    snapshot = await transaction.get(this.reference as FirebaseFirestore.DocumentReference)
-                }
-                if (transaction instanceof firebase.firestore.Transaction) {
-                    snapshot = await transaction.get(this.reference as firebase.firestore.DocumentReference)
-                }
+                snapshot = await transaction.get(this.reference as firebase.firestore.DocumentReference)
             } else {
                 snapshot = await this.reference.get()
             }    

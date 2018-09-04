@@ -1,4 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import { } from "reflect-metadata"
 import * as firebase from 'firebase'
 import { BatchType, Batch } from './batch'
@@ -81,12 +80,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         try {
             let snapshot: DocumentSnapshot
             if (transaction) {
-                if (transaction instanceof FirebaseFirestore.Transaction) {
-                    snapshot = await transaction.get(this.reference.doc(id) as FirebaseFirestore.DocumentReference)
-                }
-                if (transaction instanceof firebase.firestore.Transaction) {
-                    snapshot = await transaction.get(this.reference.doc(id) as firebase.firestore.DocumentReference)
-                }
+                snapshot = await transaction.get(this.reference.doc(id) as firebase.firestore.DocumentReference)
             } else {
                 snapshot = await this.reference.doc(id).get()
             }             
@@ -107,9 +101,6 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         try {
             let snapshot: QuerySnapshot
             if (transaction) {
-                if (transaction instanceof FirebaseFirestore.Transaction) {
-                    snapshot = await transaction.get(this.reference as FirebaseFirestore.CollectionReference)
-                }
                 if (transaction instanceof firebase.firestore.Transaction) {
                     console.log("[Pring] Firebase JS SDK Transaction not supported")
                 }

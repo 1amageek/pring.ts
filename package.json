@@ -37,9 +37,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "dependencies": {
-    "@google-cloud/firestore": "^0.16.1",
-    "firebase": "^5.4.1",
-    "firebase-admin": "^6.0.0",
+    "firebase": "^5.4.2",
     "reflect-metadata": "^0.1.12",
     "uuid": "^3.3.2"
   },

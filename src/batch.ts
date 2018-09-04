@@ -1,4 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as firebase from 'firebase'
 import {
     DocumentReference, 
@@ -22,17 +21,10 @@ export interface Batchable {
 
 export class Batch {
 
-    private _adminWriteBatch?: FirebaseFirestore.WriteBatch
-
     private _writeBatch?: firebase.firestore.WriteBatch
 
     constructor(writeBatch: WriteBatch) {
-        if (writeBatch instanceof FirebaseFirestore.WriteBatch) {
-            this._adminWriteBatch = writeBatch
-        }
-        if (writeBatch instanceof firebase.firestore.WriteBatch) {
-            this._writeBatch = writeBatch
-        }
+        this._writeBatch = writeBatch
     }
 
     /**
@@ -50,12 +42,7 @@ export class Batch {
         data: DocumentData,
         options?: SetOptions
     ): Batch {
-        if (documentRef instanceof FirebaseFirestore.DocumentReference) {
-            this._adminWriteBatch.set(documentRef, data, options)
-        }
-        if (documentRef instanceof firebase.firestore.DocumentReference) {
-            this._writeBatch.set(documentRef, data, options)
-        }
+        this._writeBatch.set(documentRef, data, options)
         return this
     }
 
@@ -71,12 +58,7 @@ export class Batch {
      * @return This `WriteBatch` instance. Used for chaining method calls.
      */
     update(documentRef: DocumentReference, data: UpdateData): Batch {
-        if (documentRef instanceof FirebaseFirestore.DocumentReference) {
-            this._adminWriteBatch.update(documentRef, data)
-        }
-        if (documentRef instanceof firebase.firestore.DocumentReference) {
-            this._writeBatch.update(documentRef, data)
-        }
+        this._writeBatch.update(documentRef, data)
         return this
     }
 
@@ -116,12 +98,7 @@ export class Batch {
      * @return This `WriteBatch` instance. Used for chaining method calls.
      */
     delete(documentRef: DocumentReference): Batch {
-        if (documentRef instanceof FirebaseFirestore.DocumentReference) {
-            this._adminWriteBatch.delete(documentRef)
-        }
-        if (documentRef instanceof firebase.firestore.DocumentReference) {
-            this._writeBatch.delete(documentRef)
-        }
+        this._writeBatch.delete(documentRef)
         return this
     }
 
@@ -133,15 +110,10 @@ export class Batch {
      * resolve while you're offline.
      */
     async commit() {
-        if (this._adminWriteBatch) {
-            return await this._adminWriteBatch.commit()
-        }
-        if (this._writeBatch) {
-            return await this._writeBatch.commit()
-        }
+        return await this._writeBatch.commit()
     }
 
     batch(): WriteBatch {
-        return this._adminWriteBatch || this._writeBatch
+        return this._writeBatch
     }
 }

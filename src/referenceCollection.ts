@@ -1,5 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore'
-import * as admin from 'firebase-admin'
 import { } from "reflect-metadata"
 import { BatchType, Batch } from './batch'
 import { firestore, timestamp } from './index'
