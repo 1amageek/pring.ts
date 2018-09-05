@@ -1,7 +1,11 @@
 # pring.ts
 
 This library has an interface similar to iOS's Pring.
-https://github.com/1amageek/Pring
+
+
+(Pring for iOS)[https://github.com/1amageek/Pring]
+(Pring for admin)[https://github.com/1amageek/pring-admin.ts]
+(Pring for web)[https://github.com/1amageek/pring.ts]
 
 ⚠️ This library still contains bugs.
 
