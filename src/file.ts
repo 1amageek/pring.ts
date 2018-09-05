@@ -1,12 +1,12 @@
-import { ValueProtocol } from './base'
+import { ValueProtocol, FileData, FieldPath } from './base'
 
 export class File implements ValueProtocol {
 
-    mimeType: string
+    mimeType?: string
 
-    name: string
+    name?: string
 
-    url: string
+    url?: string
 
     constructor(name?: string, url?: string, mimeType?: string) {
         this.name = name
@@ -14,13 +14,13 @@ export class File implements ValueProtocol {
         this.mimeType = mimeType
     }
 
-    init(value: object) {
+    init(value: FileData) {
         this.mimeType = value["mimeType"]
         this.name = value["name"]
         this.url = value["url"]
     }
 
-    setValue(value: any, key: string) {
+    setValue(value: any, key: (keyof FileData)) {
         this[key] = value
     }
 

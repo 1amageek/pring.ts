@@ -15,13 +15,13 @@ import {
 
 export class SubCollection<T extends Base> implements AnySubCollection {
 
-    public path: string
+    public path!: string
 
-    public reference: CollectionReference
+    public reference!: CollectionReference
 
     public parent: Base
 
-    public key: string
+    public key!: string
 
     public batchID?: string
 
@@ -86,7 +86,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
             }             
             if (snapshot.exists) {
                 const document: T = new type(snapshot.id, {})
-                document.setData(snapshot.data())
+                document.setData(snapshot.data()!)
                 document.setParent(this)
                 return document
             } else {
@@ -97,20 +97,14 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }     
     }
 
-    async get(type: { new(id?: string, data?: DocumentData): T; }, transaction?: Transaction) {
+    async get(type: { new(id?: string, data?: DocumentData): T; }) {
         try {
             let snapshot: QuerySnapshot
-            if (transaction) {
-                if (transaction instanceof firebase.firestore.Transaction) {
-                    console.log("[Pring] Firebase JS SDK Transaction not supported")
-                }
-            } else {
-                snapshot = await this.reference.get()
-            } 
+            snapshot = await this.reference.get()
             const docs: DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
                 const document: T = new type(documentSnapshot.id, {})
-                document.setData(documentSnapshot.data())
+                document.setData(documentSnapshot.data()!)
                 return document
             })
             this.objects = documents

@@ -10,7 +10,7 @@ import { File } from './file'
 import { Batchable, BatchType, Batch } from './batch'
 
 export type CollectionReference = firebase.firestore.CollectionReference
-export type DocumentReference =  firebase.firestore.DocumentReference
+export type DocumentReference = firebase.firestore.DocumentReference
 export type DocumentSnapshot = firebase.firestore.DocumentSnapshot
 export type Query = firebase.firestore.Query
 export type QuerySnapshot = firebase.firestore.QuerySnapshot
@@ -19,12 +19,13 @@ export type SetOptions = firebase.firestore.SetOptions
 export type UpdateData = firebase.firestore.UpdateData
 export type FieldPath = firebase.firestore.FieldPath
 export type Transaction = firebase.firestore.Transaction
-export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | firebase.firestore.DocumentData | any
+export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | firebase.firestore.DocumentData
 export type DataOrSnapshot = DocumentData | DocumentSnapshot
+export type DateType = 'createdAt' | 'updatedAt'
 
 const propertyMetadataKey = Symbol("property")
 
-export const property = <T extends Document>(target: T, propertyKey) => {
+export const property = <T extends Document>(target: T, propertyKey: string) => {
     const properties = Reflect.getMetadata(propertyMetadataKey, target) || []
     properties.push(propertyKey)
     Reflect.defineMetadata(propertyMetadataKey, properties, target)
@@ -32,10 +33,17 @@ export const property = <T extends Document>(target: T, propertyKey) => {
 
 export interface ValueProtocol {
     value(): any
-    setValue(value: any, key: string)
+    setValue(value: any, key: string): void
+}
+
+export interface FileData {
+    mimeType: string
+    name: string
+    url: string
 }
 
 export interface Document extends Batchable, ValueProtocol {
+    [index: string]: any | null | undefined
     version: number
     modelName: string
     path: string
@@ -54,20 +62,20 @@ export interface AnySubCollection extends Batchable {
     path: string
     reference: CollectionReference
     key: string
-    setParent(parent: Base, key: string)
+    setParent(parent: Base, key: string): void
 }
 
-export function isCollection(arg): Boolean {
+export function isCollection(arg: any): Boolean {
     return (arg instanceof SubCollection) ||
         (arg instanceof NestedCollection) ||
         (arg instanceof ReferenceCollection)
 }
 
-export function isFile(arg): Boolean {
+export function isFile(arg: any): Boolean {
     return (arg instanceof File)
 }
 
-export function isTimestamp(arg): Boolean {
+export function isTimestamp(arg: any): Boolean {
     return (arg instanceof firebase.firestore.Timestamp)
 }
 
@@ -103,7 +111,7 @@ export class Base implements Document {
             const snapshot: DocumentSnapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
             if (snapshot.exists) {
                 const document: T = new type(snapshot.id, {})
-                document.setData(snapshot.data())
+                document.setData(snapshot.data()!)
                 return document
             } else {
                 return undefined
@@ -123,9 +131,9 @@ export class Base implements Document {
 
     public id: string
 
-    public createdAt: Date
+    public createdAt!: Date
 
-    public updatedAt: Date
+    public updatedAt!: Date
 
     public isSaved: Boolean = false
 
@@ -137,7 +145,7 @@ export class Base implements Document {
 
     private _updateValues: { [key: string]: any } = {}
 
-    private _defineProperty(key: string, value?: any) {
+    private _defineProperty<T extends keyof ThisType<this>>(key: T | DateType, value?: any) {
         let _value: any = value
         const descriptor: PropertyDescriptor = {
             enumerable: true,
@@ -149,7 +157,7 @@ export class Base implements Document {
                 return _value
             },
             set: (newValue) => {
-                _value = newValue                
+                _value = newValue
                 if (isCollection(newValue)) {
                     const collection: AnySubCollection = newValue as AnySubCollection
                     collection.setParent(this, key)
@@ -178,12 +186,14 @@ export class Base implements Document {
         // Pring properties define 
         const properties: string[] = Reflect.getMetadata(propertyMetadataKey, this) || []
         if (data) {
-            for (const key of properties) {
+            for (const prop of properties) {
+                const key: (keyof DocumentData) = prop as (keyof DocumentData)
                 this._defineProperty(key, data[key])
             }
             this.isSaved = true
         } else {
-            for (const key of properties) {
+            for (const prop of properties) {
+                const key: (keyof DocumentData) = prop as (keyof DocumentData)
                 this._defineProperty(key)
             }
         }
@@ -197,7 +207,8 @@ export class Base implements Document {
             this._defineProperty('updatedAt', data.updatedAt)
         }
         const properties: string[] = this.getProperties()
-        for (const key of properties) {
+        for (const prop of properties) {
+            const key: (keyof DocumentData) = prop as (keyof DocumentData)
             const value = data[key]
             if (!isUndefined(value)) {
                 this._defineProperty(key, value)
@@ -230,25 +241,27 @@ export class Base implements Document {
         return Reflect.getMetadata(propertyMetadataKey, this) || []
     }
 
-    setValue(value: any, key: string) {
+    setValue<K extends keyof ThisType<this>>(value: any, key: K) {
         this[key] = value
     }
 
     rawValue(): any {
         const properties = this.getProperties()
-        const values = {}
+        const values: any = {}
         for (const key of properties) {
             const descriptor = Object.getOwnPropertyDescriptor(this, key)
             if (descriptor) {
-                const value = descriptor.get()
-                if (!isUndefined(value)) {
-                    if (isCollection(value)) {
-                        // Nothing 
-                    } else if (isFile(value)) {
-                        const file: ValueProtocol = value as ValueProtocol
-                        values[key] = file.value()
-                    } else {
-                        values[key] = value
+                if (descriptor.get) {
+                    const value = descriptor.get()
+                    if (!isUndefined(value)) {
+                        if (isCollection(value)) {
+                            // Nothing 
+                        } else if (isFile(value)) {
+                            const file: ValueProtocol = value as ValueProtocol
+                            values[key] = file.value()
+                        } else {
+                            values[key] = value
+                        }
                     }
                 }
             }
@@ -273,7 +286,7 @@ export class Base implements Document {
 
         // If a batch ID is not specified, it is generated
         const _batchID = batchID || UUID.v4()
-        
+
         // If you do not process already packed documents
         if (_batchID === this.batchID) {
             return _batch.batch()
@@ -288,12 +301,14 @@ export class Base implements Document {
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
                     if (descriptor) {
-                        const value = descriptor.get()
-                        if (isCollection(value)) {
-                            const collection: AnySubCollection = value as AnySubCollection
-                            collection.setParent(this, key)
-                            const batchable: Batchable = value as Batchable
-                            batchable.pack(BatchType.save, _batchID, _writeBatch)
+                        if (descriptor.get) {
+                            const value = descriptor.get()
+                            if (isCollection(value)) {
+                                const collection: AnySubCollection = value as AnySubCollection
+                                collection.setParent(this, key)
+                                const batchable: Batchable = value as Batchable
+                                batchable.pack(BatchType.save, _batchID, _writeBatch)
+                            }
                         }
                     }
                 }
@@ -305,12 +320,14 @@ export class Base implements Document {
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
                     if (descriptor) {
-                        const value = descriptor.get()
-                        if (isCollection(value)) {
-                            const collection: AnySubCollection = value as AnySubCollection
-                            collection.setParent(this, key)
-                            const batchable: Batchable = value as Batchable
-                            batchable.pack(BatchType.update, _batchID, _writeBatch)
+                        if (descriptor.get) {
+                            const value = descriptor.get()
+                            if (isCollection(value)) {
+                                const collection: AnySubCollection = value as AnySubCollection
+                                collection.setParent(this, key)
+                                const batchable: Batchable = value as Batchable
+                                batchable.pack(BatchType.update, _batchID, _writeBatch)
+                            }
                         }
                     }
                 }
@@ -331,11 +348,15 @@ export class Base implements Document {
         for (const key of properties) {
             const descriptor = Object.getOwnPropertyDescriptor(this, key)
             if (descriptor) {
-                const value = descriptor.get()
-                if (isCollection(value)) {
-                    const collection: AnySubCollection = value as AnySubCollection
-                    collection.setParent(this, key)
-                    collection.batch(type, batchID)
+                if (descriptor.get) {
+                    const value = descriptor.get()
+                    if (value) {
+                        if (isCollection(value)) {
+                            const collection: AnySubCollection = value as AnySubCollection
+                            collection.setParent(this, key)
+                            collection.batch(type, batchID)
+                        }
+                    }
                 }
             }
         }
@@ -382,12 +403,12 @@ export class Base implements Document {
                 snapshot = await transaction.get(this.reference as firebase.firestore.DocumentReference)
             } else {
                 snapshot = await this.reference.get()
-            }    
+            }
             const data = snapshot.data()
             if (data) {
                 this.setData(data)
                 this.isSaved = true
-            }            
+            }
         } catch (error) {
             throw error
         }

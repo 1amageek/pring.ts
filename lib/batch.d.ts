@@ -7,10 +7,10 @@ export declare enum BatchType {
 export interface Batchable {
     batchID?: string;
     pack(type: BatchType, batchID: string, batch?: WriteBatch): WriteBatch;
-    batch(type: BatchType, batchID: string): any;
+    batch(type: BatchType, batchID: string): void;
 }
 export declare class Batch {
-    private _writeBatch?;
+    private _writeBatch;
     constructor(writeBatch: WriteBatch);
     /**
      * Writes to the document referred to by the provided `DocumentReference`.

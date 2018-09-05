@@ -38,12 +38,12 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         switch (type) {
             case BatchType.save: {
                 this.forEach(document => {
-                    let value = {}
+                    let value: DocumentData = {}
                     if (document.shouldBeReplicated()) {
                         value = document.value()
                     }
-                    value["createdAt"] = timestamp
-                    value["updatedAt"] = timestamp
+                    value.createdAt = timestamp
+                    value.updatedAt = timestamp
                     if (!document.isSaved) {
                         _batch.set(document.reference, document.value(), {merge: true})
                     }
@@ -55,22 +55,22 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
             case BatchType.update:
                 const insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
                 insertions.forEach(document => {
-                    let value = {}
+                    let value: DocumentData = {}
                     if (document.isSaved) {
                         if (document.shouldBeReplicated()) {
                             value = document.value()
                         }
                         if (document.createdAt) {
-                            value["createdAt"] = document.createdAt
+                            value.createdAt = document.createdAt
                         }
-                        value["updatedAt"] = timestamp
+                        value.updatedAt = timestamp
                         _batch.set(document.reference, document.value(), { merge: true})
                     } else {
                         if (document.shouldBeReplicated()) {
                             value = document.value()
                         }
-                        value["createdAt"] = timestamp
-                        value["updatedAt"] = timestamp
+                        value.createdAt = timestamp
+                        value.updatedAt = timestamp
                     }
                     const reference = this.reference.doc(document.id)
                     _batch.set(reference, value, { merge: true})

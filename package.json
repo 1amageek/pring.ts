@@ -37,6 +37,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "dependencies": {
+    "@types/uuid": "^3.4.4",
     "firebase": "^5.4.2",
     "reflect-metadata": "^0.1.12",
     "uuid": "^3.3.2"

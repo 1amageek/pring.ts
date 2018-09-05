@@ -16,12 +16,12 @@ export enum BatchType {
 export interface Batchable {
     batchID?: string
     pack(type: BatchType, batchID: string, batch?: WriteBatch): WriteBatch
-    batch(type: BatchType, batchID: string)
+    batch(type: BatchType, batchID: string): void
 }
 
 export class Batch {
 
-    private _writeBatch?: firebase.firestore.WriteBatch
+    private _writeBatch: firebase.firestore.WriteBatch
 
     constructor(writeBatch: WriteBatch) {
         this._writeBatch = writeBatch

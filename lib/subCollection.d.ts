@@ -18,10 +18,10 @@ export declare class SubCollection<T extends Base> implements AnySubCollection {
     delete(member: T): void;
     doc(id: string, type: {
         new (id?: string, data?: DocumentData): T;
-    }, transaction?: Transaction): Promise<T>;
+    }, transaction?: Transaction): Promise<T | undefined>;
     get(type: {
         new (id?: string, data?: DocumentData): T;
-    }, transaction?: Transaction): Promise<T[]>;
+    }): Promise<T[]>;
     contains(id: string): Promise<boolean>;
     forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
     pack(type: BatchType, batchID: string, writeBatch?: WriteBatch): WriteBatch;

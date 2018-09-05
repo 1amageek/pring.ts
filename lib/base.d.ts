@@ -17,14 +17,21 @@ export declare type DocumentData = {
     updatedAt: Date;
 } | {
     [key: string]: any;
-} | firebase.firestore.DocumentData | any;
+} | firebase.firestore.DocumentData;
 export declare type DataOrSnapshot = DocumentData | DocumentSnapshot;
-export declare const property: <T extends Document>(target: T, propertyKey: any) => void;
+export declare type DateType = 'createdAt' | 'updatedAt';
+export declare const property: <T extends Document>(target: T, propertyKey: string) => void;
 export interface ValueProtocol {
     value(): any;
-    setValue(value: any, key: string): any;
+    setValue(value: any, key: string): void;
+}
+export interface FileData {
+    mimeType: string;
+    name: string;
+    url: string;
 }
 export interface Document extends Batchable, ValueProtocol {
+    [index: string]: any | null | undefined;
     version: number;
     modelName: string;
     path: string;
@@ -42,7 +49,7 @@ export interface AnySubCollection extends Batchable {
     path: string;
     reference: CollectionReference;
     key: string;
-    setParent(parent: Base, key: string): any;
+    setParent(parent: Base, key: string): void;
 }
 export declare function isCollection(arg: any): Boolean;
 export declare function isFile(arg: any): Boolean;
@@ -56,7 +63,7 @@ export declare class Base implements Document {
     static getPath(): string;
     static get<T extends Base>(id: string, type: {
         new (id?: string, data?: DocumentData): T;
-    }): Promise<T>;
+    }): Promise<T | undefined>;
     version: number;
     modelName: string;
     path: string;
@@ -77,7 +84,7 @@ export declare class Base implements Document {
     getPath(): string;
     getReference(): DocumentReference;
     getProperties(): string[];
-    setValue(value: any, key: string): void;
+    setValue<K extends keyof ThisType<this>>(value: any, key: K): void;
     rawValue(): any;
     value(): DocumentData;
     pack(type: BatchType, batchID?: string, writeBatch?: WriteBatch): WriteBatch;
