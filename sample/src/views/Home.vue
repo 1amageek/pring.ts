@@ -9,8 +9,14 @@
 import { Component, Vue } from 'vue-property-decorator';
 import HelloWorld from '../components/HelloWorld.vue'; // @ is an alias to /src
 import firebase from 'firebase';
+import 'firebase/firestore';
+import * as Pring from '../../../src/index';
 import { User } from '../models/user';
-import { config } from "../../../test/config"
+import { config } from "../../../test/config";
+
+const app = firebase.initializeApp(config);
+Pring.initialize(app, firebase.firestore.FieldValue.serverTimestamp())
+
 @Component({
   components: {
     HelloWorld,
@@ -19,8 +25,9 @@ import { config } from "../../../test/config"
 export default class Home extends Vue {
 
   public created() {
-    const app = firebase.initializeApp(config);
+    
+    const user: User = new User();
+    console.log(user);
   }
-
 }
 </script>
