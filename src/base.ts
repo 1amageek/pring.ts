@@ -8,6 +8,7 @@ import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
 import { File } from './file'
 import { Batchable, BatchType, Batch } from './batch'
+import * as DataSourceQuery from './query'
 
 export type CollectionReference = firebase.firestore.CollectionReference
 export type DocumentReference = firebase.firestore.DocumentReference
@@ -22,6 +23,9 @@ export type Transaction = firebase.firestore.Transaction
 export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | firebase.firestore.DocumentData
 export type DataOrSnapshot = DocumentData | DocumentSnapshot
 export type DateType = 'createdAt' | 'updatedAt'
+export type WhereFilterOp = firebase.firestore.WhereFilterOp
+export type OrderByDirection = firebase.firestore.OrderByDirection
+export type GetOptions = firebase.firestore.GetOptions
 
 const propertyMetadataKey = Symbol("property")
 
@@ -104,6 +108,10 @@ export class Base implements Document {
 
     static getPath(): string {
         return `version/${this.getVersion()}/${this.getModelName()}`
+    }
+
+    static query(): DataSourceQuery.Query {
+        return new DataSourceQuery.Query(this.getReference())
     }
 
     static async get<T extends Base>(id: string, type: { new(id?: string, data?: DocumentData): T }) {

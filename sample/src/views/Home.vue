@@ -12,10 +12,6 @@ import firebase from 'firebase';
 import 'firebase/firestore';
 import * as Pring from '../../../src/index';
 import { User } from '../models/user';
-import { config } from "../../../test/config";
-
-const app = firebase.initializeApp(config);
-Pring.initialize(app, firebase.firestore.FieldValue.serverTimestamp())
 
 @Component({
   components: {
@@ -28,6 +24,9 @@ export default class Home extends Vue {
     
     const user: User = new User();
     console.log(user);
+
+    User.query().dataSource()
+
   }
 }
 </script>
