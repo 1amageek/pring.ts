@@ -26,6 +26,7 @@ export type DateType = 'createdAt' | 'updatedAt'
 export type WhereFilterOp = firebase.firestore.WhereFilterOp
 export type OrderByDirection = firebase.firestore.OrderByDirection
 export type GetOptions = firebase.firestore.GetOptions
+export type DocumentChange = firebase.firestore.DocumentChange
 
 const propertyMetadataKey = Symbol("property")
 
@@ -110,7 +111,7 @@ export class Base implements Document {
         return `version/${this.getVersion()}/${this.getModelName()}`
     }
 
-    static query(): DataSourceQuery.Query {
+    static query<T extends Base>(): DataSourceQuery.Query<T> {
         return new DataSourceQuery.Query(this.getReference())
     }
 
