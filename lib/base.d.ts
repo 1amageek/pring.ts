@@ -2,6 +2,7 @@ import * as firebase from 'firebase';
 import "reflect-metadata";
 import { NestedCollection } from './nestedCollection';
 import { Batchable, BatchType } from './batch';
+import * as DataSourceQuery from './query';
 export declare type CollectionReference = firebase.firestore.CollectionReference;
 export declare type DocumentReference = firebase.firestore.DocumentReference;
 export declare type DocumentSnapshot = firebase.firestore.DocumentSnapshot;
@@ -20,6 +21,10 @@ export declare type DocumentData = {
 } | firebase.firestore.DocumentData;
 export declare type DataOrSnapshot = DocumentData | DocumentSnapshot;
 export declare type DateType = 'createdAt' | 'updatedAt';
+export declare type WhereFilterOp = firebase.firestore.WhereFilterOp;
+export declare type OrderByDirection = firebase.firestore.OrderByDirection;
+export declare type GetOptions = firebase.firestore.GetOptions;
+export declare type DocumentChange = firebase.firestore.DocumentChange;
 export declare const property: <T extends Document>(target: T, propertyKey: string) => void;
 export interface ValueProtocol {
     value(): any;
@@ -61,6 +66,7 @@ export declare class Base implements Document {
     static getVersion(): number;
     static getModelName(): string;
     static getPath(): string;
+    static query<T extends Base>(): DataSourceQuery.Query<T>;
     static get<T extends Base>(id: string, type: {
         new (id?: string, data?: DocumentData): T;
     }): Promise<T | undefined>;
