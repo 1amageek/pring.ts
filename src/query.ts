@@ -45,63 +45,47 @@ export class Query<Element extends Base.Base> {
         return query
     }
 
-    public orderBy(fieldPath: string | FieldPath, directionStr?: OrderByDirection) {
+    public orderBy(fieldPath: string | FieldPath, directionStr?: OrderByDirection): Query<Element> {
         const query: Query<Element> = new Query(this.reference, this.isReference)
         query.query = this.query.orderBy(fieldPath, directionStr)
         return query
     }
 
-    public limit(limit: number) {
+    public limit(limit: number): Query<Element> {
         const query: Query<Element> = new Query(this.reference, this.isReference)
         query.query = this.query.limit(limit)
         return query
     }
 
-    public startAt(snapshot: DocumentSnapshot) {
+    public startAt(snapshot: DocumentSnapshot): Query<Element>
+    public startAt(...fieldValues: any[]): Query<Element>
+    public startAt(arg: DocumentSnapshot | any[]): Query<Element> {
         const query: Query<Element> = new Query(this.reference, this.isReference)
-        query.query = this.query.startAt(snapshot)
+        query.query = this.query.startAt(arg)
         return query
     }
 
-    public startAt(...fieldValues: any[]) {
+    public startAfter(snapshot: DocumentSnapshot): Query<Element>
+    public startAfter(...fieldValues: any[]): Query<Element>
+    public startAfter(arg: DocumentSnapshot | any[]): Query<Element> {
         const query: Query<Element> = new Query(this.reference, this.isReference)
-        query.query = this.query.startAt(fieldValues)
+        query.query = this.query.startAfter(arg)
         return query
     }
 
-    public startAfter(snapshot: DocumentSnapshot) {
+    public endBefore(snapshot: DocumentSnapshot): Query<Element>
+    public endBefore(...fieldValues: any[]): Query<Element>
+    public endBefore(arg: DocumentSnapshot | any[]): Query<Element> {
         const query: Query<Element> = new Query(this.reference, this.isReference)
-        query.query = this.query.startAfter(snapshot)
+        query.query = this.query.endBefore(arg)
         return query
     }
 
-    public startAfter(...fieldValues: any[]) {
+    public endAt(snapshot: DocumentSnapshot): Query<Element>
+    public endAt(...fieldValues: any[]): Query<Element>
+    public endAt(arg: DocumentSnapshot | any[]): Query<Element> {
         const query: Query<Element> = new Query(this.reference, this.isReference)
-        query.query = this.query.startAfter(fieldValues)
-        return query
-    }
-
-    public endBefore(snapshot: DocumentSnapshot) {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
-        query.query = this.query.endBefore(snapshot)
-        return query
-    }
-
-    public endBefore(...fieldValues: any[]) {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
-        query.query = this.query.endBefore(fieldValues)
-        return query
-    }
-
-    public endAt(snapshot: DocumentSnapshot) {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
-        query.query = this.query.endAt(snapshot)
-        return query
-    }
-
-    public endAt(...fieldValues: any[]) {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
-        query.query = this.query.endAt(fieldValues)
+        query.query = this.query.endAt(arg)
         return query
     }
 

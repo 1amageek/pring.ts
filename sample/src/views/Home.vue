@@ -23,14 +23,22 @@ export default class Home extends Vue {
   public created() {
     
     const user: User = new User();
-    console.log(user);
+    // console.log(user);
 
     const dataSource = User.query().dataSource(User)
 
     dataSource.on((snapshot, changes) => {
+
+      console.log(changes)
+      console.log(dataSource.documents)
       dataSource.documents.forEach(doc => {
-        console.log(doc)
+        console.log(doc);
       })
+
+      // const user: User = dataSource.documents
+      
+      // console.log(user);
+
     }).listen()
 
   }
