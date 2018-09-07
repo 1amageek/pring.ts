@@ -7,10 +7,10 @@ export declare class SubCollection<T extends Base> implements AnySubCollection {
     key: string;
     batchID?: string;
     objects: T[];
-    constructor(parent: Base);
     protected _insertions: T[];
     protected _deletions: T[];
-    isSaved(): Boolean;
+    constructor(parent: Base);
+    isSaved(): boolean;
     setParent(parent: Base, key: string): void;
     getPath(): string;
     getReference(): CollectionReference;

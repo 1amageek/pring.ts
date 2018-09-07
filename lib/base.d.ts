@@ -56,9 +56,9 @@ export interface AnySubCollection extends Batchable {
     key: string;
     setParent(parent: Base, key: string): void;
 }
-export declare function isCollection(arg: any): Boolean;
-export declare function isFile(arg: any): Boolean;
-export declare function isTimestamp(arg: any): Boolean;
+export declare function isCollection(arg: any): boolean;
+export declare function isFile(arg: any): boolean;
+export declare function isTimestamp(arg: any): boolean;
 export declare const isUndefined: (value: any) => boolean;
 export declare class Base implements Document {
     static getTriggerPath(): string;
@@ -77,11 +77,10 @@ export declare class Base implements Document {
     id: string;
     createdAt: Date;
     updatedAt: Date;
-    isSaved: Boolean;
-    isLocalSaved: Boolean;
+    isSaved: boolean;
+    isLocalSaved: boolean;
     batchID?: string;
     private _updateValues;
-    private _defineProperty;
     constructor(id?: string, data?: DocumentData);
     setData(data: DocumentData): void;
     shouldBeReplicated(): boolean;
@@ -100,4 +99,5 @@ export declare class Base implements Document {
     update(): Promise<void>;
     delete(): Promise<void>;
     fetch(transaction?: Transaction): Promise<void>;
+    private _defineProperty;
 }
