@@ -9,7 +9,7 @@ import {
     DocumentSnapshot,
     QuerySnapshot,
     WriteBatch,
-    Transaction, 
+    Transaction,
     DocumentData
 } from './base'
 
@@ -27,34 +27,34 @@ export class SubCollection<T extends Base> implements AnySubCollection {
 
     public objects: T[] = []
 
-    constructor(parent: Base) {
-        this.parent = parent
-    }
-
     protected _insertions: T[] = []
 
     protected _deletions: T[] = []
 
-    isSaved(): Boolean {
+    constructor(parent: Base) {
+        this.parent = parent
+    }
+
+    public isSaved(): boolean {
         return this.parent.isSaved
     }
 
-    setParent(parent: Base, key: string) {
+    public setParent(parent: Base, key: string) {
         this.parent = parent
         this.key = key
         this.path = this.getPath()
         this.reference = this.getReference()
     }
 
-    getPath(): string {
+    public getPath(): string {
         return `${this.parent.path}/${this.key}`
     }
 
-    getReference(): CollectionReference {
+    public getReference(): CollectionReference {
         return firestore.collection(this.getPath())
     }
 
-    insert(newMember: T) {
+    public insert(newMember: T) {
         newMember.reference = this.reference.doc(newMember.id)
         this.objects.push(newMember)
         if (this.isSaved()) {
@@ -62,7 +62,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }
     }
 
-    delete(member: T) {
+    public delete(member: T) {
         this.objects.some((v, i) => {
             if (v.id === member.id) {
                 this.objects.splice(i, 1)
@@ -76,14 +76,14 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         member.reference = member.getReference()
     }
 
-    async doc(id: string, type: { new(id?: string, data?: DocumentData): T; }, transaction?: Transaction) {
+    public async doc(id: string, type: { new(id?: string, data?: DocumentData): T; }, transaction?: Transaction) {
         try {
             let snapshot: DocumentSnapshot
             if (transaction) {
                 snapshot = await transaction.get(this.reference.doc(id) as firebase.firestore.DocumentReference)
             } else {
                 snapshot = await this.reference.doc(id).get()
-            }             
+            }
             if (snapshot.exists) {
                 const document: T = new type(snapshot.id, {})
                 document.setData(snapshot.data()!)
@@ -94,10 +94,10 @@ export class SubCollection<T extends Base> implements AnySubCollection {
             }
         } catch (error) {
             throw error
-        }     
+        }
     }
 
-    async get(type: { new(id?: string, data?: DocumentData): T; }) {
+    public async get(type: { new(id?: string, data?: DocumentData): T; }) {
         try {
             let snapshot: QuerySnapshot
             snapshot = await this.reference.get()
@@ -111,10 +111,10 @@ export class SubCollection<T extends Base> implements AnySubCollection {
             return documents
         } catch (error) {
             throw error
-        }       
+        }
     }
 
-    async contains(id: string) {
+    public async contains(id: string) {
         try {
             const snapshot = await this.reference.doc(id).get()
             return snapshot.exists
@@ -123,11 +123,11 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }
     }
 
-    forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any) {
+    public forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any) {
         this.objects.forEach(callbackfn)
     }
 
-    pack(type: BatchType, batchID: string, writeBatch?: WriteBatch): WriteBatch {
+    public pack(type: BatchType, batchID: string, writeBatch?: WriteBatch): WriteBatch {
         const _writeBatch: WriteBatch = writeBatch || firestore.batch()
         const _batch: Batch = new Batch(_writeBatch)
         const self = this
@@ -137,7 +137,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                     const reference = self.reference.doc(document.id)
                     if (document.isSaved) {
                         _batch.set(reference, document.value())
-                    } else {                        
+                    } else {
                         _batch.set(reference, document.value(), { merge: true })
                     }
                 })
@@ -146,7 +146,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                 const insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
                 insertions.forEach(document => {
                     const reference = self.reference.doc(document.id)
-                    _batch.set(reference, document.value(), { merge: true})
+                    _batch.set(reference, document.value(), { merge: true })
                 })
                 const deletions = this._deletions.filter(item => this._insertions.indexOf(item) < 0)
                 deletions.forEach(document => {
@@ -163,7 +163,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }
     }
 
-    batch(type: BatchType, batchID: string) {
+    public batch(type: BatchType, batchID: string) {
         this.forEach(document => {
             document.batch(type, batchID)
         })

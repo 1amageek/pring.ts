@@ -1,10 +1,10 @@
 import * as firebase from 'firebase'
 import {
-    DocumentReference, 
-    WriteBatch, 
-    SetOptions, 
-    UpdateData, 
-    DocumentData, 
+    DocumentReference,
+    WriteBatch,
+    SetOptions,
+    UpdateData,
+    DocumentData,
 } from './base'
 
 export enum BatchType {
@@ -37,7 +37,7 @@ export class Batch {
      * @param options An object to configure the set behavior.
      * @return This `WriteBatch` instance. Used for chaining method calls.
      */
-    set(
+    public set(
         documentRef: DocumentReference,
         data: DocumentData,
         options?: SetOptions
@@ -57,7 +57,7 @@ export class Batch {
      * within the document.
      * @return This `WriteBatch` instance. Used for chaining method calls.
      */
-    update(documentRef: DocumentReference, data: UpdateData): Batch {
+    public update(documentRef: DocumentReference, data: UpdateData): Batch {
         this._writeBatch.update(documentRef, data)
         return this
     }
@@ -97,7 +97,7 @@ export class Batch {
      * @param documentRef A reference to the document to be deleted.
      * @return This `WriteBatch` instance. Used for chaining method calls.
      */
-    delete(documentRef: DocumentReference): Batch {
+    public delete(documentRef: DocumentReference): Batch {
         this._writeBatch.delete(documentRef)
         return this
     }
@@ -109,11 +109,11 @@ export class Batch {
      * successfully written to the backend as an atomic unit. Note that it won't
      * resolve while you're offline.
      */
-    async commit() {
+    public async commit() {
         return await this._writeBatch.commit()
     }
 
-    batch(): WriteBatch {
+    public batch(): WriteBatch {
         return this._writeBatch
     }
 }

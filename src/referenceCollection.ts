@@ -12,14 +12,14 @@ import {
 
 export class ReferenceCollection<T extends Base> extends SubCollection<T> {
 
-    insert(newMember: T) {
+    public nsert(newMember: T) {
         this.objects.push(newMember)
         if (this.isSaved()) {
             this._insertions.push(newMember)
         }
     }
 
-    delete(member: T) {
+    public delete(member: T) {
         this.objects.some((v, i) => {
             if (v.id === member.id) {
                 this.objects.splice(i, 1)
@@ -32,7 +32,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         }
     }
 
-    pack(type: BatchType, batchID?: string, writeBatch?: WriteBatch): WriteBatch {
+    public pack(type: BatchType, batchID?: string, writeBatch?: WriteBatch): WriteBatch {
         const _writeBatch: WriteBatch = writeBatch || firestore.batch()
         const _batch: Batch = new Batch(_writeBatch)
         switch (type) {
@@ -90,7 +90,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         }
     }
 
-    async doc(id: string, type: { new(id?: string, data?: DocumentData): T; }) {
+    public async doc(id: string, type: { new(id?: string, data?: DocumentData): T; }) {
         try {
             const document: T = new type(id, {})
             await document.fetch()
@@ -100,7 +100,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         }
     }
 
-    async get(type: { new(id?: string, data?: DocumentData): T; }) {
+    public async get(type: { new(id?: string, data?: DocumentData): T; }) {
         try {
             const snapshot: QuerySnapshot = await this.reference.get()
             const docs: DocumentSnapshot[] = snapshot.docs

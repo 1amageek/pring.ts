@@ -2,11 +2,11 @@ import { ValueProtocol, FileData, FieldPath } from './base'
 
 export class File implements ValueProtocol {
 
-    mimeType?: string
+    public mimeType?: string
 
-    name?: string
+    public name?: string
 
-    url?: string
+    public url?: string
 
     constructor(name?: string, url?: string, mimeType?: string) {
         this.name = name
@@ -14,17 +14,20 @@ export class File implements ValueProtocol {
         this.mimeType = mimeType
     }
 
-    init(value: FileData) {
-        this.mimeType = value["mimeType"]
-        this.name = value["name"]
-        this.url = value["url"]
+    public init(value: FileData) {
+        const mimeType: (keyof FileData) = "mimeType"
+        const name: (keyof FileData) = "name"
+        const url: (keyof FileData) = "url"
+        this.mimeType = value[mimeType]
+        this.name = value[name]
+        this.url = value[url]
     }
 
-    setValue(value: any, key: (keyof FileData)) {
+    public setValue(value: any, key: (keyof FileData)) {
         this[key] = value
     }
 
-    value(): any {
+    public value(): any {
         return {
             "name": this.name || "",
             "url": this.url || "",

@@ -36,7 +36,6 @@ export default class Home extends Vue {
       })
 
       // const user: User = dataSource.documents
-      
       // console.log(user);
 
     }).listen()

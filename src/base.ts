@@ -70,52 +70,52 @@ export interface AnySubCollection extends Batchable {
     setParent(parent: Base, key: string): void
 }
 
-export function isCollection(arg: any): Boolean {
+export function isCollection(arg: any): boolean {
     return (arg instanceof SubCollection) ||
         (arg instanceof NestedCollection) ||
         (arg instanceof ReferenceCollection)
 }
 
-export function isFile(arg: any): Boolean {
+export function isFile(arg: any): boolean {
     return (arg instanceof File)
 }
 
-export function isTimestamp(arg: any): Boolean {
+export function isTimestamp(arg: any): boolean {
     return (arg instanceof firebase.firestore.Timestamp)
 }
 
 export const isUndefined = (value: any): boolean => {
-    return (value === null || value === undefined || value === NaN)
+    return (value === null || value === undefined)
 }
 
 /// Pring Base class
 export class Base implements Document {
 
-    static getTriggerPath(): string {
+    public static getTriggerPath(): string {
         return `/version/{version}/${this.getModelName()}/{id}`
     }
 
-    static getReference(): CollectionReference {
+    public static getReference(): CollectionReference {
         return firestore.collection(this.getPath())
     }
 
-    static getVersion(): number {
+    public static getVersion(): number {
         return 1
     }
 
-    static getModelName(): string {
+    public static getModelName(): string {
         return this.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1].toLowerCase()
     }
 
-    static getPath(): string {
+    public static getPath(): string {
         return `version/${this.getVersion()}/${this.getModelName()}`
     }
 
-    static query<T extends Base>(): DataSourceQuery.Query<T> {
+    public static query<T extends Base>(): DataSourceQuery.Query<T> {
         return new DataSourceQuery.Query(this.getReference())
     }
 
-    static async get<T extends Base>(id: string, type: { new(id?: string, data?: DocumentData): T }) {
+    public static async get<T extends Base>(id: string, type: { new(id?: string, data?: DocumentData): T }) {
         try {
             const snapshot: DocumentSnapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
             if (snapshot.exists) {
@@ -144,45 +144,15 @@ export class Base implements Document {
 
     public updatedAt!: Date
 
-    public isSaved: Boolean = false
+    public isSaved: boolean = false
 
-    public isLocalSaved: Boolean = false
+    public isLocalSaved: boolean = false
 
     public batchID?: string
 
-    // - basic 
-
     private _updateValues: { [key: string]: any } = {}
 
-    private _defineProperty<T extends keyof ThisType<this>>(key: T | DateType, value?: any) {
-        let _value: any = value
-        const descriptor: PropertyDescriptor = {
-            enumerable: true,
-            configurable: true,
-            get: () => {
-                if (isTimestamp(_value)) {
-                    return _value.toDate()
-                }
-                return _value
-            },
-            set: (newValue) => {
-                _value = newValue
-                if (isCollection(newValue)) {
-                    const collection: AnySubCollection = newValue as AnySubCollection
-                    collection.setParent(this, key)
-                } else if (isFile(newValue)) {
-                    const file: ValueProtocol = newValue as ValueProtocol
-                    this._updateValues[key] = file.value()
-                } else {
-                    this._updateValues[key] = newValue
-                }
-            }
-        }
-        Object.defineProperty(this, key, descriptor)
-    }
-
-    constructor(id?: string, data?: DocumentData) {
-
+    public constructor(id?: string, data?: DocumentData) {
         // set pring object base data
         this.version = this.getVersion()
         this.modelName = this.getModelName()
@@ -192,7 +162,7 @@ export class Base implements Document {
         this.path = this.getPath()
         this.reference = this.getReference()
 
-        // Pring properties define 
+        // Pring properties define
         const properties: string[] = Reflect.getMetadata(propertyMetadataKey, this) || []
         if (data) {
             for (const prop of properties) {
@@ -208,7 +178,7 @@ export class Base implements Document {
         }
     }
 
-    setData(data: DocumentData) {
+    public setData(data: DocumentData) {
         if (data.createdAt) {
             this._defineProperty('createdAt', data.createdAt)
         }
@@ -226,35 +196,35 @@ export class Base implements Document {
         this._updateValues = {}
     }
 
-    shouldBeReplicated(): boolean {
+    public shouldBeReplicated(): boolean {
         return false
     }
 
-    getVersion(): number {
+    public getVersion(): number {
         return 1
     }
 
-    getModelName(): string {
+    public getModelName(): string {
         return this.constructor.toString().split('(' || /s+/)[0].split(' ' || /s+/)[1].toLowerCase()
     }
 
-    getPath(): string {
+    public getPath(): string {
         return `version/${this.version}/${this.modelName}/${this.id}`
     }
 
-    getReference(): DocumentReference {
+    public getReference(): DocumentReference {
         return firestore.doc(this.getPath())
     }
 
-    getProperties(): string[] {
+    public getProperties(): string[] {
         return Reflect.getMetadata(propertyMetadataKey, this) || []
     }
 
-    setValue<K extends keyof ThisType<this>>(value: any, key: K) {
+    public setValue<K extends keyof ThisType<this>>(value: any, key: K) {
         this[key] = value
     }
 
-    rawValue(): any {
+    public rawValue(): any {
         const properties = this.getProperties()
         const values: any = {}
         for (const key of properties) {
@@ -264,7 +234,7 @@ export class Base implements Document {
                     const value = descriptor.get()
                     if (!isUndefined(value)) {
                         if (isCollection(value)) {
-                            // Nothing 
+                            // Nothing
                         } else if (isFile(value)) {
                             const file: ValueProtocol = value as ValueProtocol
                             values[key] = file.value()
@@ -278,18 +248,21 @@ export class Base implements Document {
         return values
     }
 
-    value(): DocumentData {
+    public value(): DocumentData {
         const values: DocumentData = this.rawValue()
         if (this.isSaved) {
-            values["updatedAt"] = timestamp
+            const updatedAt: (keyof DocumentData) = "updatedAt"
+            values[updatedAt] = timestamp
         } else {
-            values["createdAt"] = this.createdAt || timestamp
-            values["updatedAt"] = this.updatedAt || timestamp
+            const updatedAt: (keyof DocumentData) = "updatedAt"
+            const createdAt: (keyof DocumentData) = "createdAt"
+            values[updatedAt] = this.updatedAt || timestamp
+            values[createdAt] = this.createdAt || timestamp
         }
         return values
     }
 
-    pack(type: BatchType, batchID?: string, writeBatch?: WriteBatch): WriteBatch {
+    public pack(type: BatchType, batchID?: string, writeBatch?: WriteBatch): WriteBatch {
         const _writeBatch: WriteBatch = writeBatch || firestore.batch()
         const _batch: Batch = new Batch(_writeBatch)
 
@@ -323,8 +296,9 @@ export class Base implements Document {
                 }
                 return _batch.batch()
             case BatchType.update:
-                const updateValues = this._updateValues
-                updateValues["updatedAt"] = timestamp
+                const updateValues: DocumentData = this._updateValues
+                const updatedAt: (keyof DocumentData) = "updatedAt"
+                updateValues[updatedAt] = timestamp
                 _batch.update(reference, updateValues)
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
@@ -347,7 +321,7 @@ export class Base implements Document {
         }
     }
 
-    batch(type: BatchType, batchID: string = UUID.v4()) {
+    public batch(type: BatchType, batchID: string = UUID.v4()) {
         if (batchID === this.batchID) {
             return
         }
@@ -371,13 +345,13 @@ export class Base implements Document {
         }
     }
 
-    setParent<T extends Base>(parent: NestedCollection<T>) {
+    public setParent<T extends Base>(parent: NestedCollection<T>) {
         // Set reference
         this.path = `${parent.path}/${this.id}`
         this.reference = firestore.doc(this.path)
     }
 
-    async save() {
+    public async save() {
         const batch = this.pack(BatchType.save)
         try {
             const result = await batch.commit()
@@ -389,7 +363,7 @@ export class Base implements Document {
         }
     }
 
-    async update() {
+    public async update() {
         const batch = this.pack(BatchType.update)
         try {
             const result = await batch.commit()
@@ -401,11 +375,11 @@ export class Base implements Document {
         }
     }
 
-    async delete() {
+    public async delete() {
         return await this.reference.delete()
     }
 
-    async fetch(transaction?: Transaction) {
+    public async fetch(transaction?: Transaction) {
         try {
             let snapshot
             if (transaction) {
@@ -421,5 +395,32 @@ export class Base implements Document {
         } catch (error) {
             throw error
         }
+    }
+
+    private _defineProperty<T extends keyof ThisType<this>>(key: T | DateType, value?: any) {
+        let _value: any = value
+        const descriptor: PropertyDescriptor = {
+            enumerable: true,
+            configurable: true,
+            get: () => {
+                if (isTimestamp(_value)) {
+                    return _value.toDate()
+                }
+                return _value
+            },
+            set: (newValue) => {
+                _value = newValue
+                if (isCollection(newValue)) {
+                    const collection: AnySubCollection = newValue as AnySubCollection
+                    collection.setParent(this, key)
+                } else if (isFile(newValue)) {
+                    const file: ValueProtocol = newValue as ValueProtocol
+                    this._updateValues[key] = file.value()
+                } else {
+                    this._updateValues[key] = newValue
+                }
+            }
+        }
+        Object.defineProperty(this, key, descriptor)
     }
 }

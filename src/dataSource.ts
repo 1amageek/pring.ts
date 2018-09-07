@@ -44,6 +44,10 @@ export class DataSource<Element extends Base> {
 
     public changeBlock?: (snapshot: QuerySnapshot, change: CollectionChange) => void
 
+    public errorBlock?: (error: Error) => void
+
+    public completedBlock?: (documents: Element[]) => void
+
     private _Element!: { new(id?: string, data?: DocumentData): Element }
 
     constructor(query: Query<Element>, option: Option<Element> = new Option(), type: { new(id?: string, data?: DocumentData): Element }) {
@@ -61,6 +65,16 @@ export class DataSource<Element extends Base> {
         return this
     }
 
+    public onError(block: (error: Error) => void): this {
+        this.errorBlock = block
+        return this
+    }
+
+    public onCompleted(block: (documents: Element[]) => void): this {
+        this.completedBlock = block
+        return this
+    }
+
     public listen(): this {
         let isFirst: boolean = true
         this.query.listen({
@@ -73,10 +87,14 @@ export class DataSource<Element extends Base> {
                 }
             },
             error: (error) => {
-
+                if (this.errorBlock) {
+                    this.errorBlock(error)
+                }
             },
             complete: () => {
-
+                if (this.completedBlock) {
+                    this.completedBlock(this.documents)
+                }
             }
         })
         return this
@@ -141,7 +159,6 @@ export class DataSource<Element extends Base> {
     }
 
     private async _get(change: DocumentChange) {
-        // private async _get(change: DocumentChange) {
         const id: string = change.doc.id
         if (this.query.isReference) {
             const document: Element = new this._Element(id, {})

@@ -4,7 +4,6 @@ import {
     FieldPath,
     DocumentSnapshot,
     QuerySnapshot,
-    WriteBatch,
     DocumentData,
     OrderByDirection,
     WhereFilterOp,
@@ -12,14 +11,13 @@ import {
     CollectionReference
 } from './base'
 
-
 export class Query<Element extends Base.Base> {
+
+    public isReference: boolean
 
     private reference: CollectionReference
 
     private query: Base.Query
-
-    public isReference: boolean
 
     constructor(reference: CollectionReference, isReference: boolean = false) {
         this.reference = reference
@@ -27,7 +25,9 @@ export class Query<Element extends Base.Base> {
         this.isReference = isReference
     }
 
-    public dataSource(type: { new(id?: string, data?: DocumentData): Element }, option: Option<Element> = new Option()): DataSource<Element> {
+    public dataSource(
+        type: { new(id?: string, data?: DocumentData): Element },
+        option: Option<Element> = new Option()): DataSource<Element> {
         return new DataSource(this, option, type)
     }
 
@@ -35,7 +35,7 @@ export class Query<Element extends Base.Base> {
         next?: (snapshot: QuerySnapshot) => void;
         error?: (error: Error) => void;
         complete?: () => void;
-      }) {
+    }) {
         return this.query.onSnapshot(observer)
     }
 
