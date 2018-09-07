@@ -23,7 +23,7 @@ export class Batch {
 
     private _writeBatch: firebase.firestore.WriteBatch
 
-    constructor(writeBatch: WriteBatch) {
+    public constructor(writeBatch: WriteBatch) {
         this._writeBatch = writeBatch
     }
 

@@ -8,6 +8,7 @@ import {
     QuerySnapshot,
     WriteBatch,
     DocumentData,
+    DocumentReference,
 } from './base'
 
 export class ReferenceCollection<T extends Base> extends SubCollection<T> {
@@ -45,7 +46,8 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                     value.createdAt = timestamp
                     value.updatedAt = timestamp
                     if (!document.isSaved) {
-                        _batch.set(document.reference, document.value(), {merge: true})
+                        const reference: DocumentReference = document.getReference()
+                        _batch.set(reference, document.value(), {merge: true})
                     }
                     const reference = this.reference.doc(document.id)
                     _batch.set(reference, value, { merge: true})
@@ -64,7 +66,8 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                             value.createdAt = document.createdAt
                         }
                         value.updatedAt = timestamp
-                        _batch.set(document.reference, document.value(), { merge: true})
+                        const reference: DocumentReference = document.getReference()
+                        _batch.set(reference, document.value(), { merge: true})
                     } else {
                         if (document.shouldBeReplicated()) {
                             value = document.value()

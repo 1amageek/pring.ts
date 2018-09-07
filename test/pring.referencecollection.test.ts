@@ -17,6 +17,12 @@ describe("SubCollection pack", () => {
     const doc1_other = new DocumentLite()
     const doc2_other = new DocumentLite()
 
+    doc0.name = "doc0"
+    doc1.name = "doc1"
+    doc2.name = "doc2"
+    doc1_other.name = "doc1_other"
+    doc2_other.name = "doc2_other"
+
     const doc0_id = doc0.id
     const doc1_id = doc1.id
     const doc2_id = doc2.id

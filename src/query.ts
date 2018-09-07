@@ -19,7 +19,7 @@ export class Query<Element extends Base.Base> {
 
     private query: Base.Query
 
-    constructor(reference: CollectionReference, isReference: boolean = false) {
+    public constructor(reference: CollectionReference, isReference: boolean = false) {
         this.reference = reference
         this.query = reference
         this.isReference = isReference

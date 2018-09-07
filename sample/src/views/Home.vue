@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
+    <img alt="Vue logo" src="../assets/logo.png" v-on:click="addUser">
     <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
   </div>
 </template>
@@ -20,26 +20,32 @@ import { User } from '../models/user';
 })
 export default class Home extends Vue {
 
+  public async addUser() {
+    const user: User = new User()
+    user.name = "@1amageek"
+    await user.save()
+  }
+
   public created() {
-    
-    const user: User = new User();
-    // console.log(user);
-
     const dataSource = User.query().dataSource(User)
-
     dataSource.on((snapshot, changes) => {
 
-      console.log(changes)
-      console.log(dataSource.documents)
-      dataSource.documents.forEach(doc => {
-        console.log(doc);
-      })
-
-      // const user: User = dataSource.documents
-      // console.log(user);
-
+      switch (changes.type) {
+        case "initial": {
+          console.log(dataSource.documents)
+          break
+        }
+        case "update": {
+          console.log("insert", changes.insertions)
+          console.log("change", changes.modifications)
+          console.log("delete", changes.deletions)
+          break
+        }
+        case "error": {
+          break
+        }
+      }
     }).listen()
-
   }
 }
 </script>

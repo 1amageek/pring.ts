@@ -8,7 +8,7 @@ export class File implements ValueProtocol {
 
     public url?: string
 
-    constructor(name?: string, url?: string, mimeType?: string) {
+    public constructor(name?: string, url?: string, mimeType?: string) {
         this.name = name
         this.url = url
         this.mimeType = mimeType

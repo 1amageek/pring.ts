@@ -31,7 +31,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
 
     protected _deletions: T[] = []
 
-    constructor(parent: Base) {
+    public constructor(parent: Base) {
         this.parent = parent
     }
 

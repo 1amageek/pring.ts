@@ -50,7 +50,7 @@ export class DataSource<Element extends Base> {
 
     private _Element!: { new(id?: string, data?: DocumentData): Element }
 
-    constructor(query: Query<Element>, option: Option<Element> = new Option(), type: { new(id?: string, data?: DocumentData): Element }) {
+    public constructor(query: Query<Element>, option: Option<Element> = new Option(), type: { new(id?: string, data?: DocumentData): Element }) {
         this.query = query
         this.option = option
         this._Element = type
