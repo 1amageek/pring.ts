@@ -113,11 +113,13 @@ let user = new User("YOUR_ID")
 // any ID, Handle already saved users
 let user = new User("YOUR_ID", {})
 ```
-** memo **
+__memo__
+
 The developer is responsible for managing the Document being saved. 
 In Pring it is prohibited to save the already saved Document again.
 
-`new User("YOUR_ID", {})`, `let user = new User("YOUR_ID")`
+Please use explicitly by the initialization method.
+`new User("YOUR_ID", {})` `let user = new User("YOUR_ID")`
 
 #### Save
 ``` typescript
