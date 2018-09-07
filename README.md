@@ -65,13 +65,19 @@ Set `experimentalDecorators` to `true`.
 
 ### Initialize
 
+When using Pring in Vue please include it in `main.ts`.
+
+
 ``` typescript
-import { Pring, property } from "pring"
+import * as Pring from "pring"
+import { config } from "./config"
+import firebase from "firebase"
+import "firebase/firestore";
 
-admin.initializeApp()
-const app = admin.app()
+firebase.initializeApp()
+const app = firebase.app()
 
-Pring.initialize(app, admin.firestore.FieldValue.serverTimestamp())
+Pring.initialize(app, firebase.firestore.FieldValue.serverTimestamp())
 ```
 
 ### Scheme
@@ -80,6 +86,8 @@ Pring.initialize(app, admin.firestore.FieldValue.serverTimestamp())
 - SubCollection can not be optional. Please initialize here.
 
 ``` typescript
+import * as Pring from "pring"
+const property = Pring.property
 
 class Group extends Pring.Base {
     @property name: string
@@ -128,7 +136,7 @@ The inserted Object is saved simultaneously with the save of the parent.
 let user = new User()
 let group = new Group()
 user.groups.insert(group)
-user.save()
+await user.save()
 ```
 
 If you insert the parent after it is saved, you need to use `await` to guarantee the count of SubCollection.
@@ -143,6 +151,42 @@ try {
   await user.groups.insert(group1)
 } catch(error) {
   console.log(error)
+}
+```
+
+### DataSource
+DataSource is a class that controls Collection of Firestore.
+
+``` typescript
+export default class Home extends Vue {
+
+  public async addUser() {
+    const user: User = new User()
+    user.name = "@1amageek"
+    await user.save()
+  }
+
+  public created() {
+    const dataSource = User.query().dataSource(User)
+    dataSource.on((snapshot, changes) => {
+
+      switch (changes.type) {
+        case "initial": {
+          console.log(dataSource.documents)
+          break
+        }
+        case "update": {
+          console.log("insert", changes.insertions)
+          console.log("change", changes.modifications)
+          console.log("delete", changes.deletions)
+          break
+        }
+        case "error": {
+          break
+        }
+      }
+    }).listen()
+  }
 }
 ```
 
