@@ -1,17 +1,13 @@
 # pring.ts
 
-Firebase Cloud Firestore model framework for web.
+Firebase Cloud Firestore model framework for TypeScript. It supports both Web Client and Admin.
 
 - [Pring for iOS](https://github.com/1amageek/Pring)
-- [Pring for admin](https://github.com/1amageek/pring-admin.ts)
-- [Pring for web](https://github.com/1amageek/pring.ts)
-
-⚠️ This library still contains bugs.
+- [Pring for Typescript](https://github.com/1amageek/pring.ts)
 
 ## Installation ⚙
 
 `npm install pring --save `
-
 
 ## Usage
 
@@ -67,6 +63,7 @@ Set `experimentalDecorators` to `true`.
 
 When using Pring in Vue please include it in `main.ts`.
 
+#### For Web
 
 ``` typescript
 import * as Pring from "pring"
@@ -77,7 +74,20 @@ import "firebase/firestore";
 firebase.initializeApp()
 const app = firebase.app()
 
-Pring.initialize(app, firebase.firestore.FieldValue.serverTimestamp())
+Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp())
+```
+
+#### For Admin
+
+``` typescript
+import * as Pring from "pring"
+import { config } from "./config"
+import * as admin from "firebase-admin"
+
+firebase.initializeApp()
+const app = admin.app()
+
+Pring.initialize(app.firestore(), admin.firestore.FieldValue.serverTimestamp())
 ```
 
 ### Scheme
