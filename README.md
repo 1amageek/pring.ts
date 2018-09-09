@@ -11,47 +11,32 @@ Firebase Cloud Firestore model framework for TypeScript. It supports both Web Cl
 
 ## Usage
 
-### tsconfig.json
+### TypeScript
 
-Pring uses a decorator.
-Set `experimentalDecorators` to `true`.
+required 
+
+```JSON
+  "devDependencies": {
+    "@types/node": "^10.9.2",
+    "typescript": "^3.0.3"
+  },
+```
+
+### tsconfig.json
 
 ```JSON
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "esnext",
-    "strict": true,
-    "jsx": "preserve",
-    "importHelpers": true,
-    "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
+    "lib": ["es2018", "dom"],
+    "module": "commonjs",
+    "noImplicitReturns": true,
     "outDir": "lib",
-    "baseUrl": ".",
-    "types": [
-      "node"
-    ],
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ]
+    "sourceMap": true,
+    "target": "es2018"
   },
+  "compileOnSave": true,
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src"
   ],
   "exclude": [
     "node_modules"
