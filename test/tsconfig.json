@@ -1,17 +1,17 @@
-
 {
   "compilerOptions": {
-    "lib": ["es6"],
+    "lib": ["es2018", "dom"],
     "module": "commonjs",
     "noImplicitReturns": true,
     "outDir": "lib",
     "sourceMap": true,
-    "target": "es6",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "target": "es2018"
   },
   "compileOnSave": true,
   "include": [
-    "./"
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

@@ -1,5 +1,4 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
-import * as firebase from 'firebase'
 import { BatchType } from './batch'
 import { Firestore, FieldValue, Base, property } from './base'
 import { SubCollection } from './subCollection'

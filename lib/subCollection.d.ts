@@ -18,7 +18,7 @@ export declare class SubCollection<T extends Base> implements AnySubCollection {
     delete(member: T): void;
     doc(id: string, type: {
         new (id?: string, data?: DocumentData): T;
-    }, transaction?: Transaction): Promise<T | undefined>;
+    }, transaction?: Transaction): Promise<T>;
     get(type: {
         new (id?: string, data?: DocumentData): T;
     }, transaction?: Transaction): Promise<T[]>;

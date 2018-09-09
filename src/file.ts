@@ -1,4 +1,4 @@
-import { ValueProtocol, FileData, FieldPath } from './base'
+import { ValueProtocol, FileData } from './base'
 
 export class File implements ValueProtocol {
 
