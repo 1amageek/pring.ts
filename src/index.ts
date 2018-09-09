@@ -15,10 +15,9 @@ export let timestamp: FieldValue
 
 export const initialize = (appFirestore: Firestore, serverTimestamp: FieldValue) => {
     firestore = appFirestore
-    if (firestore instanceof firebase.firestore.Firestore) {
-        firestore.settings({timestampsInSnapshots: true})
-    }
     if (firestore instanceof FirebaseFirestore.Firestore) {
+        firestore.settings({timestampsInSnapshots: true})
+    } else {
         firestore.settings({timestampsInSnapshots: true})
     }
     timestamp = serverTimestamp

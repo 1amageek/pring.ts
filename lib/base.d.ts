@@ -4,6 +4,8 @@ import "reflect-metadata";
 import { NestedCollection } from './nestedCollection';
 import { Batchable, BatchType } from './batch';
 import * as DataSourceQuery from './query';
+export declare type Firestore = firebase.firestore.Firestore | FirebaseFirestore.Firestore;
+export declare type FieldValue = firebase.firestore.FieldValue | FirebaseFirestore.FieldValue;
 export declare type CollectionReference = firebase.firestore.CollectionReference | FirebaseFirestore.CollectionReference;
 export declare type DocumentReference = firebase.firestore.DocumentReference | FirebaseFirestore.DocumentReference;
 export declare type DocumentSnapshot = firebase.firestore.DocumentSnapshot | FirebaseFirestore.DocumentSnapshot;

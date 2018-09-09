@@ -10,7 +10,7 @@ import firebase from 'firebase';
 import 'firebase/firestore';
 
 const app = firebase.initializeApp(config);
-Pring.initialize(app, firebase.firestore.FieldValue.serverTimestamp());
+Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp());
 
 Vue.config.productionTip = false;
 

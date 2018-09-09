@@ -23,7 +23,8 @@ export type SetOptions = firebase.firestore.SetOptions | FirebaseFirestore.SetOp
 export type UpdateData = firebase.firestore.UpdateData | FirebaseFirestore.UpdateData
 export type FieldPath = firebase.firestore.FieldPath | FirebaseFirestore.FieldPath
 export type Transaction = firebase.firestore.Transaction | FirebaseFirestore.Transaction
-export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | firebase.firestore.DocumentData | FirebaseFirestore.DocumentData
+export type DocumentData = { createdAt: Date, updatedAt: Date } |
+{ [key: string]: any } | firebase.firestore.DocumentData | FirebaseFirestore.DocumentData
 export type DataOrSnapshot = DocumentData | DocumentSnapshot | DocumentSnapshot
 export type DateType = 'createdAt' | 'updatedAt'
 export type WhereFilterOp = firebase.firestore.WhereFilterOp | FirebaseFirestore.WhereFilterOp

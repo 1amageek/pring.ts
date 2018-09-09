@@ -1,3 +1,4 @@
+import * as FirebaseFirestore from '@google-cloud/firestore';
 import { DocumentReference, WriteBatch, SetOptions, UpdateData, DocumentData } from './base';
 export declare enum BatchType {
     save = 0,

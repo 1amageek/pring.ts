@@ -46,8 +46,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                     value.createdAt = timestamp
                     value.updatedAt = timestamp
                     if (!document.isSaved) {
-                        const reference: DocumentReference = document.getReference()
-                        _batch.set(reference, document.value(), {merge: true})
+                        _batch.set(document.getReference(), document.value(), {merge: true})
                     }
                     const reference = this.reference.doc(document.id)
                     _batch.set(reference, value, { merge: true})
@@ -66,8 +65,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                             value.createdAt = document.createdAt
                         }
                         value.updatedAt = timestamp
-                        const reference: DocumentReference = document.getReference()
-                        _batch.set(reference, document.value(), { merge: true})
+                        _batch.set(document.getReference(), document.value(), { merge: true})
                     } else {
                         if (document.shouldBeReplicated()) {
                             value = document.value()

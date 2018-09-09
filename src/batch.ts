@@ -26,7 +26,7 @@ export class Batch {
     private _writeBatch?: firebase.firestore.WriteBatch
 
     private _adminWriteBatch?: FirebaseFirestore.WriteBatch
-    
+
     public constructor(writeBatch: WriteBatch) {
         if (writeBatch instanceof firebase.firestore.WriteBatch) {
             this._writeBatch = writeBatch
@@ -117,7 +117,7 @@ export class Batch {
      * @param documentRef A reference to the document to be deleted.
      * @return This `WriteBatch` instance. Used for chaining method calls.
      */
-    public delete(documentRef: DocumentReference): Batch {        
+    public delete(documentRef: DocumentReference): Batch {
         if (documentRef instanceof firebase.firestore.DocumentReference) {
             this._writeBatch!.delete(documentRef)
         }

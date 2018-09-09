@@ -1,11 +1,10 @@
-import * as firebase from 'firebase';
 import { BatchType } from './batch';
-import { Base, property } from './base';
+import { Firestore, FieldValue, Base, property } from './base';
 import { SubCollection } from './subCollection';
 import { NestedCollection } from './nestedCollection';
 import { ReferenceCollection } from './referenceCollection';
 import { File } from './file';
 export { BatchType, Base, property, SubCollection, NestedCollection, ReferenceCollection, File };
-export declare let firestore: firebase.firestore.Firestore;
-export declare let timestamp: firebase.firestore.FieldValue;
-export declare const initialize: (app: firebase.app.App, serverTimestamp: firebase.firestore.FieldValue) => void;
+export declare let firestore: Firestore;
+export declare let timestamp: FieldValue;
+export declare const initialize: (appFirestore: Firestore, serverTimestamp: FieldValue) => void;

@@ -106,10 +106,11 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         try {
             let snapshot: QuerySnapshot
             if (transaction instanceof FirebaseFirestore.Transaction) {
-                snapshot = await (transaction as FirebaseFirestore.Transaction).get(this.reference as FirebaseFirestore.CollectionReference)
+                const reference = this.reference as FirebaseFirestore.CollectionReference
+                snapshot = await (transaction as FirebaseFirestore.Transaction).get(reference)
             } else {
                 snapshot = await this.reference.get()
-            } 
+            }
             const docs: DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
                 const document: T = new type(documentSnapshot.id, {})
