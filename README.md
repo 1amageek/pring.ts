@@ -101,6 +101,25 @@ class User extends Pring.Base {
 ```
 
 ### Manage data
+#### Initialize
+``` typescript
+
+// auto generate ID
+let user = new User()
+
+// any ID
+let user = new User("YOUR_ID")
+
+// any ID, Handle already saved users
+let user = new User("YOUR_ID", {})
+```
+__memo__
+
+The developer is responsible for managing the Document being saved. 
+In Pring it is prohibited to save the already saved Document again.
+
+Please use explicitly by the initialization method.
+`new User("YOUR_ID", {})` `let user = new User("YOUR_ID")`
 
 #### Save
 ``` typescript
@@ -117,6 +136,12 @@ let user: User = await User.get("USER_ID", User)
 #### Update
 ``` typescript
 let user: User = await User.get("USER_ID", User)
+user.name = "UPDATE NAME"
+await user.update()
+```
+
+``` typescript
+let user: User = new User("USER_ID", {})
 user.name = "UPDATE NAME"
 await user.update()
 ```
