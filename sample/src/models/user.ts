@@ -4,5 +4,5 @@ const property = Pring.property;
 const File = Pring.File;
 
 export class User extends Pring.Base {
-    @property name?: string;
+    @property public name?: string;
 }

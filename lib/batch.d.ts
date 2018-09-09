@@ -10,7 +10,8 @@ export interface Batchable {
     batch(type: BatchType, batchID: string): void;
 }
 export declare class Batch {
-    private _writeBatch;
+    private _writeBatch?;
+    private _adminWriteBatch?;
     constructor(writeBatch: WriteBatch);
     /**
      * Writes to the document referred to by the provided `DocumentReference`.
@@ -63,6 +64,6 @@ export declare class Batch {
      * successfully written to the backend as an atomic unit. Note that it won't
      * resolve while you're offline.
      */
-    commit(): Promise<void>;
+    commit(): Promise<void | FirebaseFirestore.WriteResult[]>;
     batch(): WriteBatch;
 }

@@ -21,7 +21,7 @@ export declare class SubCollection<T extends Base> implements AnySubCollection {
     }, transaction?: Transaction): Promise<T | undefined>;
     get(type: {
         new (id?: string, data?: DocumentData): T;
-    }): Promise<T[]>;
+    }, transaction?: Transaction): Promise<T[]>;
     contains(id: string): Promise<boolean>;
     forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
     pack(type: BatchType, batchID: string, writeBatch?: WriteBatch): WriteBatch;

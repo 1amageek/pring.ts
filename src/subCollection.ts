@@ -1,4 +1,5 @@
 import { } from "reflect-metadata"
+import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as firebase from 'firebase'
 import { BatchType, Batch } from './batch'
 import { firestore } from './index'
@@ -80,7 +81,11 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         try {
             let snapshot: DocumentSnapshot
             if (transaction) {
-                snapshot = await transaction.get(this.reference.doc(id) as firebase.firestore.DocumentReference)
+                if (transaction instanceof firebase.firestore.Transaction) {
+                    snapshot = await transaction.get(this.reference.doc(id) as firebase.firestore.DocumentReference)
+                } else {
+                    snapshot = await transaction.get(this.reference.doc(id) as FirebaseFirestore.DocumentReference)
+                }
             } else {
                 snapshot = await this.reference.doc(id).get()
             }
@@ -97,10 +102,14 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }
     }
 
-    public async get(type: { new(id?: string, data?: DocumentData): T; }) {
+    public async get(type: { new(id?: string, data?: DocumentData): T; }, transaction?: Transaction) {
         try {
             let snapshot: QuerySnapshot
-            snapshot = await this.reference.get()
+            if (transaction instanceof FirebaseFirestore.Transaction) {
+                snapshot = await (transaction as FirebaseFirestore.Transaction).get(this.reference as FirebaseFirestore.CollectionReference)
+            } else {
+                snapshot = await this.reference.get()
+            } 
             const docs: DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
                 const document: T = new type(documentSnapshot.id, {})

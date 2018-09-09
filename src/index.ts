@@ -1,6 +1,7 @@
+import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as firebase from 'firebase'
 import { BatchType } from './batch'
-import { Base, property } from './base'
+import { Firestore, FieldValue, Base, property } from './base'
 import { SubCollection } from './subCollection'
 import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
@@ -8,12 +9,17 @@ import { File } from './file'
 
 export { BatchType, Base, property, SubCollection, NestedCollection, ReferenceCollection, File }
 
-export let firestore: firebase.firestore.Firestore
+export let firestore: Firestore
 
-export let timestamp: firebase.firestore.FieldValue
+export let timestamp: FieldValue
 
-export const initialize = (app: firebase.app.App, serverTimestamp: firebase.firestore.FieldValue) => {
-    firestore = app.firestore()
-    firestore.settings({timestampsInSnapshots: true})
+export const initialize = (appFirestore: Firestore, serverTimestamp: FieldValue) => {
+    firestore = appFirestore
+    if (firestore instanceof firebase.firestore.Firestore) {
+        firestore.settings({timestampsInSnapshots: true})
+    }
+    if (firestore instanceof FirebaseFirestore.Firestore) {
+        firestore.settings({timestampsInSnapshots: true})
+    }
     timestamp = serverTimestamp
 }

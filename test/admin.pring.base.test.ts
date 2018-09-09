@@ -1,29 +1,34 @@
 process.env.NODE_ENV = 'test';
-import * as firebase from 'firebase'
+import * as admin from 'firebase-admin'
+import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as Pring from "../src/index"
-import { config } from "./config"
-import { DocumentLite } from './document'
 
-const app = firebase.initializeApp(config);
+var key = require("../salada-f825d-firebase-adminsdk-19k25-ded6604978.json")
+const app = admin.initializeApp({
+    credential: admin.credential.cert(key)
+})
 
-Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp())
+Pring.initialize(app.firestore(), admin.firestore.FieldValue.serverTimestamp())
+
+import { Document } from './document'
+
 
 describe("Document property", () => {
 
-    const document = new DocumentLite()
-    var doc: DocumentLite
+    const document = new Document()
+    var doc: Document
 
     beforeAll(async () => {
         document.createdAt = new Date(100)
         document.updatedAt = new Date(100)
         await document.save()
-        doc = await DocumentLite.get(document.id, DocumentLite)
+        doc = await Document.get(document.id, Document)
     });
 
     describe("properties", async () => {
 
         test("batch", () => {
-            expect(Pring.firestore.batch() instanceof firebase.firestore.WriteBatch).toBeTruthy()
+            expect(Pring.firestore.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
         })
 
         test("createdAt", () => {
@@ -50,6 +55,10 @@ describe("Document property", () => {
             expect(doc.date).toEqual(document.date)
         })
 
+        test("GeoPoint type", () => {
+            expect(doc.geoPoint).toEqual(document.geoPoint)
+        })
+
         test("Dicionary type", () => {
             expect(doc.dictionary).toEqual(document.dictionary)
         })
@@ -69,7 +78,7 @@ describe("Document property", () => {
 
     describe("Documents that do not exist", async () => {
         test("not exist", async () => {
-            const doc = await DocumentLite.get("not", DocumentLite)
+            const doc = await Document.get("not", Document)
             expect(doc).toBeUndefined()
         })
     })
@@ -79,7 +88,7 @@ describe("Document property", () => {
             try {
                 const document_id = doc.id
                 await doc.delete()
-                await DocumentLite.get(document_id, DocumentLite)
+                await Document.get(document_id, Document)
             } catch (error) {
                 expect(error).not.toBeNull()
             }

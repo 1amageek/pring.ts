@@ -1,8 +1,10 @@
+import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as firebase from 'firebase'
 import {
     DocumentReference,
     WriteBatch,
     SetOptions,
+    FieldPath,
     UpdateData,
     DocumentData,
 } from './base'
@@ -21,10 +23,17 @@ export interface Batchable {
 
 export class Batch {
 
-    private _writeBatch: firebase.firestore.WriteBatch
+    private _writeBatch?: firebase.firestore.WriteBatch
 
+    private _adminWriteBatch?: FirebaseFirestore.WriteBatch
+    
     public constructor(writeBatch: WriteBatch) {
-        this._writeBatch = writeBatch
+        if (writeBatch instanceof firebase.firestore.WriteBatch) {
+            this._writeBatch = writeBatch
+        }
+        if (writeBatch instanceof FirebaseFirestore.WriteBatch) {
+            this._adminWriteBatch = writeBatch
+        }
     }
 
     /**
@@ -42,7 +51,12 @@ export class Batch {
         data: DocumentData,
         options?: SetOptions
     ): Batch {
-        this._writeBatch.set(documentRef, data, options)
+        if (documentRef instanceof firebase.firestore.DocumentReference) {
+            this._writeBatch!.set(documentRef, data, options)
+        }
+        if (documentRef instanceof FirebaseFirestore.DocumentReference) {
+            this._adminWriteBatch!.set(documentRef, data, options)
+        }
         return this
     }
 
@@ -58,7 +72,12 @@ export class Batch {
      * @return This `WriteBatch` instance. Used for chaining method calls.
      */
     public update(documentRef: DocumentReference, data: UpdateData): Batch {
-        this._writeBatch.update(documentRef, data)
+        if (documentRef instanceof firebase.firestore.DocumentReference) {
+            this._writeBatch!.update(documentRef, data)
+        }
+        if (documentRef instanceof FirebaseFirestore.DocumentReference) {
+            this._adminWriteBatch!.update(documentRef, data)
+        }
         return this
     }
 
@@ -76,13 +95,14 @@ export class Batch {
      * @return A Promise resolved once the data has been successfully written
      * to the backend (Note that it won't resolve while you're offline).
      */
-    // update(
-    //     documentRef: DocumentReference,
-    //     field: string | FieldPath,
-    //     value: any,
-    //     ...moreFieldsAndValues: any[]
-    // ): Batch {
+    // public update(documentRef: DocumentReference, data: UpdateData): Batch
+    // public update(documentRef: DocumentReference, field: string | FieldPath, value: any, ...moreFieldsAndValues: any[]): Batch
+    // public update(documentRef: DocumentReference, field: string | FieldPath | UpdateData, value?: any, ...moreFieldsAndValues: any[]): Batch
+    // {
     //     if (documentRef instanceof FirebaseFirestore.DocumentReference) {
+    //         if (field instanceof string | FieldPath) {
+    //             this._adminWriteBatch.update(documentRef, field, value, moreFieldsAndValues)
+    //         }
     //         this._adminWriteBatch.update(documentRef, field, value, moreFieldsAndValues)
     //     }
     //     if (documentRef instanceof firebase.firestore.DocumentReference) {
@@ -97,8 +117,13 @@ export class Batch {
      * @param documentRef A reference to the document to be deleted.
      * @return This `WriteBatch` instance. Used for chaining method calls.
      */
-    public delete(documentRef: DocumentReference): Batch {
-        this._writeBatch.delete(documentRef)
+    public delete(documentRef: DocumentReference): Batch {        
+        if (documentRef instanceof firebase.firestore.DocumentReference) {
+            this._writeBatch!.delete(documentRef)
+        }
+        if (documentRef instanceof FirebaseFirestore.DocumentReference) {
+            this._adminWriteBatch!.delete(documentRef)
+        }
         return this
     }
 
@@ -110,10 +135,15 @@ export class Batch {
      * resolve while you're offline.
      */
     public async commit() {
-        return await this._writeBatch.commit()
+        if (this._writeBatch) {
+            return await this._writeBatch!.commit()
+        }
+        if (this._adminWriteBatch) {
+            return await this._adminWriteBatch!.commit()
+        }
     }
 
     public batch(): WriteBatch {
-        return this._writeBatch
+        return this._writeBatch || this._adminWriteBatch!
     }
 }

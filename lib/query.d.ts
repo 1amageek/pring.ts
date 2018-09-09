@@ -25,5 +25,5 @@ export declare class Query<Element extends Base.Base> {
     endBefore(...fieldValues: any[]): Query<Element>;
     endAt(snapshot: DocumentSnapshot): Query<Element>;
     endAt(...fieldValues: any[]): Query<Element>;
-    get(options?: GetOptions): Promise<import("firebase").firestore.QuerySnapshot>;
+    get(options?: GetOptions): Promise<Base.QuerySnapshot>;
 }

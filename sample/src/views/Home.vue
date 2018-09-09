@@ -25,7 +25,7 @@ export default class Home extends Vue {
     user.name = "@1amageek"
     await user.save()
   }
-
+  
   public created() {
     const dataSource = User.query().dataSource(User)
     dataSource.on((snapshot, changes) => {
