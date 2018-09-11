@@ -1,5 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
-import { Base, QuerySnapshot, DocumentData, DocumentChange } from './base'
+import { Base, QuerySnapshot, DocumentData, DocumentChange, QueryDocumentSnapshot } from './base'
 import { Query } from './query'
 
 export class Option<Element extends Base> {
@@ -103,8 +103,17 @@ export class DataSource<Element extends Base> {
         return this
     }
 
+    public async get() {
+        const snapshot: QuerySnapshot = await this.query.get()
+        const docs: QueryDocumentSnapshot[] = snapshot.docs
+        const promises = docs.map(async doc => {
+            return await this._get(doc.id, doc.data())
+        })
+        return Promise.all(promises)
+    }
+
     private async _operate(snapshot: QuerySnapshot, isFirst: boolean) {
-        let changes: DocumentChange[] = (snapshot as firebase.firestore.QuerySnapshot).docChanges()
+        let changes: DocumentChange[] = []
         if (snapshot instanceof FirebaseFirestore.QuerySnapshot) {
             changes = snapshot.docChanges
         } else {
@@ -114,7 +123,7 @@ export class DataSource<Element extends Base> {
             const id: string = change.doc.id
             switch (change.type) {
                 case 'added': {
-                    const document: Element = await this._get(change)
+                    const document: Element = await this._get(change.doc.id, change.doc.data())
                     this.documents.push(document)
                     this.documents = this.documents.sort(this.option.sortBlock)
                     if (!isFirst) {
@@ -130,7 +139,7 @@ export class DataSource<Element extends Base> {
                     break
                 }
                 case 'modified': {
-                    const document: Element = await this._get(change)
+                    const document: Element = await this._get(change.doc.id, change.doc.data())
                     this.documents = this.documents.filter(doc => doc.id !== id)
                     this.documents.push(document)
                     this.documents = this.documents.sort(this.option.sortBlock)
@@ -167,14 +176,13 @@ export class DataSource<Element extends Base> {
         }
     }
 
-    private async _get(change: DocumentChange) {
-        const id: string = change.doc.id
+    private async _get(id: string, data: DocumentData) {
         if (this.query.isReference) {
             const document: Element = new this._Element(id, {})
             await document.fetch()
             return document
         } else {
-            const document: Element = new this._Element(id, change.doc.data())
+            const document: Element = new this._Element(id, data)
             return document
         }
     }

@@ -26,26 +26,31 @@ export default class Home extends Vue {
     await user.save()
   }
   
-  public created() {
+  public async created() {
     const dataSource = User.query().dataSource(User)
-    dataSource.on((snapshot, changes) => {
 
-      switch (changes.type) {
-        case "initial": {
-          console.log(dataSource.documents)
-          break
-        }
-        case "update": {
-          console.log("insert", changes.insertions)
-          console.log("change", changes.modifications)
-          console.log("delete", changes.deletions)
-          break
-        }
-        case "error": {
-          break
-        }
-      }
-    }).listen()
+    // GET
+    const docs = await dataSource.get()
+    console.log(docs)
+
+    // dataSource.on((snapshot, changes) => {
+
+    //   switch (changes.type) {
+    //     case "initial": {
+    //       console.log(dataSource.documents)
+    //       break
+    //     }
+    //     case "update": {
+    //       console.log("insert", changes.insertions)
+    //       console.log("change", changes.modifications)
+    //       console.log("delete", changes.deletions)
+    //       break
+    //     }
+    //     case "error": {
+    //       break
+    //     }
+    //   }
+    // }).listen()
   }
 }
 </script>

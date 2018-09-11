@@ -3,13 +3,15 @@
     "lib": ["es2018", "dom"],
     "module": "commonjs",
     "noImplicitReturns": true,
+    "experimentalDecorators": true,
     "outDir": "lib",
     "sourceMap": true,
     "target": "es2018"
   },
   "compileOnSave": true,
   "include": [
-    "src"
+    "src/**/*.ts",
+    "test/**/*.ts"
   ],
   "exclude": [
     "node_modules"

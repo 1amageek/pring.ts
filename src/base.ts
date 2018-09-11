@@ -31,6 +31,7 @@ export type WhereFilterOp = firebase.firestore.WhereFilterOp | FirebaseFirestore
 export type OrderByDirection = firebase.firestore.OrderByDirection | FirebaseFirestore.OrderByDirection
 export type GetOptions = firebase.firestore.GetOptions
 export type DocumentChange = firebase.firestore.DocumentChange | FirebaseFirestore.DocumentChange
+export type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot | FirebaseFirestore.QueryDocumentSnapshot
 
 const propertyMetadataKey = Symbol("property")
 
