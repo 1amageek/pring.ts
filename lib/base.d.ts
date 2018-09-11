@@ -28,6 +28,7 @@ export declare type WhereFilterOp = firebase.firestore.WhereFilterOp | FirebaseF
 export declare type OrderByDirection = firebase.firestore.OrderByDirection | FirebaseFirestore.OrderByDirection;
 export declare type GetOptions = firebase.firestore.GetOptions;
 export declare type DocumentChange = firebase.firestore.DocumentChange | FirebaseFirestore.DocumentChange;
+export declare type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot | FirebaseFirestore.QueryDocumentSnapshot;
 export declare const property: <T extends Document>(target: T, propertyKey: string) => void;
 export interface ValueProtocol {
     value(): any;

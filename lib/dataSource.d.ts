@@ -33,6 +33,7 @@ export declare class DataSource<Element extends Base> {
     onError(block: (error: Error) => void): this;
     onCompleted(block: (documents: Element[]) => void): this;
     listen(): this;
+    get(): Promise<Element[]>;
     private _operate;
     private _get;
 }
