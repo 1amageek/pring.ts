@@ -23,7 +23,7 @@ describe("Document property", () => {
         test("String type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.string = "update"
             await doc.update()
             expect(doc.string).toEqual("update")
@@ -33,7 +33,7 @@ describe("Document property", () => {
         test("Number type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.number = 100
             await doc.update()
             expect(doc.number).toEqual(100)
@@ -43,7 +43,7 @@ describe("Document property", () => {
         test("Boolean type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.bool = false
             await doc.update()
             expect(doc.bool).toEqual(false)
@@ -53,7 +53,7 @@ describe("Document property", () => {
         test("Date type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.date = new Date(1000)
             await doc.update()
             expect(doc.date).toEqual(new Date(1000))
@@ -63,7 +63,7 @@ describe("Document property", () => {
         test("GeoPoint type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.geoPoint = new FirebaseFirestore.GeoPoint(10, 10)
             await doc.update()
             expect(doc.geoPoint).toEqual(new FirebaseFirestore.GeoPoint(10, 10))
@@ -73,7 +73,7 @@ describe("Document property", () => {
         test("Dicionary type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.dictionary = { "key": "update" }
             await doc.update()
             expect(doc.dictionary).toEqual({ "key": "update" })
@@ -83,7 +83,7 @@ describe("Document property", () => {
         test("Array type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.array = ["update"]
             await doc.update()
             expect(doc.array).toEqual(["update"])
@@ -93,7 +93,7 @@ describe("Document property", () => {
         test("Set type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.set = { "update": true }
             await doc.update()
             expect(doc.set).toEqual({ "update": true })
@@ -103,7 +103,7 @@ describe("Document property", () => {
         test("File type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.file = new Pring.File("update.jpg", "https://file", "image/png")
             await doc.update()
             expect(doc.file).toEqual(new Pring.File("update.jpg", "https://file", "image/png"))
@@ -120,10 +120,10 @@ describe("Document property", () => {
         test("String type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.string = "update"
             await doc.update()
-            const newDoc = await Document.get(document.id, Document)
+            const newDoc = await Document.get(document.id)
             expect(newDoc.string).toEqual("update")
             await newDoc.delete()
         })
@@ -131,10 +131,10 @@ describe("Document property", () => {
         test("Number type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.number = 100
             await doc.update()
-            const newDoc = await Document.get(document.id, Document)
+            const newDoc = await Document.get(document.id)
             expect(newDoc.number).toEqual(100)
             await newDoc.delete()
         })
@@ -142,10 +142,10 @@ describe("Document property", () => {
         test("Boolean type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.bool = false
             await doc.update()
-            const newDoc = await Document.get(document.id, Document)
+            const newDoc = await Document.get(document.id)
             expect(newDoc.bool).toEqual(false)
             await newDoc.delete()
         })
@@ -153,10 +153,10 @@ describe("Document property", () => {
         test("Date type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.date = new Date(1000)
             await doc.update()
-            const newDoc = await Document.get(document.id, Document)
+            const newDoc = await Document.get(document.id)
             expect(newDoc.date).toEqual(new Date(1000))
             await newDoc.delete()
         })
@@ -164,10 +164,10 @@ describe("Document property", () => {
         test("GeoPoint type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.geoPoint = new FirebaseFirestore.GeoPoint(10, 10)
             await doc.update()
-            const newDoc = await Document.get(document.id, Document)
+            const newDoc = await Document.get(document.id)
             expect(newDoc.geoPoint).toEqual(new FirebaseFirestore.GeoPoint(10, 10))
             await newDoc.delete()
         })
@@ -175,10 +175,10 @@ describe("Document property", () => {
         test("Dicionary type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.dictionary = { "key": "update" }
             await doc.update()
-            const newDoc = await Document.get(document.id, Document)
+            const newDoc = await Document.get(document.id)
             expect(newDoc.dictionary).toEqual({ "key": "update" })
             await newDoc.delete()
         })
@@ -186,10 +186,10 @@ describe("Document property", () => {
         test("Array type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.array = ["update"]
             await doc.update()
-            const newDoc = await Document.get(document.id, Document)
+            const newDoc = await Document.get(document.id)
             expect(newDoc.array).toEqual(["update"])
             await newDoc.delete()
         })
@@ -197,10 +197,10 @@ describe("Document property", () => {
         test("Set type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.set = { "update": true }
             await doc.update()
-            const newDoc = await Document.get(document.id, Document)
+            const newDoc = await Document.get(document.id)
             expect(newDoc.set).toEqual({ "update": true })
             // await newDoc.delete()
         })
@@ -208,10 +208,10 @@ describe("Document property", () => {
         test("File type", async () => {
             const document = new Document()
             await document.save()
-            const doc = await Document.get(document.id, Document)
+            const doc = await Document.get(document.id)
             doc.file = new Pring.File("update.jpg", "https://file", "image/png")
             await doc.update()
-            const newDoc = await Document.get(document.id, Document)
+            const newDoc = await Document.get(document.id)
             expect(newDoc.file).toEqual(new Pring.File("update.jpg", "https://file", "image/png"))
             await newDoc.delete()
         })

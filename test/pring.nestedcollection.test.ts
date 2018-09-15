@@ -39,7 +39,7 @@ describe("SubCollection pack", () => {
 
             test("Root document", async () => {
                 try {
-                    const doc: DocumentLite = await DocumentLite.get(doc0_nested_id, DocumentLite)
+                    const doc: DocumentLite = await DocumentLite.get(doc0_nested_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
                     console.log(error)
@@ -66,7 +66,7 @@ describe("SubCollection pack", () => {
     
             test("A NestedCollection saved before doc0_nested is saved", async () => {
                 try {
-                    const doc = await DocumentLite.get(doc1_other_nested_id, DocumentLite)
+                    const doc = await DocumentLite.get(doc1_other_nested_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
                     console.log(error)
@@ -140,7 +140,7 @@ describe("SubCollection pack", () => {
         describe("Get NestedCollection's document", async () => {
             test("Root document", async () => {
                 try {
-                    const doc = await DocumentLite.get(doc0_nested_id, DocumentLite)
+                    const doc = await DocumentLite.get(doc0_nested_id)
                     expect(doc).not.toBeNull()
                 } catch (error) {
                     console.log(error)

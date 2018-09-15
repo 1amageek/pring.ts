@@ -120,11 +120,11 @@ export class Base implements Document {
         return new DataSourceQuery.Query(this.getReference())
     }
 
-    public static async get<T extends Base>(id: string, type: { new(id?: string, data?: DocumentData): T }) {
+    public static async get<T extends typeof Base>(this: T, id: string) {
         try {
             const snapshot: DocumentSnapshot = await firestore.doc(`${this.getPath()}/${id}`).get()
             if (snapshot.exists) {
-                const document: T = new type(snapshot.id, {})
+                const document = new this(snapshot.id, {}) as InstanceType<T>
                 document.setData(snapshot.data()!)
                 return document
             } else {

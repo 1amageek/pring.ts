@@ -17,7 +17,7 @@ describe("Document property", () => {
         document.createdAt = new Date(100)
         document.updatedAt = new Date(100)
         await document.save()
-        doc = await DocumentLite.get(document.id, DocumentLite)
+        doc = await DocumentLite.get(document.id)
     });
 
     describe("properties", async () => {
@@ -69,7 +69,7 @@ describe("Document property", () => {
 
     describe("Documents that do not exist", async () => {
         test("not exist", async () => {
-            const doc = await DocumentLite.get("not", DocumentLite)
+            const doc = await DocumentLite.get("not")
             expect(doc).toBeUndefined()
         })
     })
@@ -79,7 +79,7 @@ describe("Document property", () => {
             try {
                 const document_id = doc.id
                 await doc.delete()
-                await DocumentLite.get(document_id, DocumentLite)
+                await DocumentLite.get(document_id)
             } catch (error) {
                 expect(error).not.toBeNull()
             }
