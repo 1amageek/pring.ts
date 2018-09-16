@@ -71,9 +71,7 @@ export declare class Base implements Document {
     static getModelName(): string;
     static getPath(): string;
     static query<T extends Base>(): DataSourceQuery.Query<T>;
-    static get<T extends Base>(id: string, type: {
-        new (id?: string, data?: DocumentData): T;
-    }): Promise<T>;
+    static get<T extends typeof Base>(this: T, id: string): Promise<InstanceType<T>>;
     version: number;
     modelName: string;
     path: string;
