@@ -3,6 +3,7 @@
     "lib": ["es2018", "dom"],
     "module": "commonjs",
     "noImplicitReturns": true,
+    "strict": true,
     "experimentalDecorators": true,
     "outDir": "lib",
     "sourceMap": true,
