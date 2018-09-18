@@ -88,7 +88,6 @@ required
     "node_modules"
   ]
 }
-
 ```
 
 ### Initialize
