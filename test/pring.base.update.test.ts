@@ -191,4 +191,8 @@ describe("DocumentLite property", () => {
             await newDoc.delete()
         })
     })
+
+    afterAll(() => {
+        app.delete()
+    })
 })

@@ -148,4 +148,8 @@ describe("SubCollection pack", () => {
             })
         })
     })
+
+    afterAll(() => {
+        app.delete()
+    })
 })

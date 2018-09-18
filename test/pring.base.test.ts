@@ -85,4 +85,8 @@ describe("Document property", () => {
             }
         })
     })
+
+    afterAll(() => {
+        app.delete()
+    })
 })
