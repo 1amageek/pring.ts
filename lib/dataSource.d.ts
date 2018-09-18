@@ -25,7 +25,7 @@ export declare class DataSource<Element extends Base> {
     errorBlock?: (error: Error) => void;
     completedBlock?: (documents: Element[]) => void;
     private _Element;
-    constructor(query: Query<Element>, option: Option<Element>, type: {
+    constructor(query: Query<Element>, option: Option<Element> | undefined, type: {
         new (id?: string, data?: DocumentData): Element;
     });
     doc(index: number): Element;
