@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { BatchType } from './batch';
 import { SubCollection } from './subCollection';
 import { Base, WriteBatch, DocumentData } from './base';
