@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { BatchType } from './batch';
 import { Base, AnySubCollection, CollectionReference, WriteBatch, Transaction, DocumentData } from './base';
 export declare class SubCollection<T extends Base> implements AnySubCollection {

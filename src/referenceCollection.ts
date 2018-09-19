@@ -1,4 +1,4 @@
-import { } from "reflect-metadata"
+import 'reflect-metadata'
 import { BatchType, Batch } from './batch'
 import { firestore, timestamp } from './index'
 import { SubCollection } from './subCollection'

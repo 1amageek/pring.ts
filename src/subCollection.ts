@@ -1,4 +1,4 @@
-import { } from "reflect-metadata"
+import 'reflect-metadata'
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as firebase from 'firebase'
 import { BatchType, Batch } from './batch'

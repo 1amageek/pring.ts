@@ -1,1 +1,1 @@
-{"version":3,"file":"nestedCollection.js","sourceRoot":"","sources":["../src/nestedCollection.ts"],"names":[],"mappings":";;AACA,mDAA+C;AAE/C,MAAa,gBAAiC,SAAQ,6BAAgB;CAAI;AAA1E,4CAA0E"}
+{"version":3,"file":"nestedCollection.js","sourceRoot":"","sources":["../src/nestedCollection.ts"],"names":[],"mappings":";;;;;;;;;;;;;AACA,OAAO,EAAE,aAAa,EAAE,MAAM,iBAAiB,CAAA;AAE/C;IAAsD,oCAAgB;IAAtE;;IAAyE,CAAC;IAAD,uBAAC;AAAD,CAAC,AAA1E,CAAsD,aAAa,GAAO"}
