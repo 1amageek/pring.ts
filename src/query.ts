@@ -8,28 +8,26 @@ import {
     DocumentData,
     OrderByDirection,
     WhereFilterOp,
-    GetOptions,
-    CollectionReference
+    GetOptions
 } from './base'
 
-export class Query<Element extends Base.Base> {
+export class Query<Element extends typeof Base.Base> {
 
     public isReference: boolean
 
-    private reference: CollectionReference
-
     private query: Base.Query
 
-    public constructor(reference: CollectionReference, isReference: boolean = false) {
-        this.reference = reference
-        this.query = reference
+    private _Element: Element
+
+    public constructor(type: Element, isReference: boolean = false) {
+        this._Element = type
+        this.query = type.getReference()
         this.isReference = isReference
     }
 
     public dataSource(
-        type: { new(id?: string, data?: DocumentData): Element },
         option: Option<Element> = new Option()): DataSource<Element> {
-        return new DataSource(this, option, type)
+        return new DataSource(this, option, this._Element)
     }
 
     public listen(observer: {
@@ -45,19 +43,19 @@ export class Query<Element extends Base.Base> {
     }
 
     public where(fieldPath: string | FieldPath, opStr: WhereFilterOp, value: any): Query<Element> {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
+        const query: Query<Element> = new Query(this._Element, this.isReference)
         query.query = this.query.where(fieldPath, opStr, value)
         return query
     }
 
     public orderBy(fieldPath: string | FieldPath, directionStr?: OrderByDirection): Query<Element> {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
+        const query: Query<Element> = new Query(this._Element, this.isReference)
         query.query = this.query.orderBy(fieldPath, directionStr)
         return query
     }
 
     public limit(limit: number): Query<Element> {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
+        const query: Query<Element> = new Query(this._Element, this.isReference)
         query.query = this.query.limit(limit)
         return query
     }
@@ -65,7 +63,7 @@ export class Query<Element extends Base.Base> {
     public startAt(snapshot: DocumentSnapshot): Query<Element>
     public startAt(...fieldValues: any[]): Query<Element>
     public startAt(arg: DocumentSnapshot | any[]): Query<Element> {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
+        const query: Query<Element> = new Query(this._Element, this.isReference)
         query.query = this.query.startAt(arg)
         return query
     }
@@ -73,7 +71,7 @@ export class Query<Element extends Base.Base> {
     public startAfter(snapshot: DocumentSnapshot): Query<Element>
     public startAfter(...fieldValues: any[]): Query<Element>
     public startAfter(arg: DocumentSnapshot | any[]): Query<Element> {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
+        const query: Query<Element> = new Query(this._Element, this.isReference)
         query.query = this.query.startAfter(arg)
         return query
     }
@@ -81,7 +79,7 @@ export class Query<Element extends Base.Base> {
     public endBefore(snapshot: DocumentSnapshot): Query<Element>
     public endBefore(...fieldValues: any[]): Query<Element>
     public endBefore(arg: DocumentSnapshot | any[]): Query<Element> {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
+        const query: Query<Element> = new Query(this._Element, this.isReference)
         query.query = this.query.endBefore(arg)
         return query
     }
@@ -89,7 +87,7 @@ export class Query<Element extends Base.Base> {
     public endAt(snapshot: DocumentSnapshot): Query<Element>
     public endAt(...fieldValues: any[]): Query<Element>
     public endAt(arg: DocumentSnapshot | any[]): Query<Element> {
-        const query: Query<Element> = new Query(this.reference, this.isReference)
+        const query: Query<Element> = new Query(this._Element, this.isReference)
         query.query = this.query.endAt(arg)
         return query
     }
