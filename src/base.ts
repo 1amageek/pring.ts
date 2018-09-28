@@ -116,8 +116,8 @@ export class Base implements Document {
         return `version/${this.getVersion()}/${this.getModelName()}`
     }
 
-    public static query<T extends Base>(): DataSourceQuery.Query<T> {
-        return new DataSourceQuery.Query(this.getReference())
+    public static query<T extends typeof Base>(this: T): DataSourceQuery.Query<T> {
+        return new DataSourceQuery.Query(this)
     }
 
     public static async get<T extends typeof Base>(this: T, id: string) {

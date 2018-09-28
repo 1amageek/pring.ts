@@ -2,11 +2,11 @@ import * as FirebaseFirestore from '@google-cloud/firestore'
 import { Base, QuerySnapshot, DocumentData, DocumentChange, QueryDocumentSnapshot } from './base'
 import { Query } from './query'
 
-export class Option<Element extends Base> {
+export class Option<Element extends typeof Base> {
 
     public timeout: number = 10
 
-    public sortBlock?: (a: Element, b: Element) => number
+    public sortBlock?: (a: InstanceType<Element>, b: InstanceType<Element>) => number
 }
 
 export enum Change {
@@ -33,33 +33,33 @@ export class CollectionChange {
     }
 }
 
-export class DataSource<Element extends Base> {
+export class DataSource<Element extends typeof Base> {
 
-    [index: number]: Element
+    [index: number]: InstanceType<Element>
 
     public query: Query<Element>
 
     public option: Option<Element>
 
-    public documents: Element[] = []
+    public documents: InstanceType<Element>[] = []
 
     public changeBlock?: (snapshot: QuerySnapshot, change: CollectionChange) => void
 
     public errorBlock?: (error: Error) => void
 
-    public completedBlock?: (documents: Element[]) => void
+    public completedBlock?: (documents: InstanceType<Element>[]) => void
 
-    private _Element!: { new(id?: string, data?: DocumentData): Element }
+    private _Element!: Element
 
     public constructor(query: Query<Element>,
         option: Option<Element> = new Option(),
-        type: { new(id?: string, data?: DocumentData): Element }) {
+        type: Element) {
         this.query = query
         this.option = option
         this._Element = type
     }
 
-    public doc(index: number): Element {
+    public doc(index: number): InstanceType<Element> {
         return this.documents[index]
     }
 
@@ -73,7 +73,7 @@ export class DataSource<Element extends Base> {
         return this
     }
 
-    public onCompleted(block: (documents: Element[]) => void): this {
+    public onCompleted(block: (documents: InstanceType<Element>[]) => void): this {
         this.completedBlock = block
         return this
     }
@@ -123,7 +123,7 @@ export class DataSource<Element extends Base> {
             const id: string = change.doc.id
             switch (change.type) {
                 case 'added': {
-                    const document: Element = await this._get(change.doc.id, change.doc.data())
+                    const document: InstanceType<Element> = await this._get(change.doc.id, change.doc.data())
                     this.documents.push(document)
                     this.documents = this.documents.sort(this.option.sortBlock)
                     if (!isFirst) {
@@ -139,7 +139,7 @@ export class DataSource<Element extends Base> {
                     break
                 }
                 case 'modified': {
-                    const document: Element = await this._get(change.doc.id, change.doc.data())
+                    const document: InstanceType<Element> = await this._get(change.doc.id, change.doc.data())
                     this.documents = this.documents.filter(doc => doc.id !== id)
                     this.documents.push(document)
                     this.documents = this.documents.sort(this.option.sortBlock)
@@ -178,11 +178,11 @@ export class DataSource<Element extends Base> {
 
     private async _get(id: string, data: DocumentData) {
         if (this.query.isReference) {
-            const document: Element = new this._Element(id, {})
+            const document = new this._Element(id, {}) as InstanceType<Element>
             await document.fetch()
             return document
         } else {
-            const document: Element = new this._Element(id, data)
+            const document = new this._Element(id, data) as InstanceType<Element>
             return document
         }
     }
