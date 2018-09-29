@@ -2,7 +2,7 @@ process.env.NODE_ENV = 'test';
 import * as Pring from "../src/index"
 import * as admin from 'firebase-admin'
 
-var key = require("../salada-f825d-firebase-adminsdk-19k25-ded6604978.json")
+var key = require("../key.json")
 const app = admin.initializeApp({
     credential: admin.credential.cert(key)
 })
