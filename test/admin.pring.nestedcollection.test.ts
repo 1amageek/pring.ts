@@ -42,7 +42,7 @@ describe("SubCollection pack", () => {
 
             test("Root document", async () => {
                 try {
-                    const doc: Document = await Document.get(doc0_nested_id)
+                    const doc: Document = await Document.get(doc0_nested_id) as Document
                     expect(doc).not.toBeNull()
                 } catch (error) {
                     console.log(error)

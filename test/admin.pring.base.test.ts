@@ -22,7 +22,7 @@ describe("Document property", () => {
         document.createdAt = new Date(100)
         document.updatedAt = new Date(100)
         await document.save()
-        doc = await Document.get(document.id)
+        doc = await Document.get(document.id) as Document
     });
 
     describe("properties", async () => {
