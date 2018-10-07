@@ -1,6 +1,6 @@
 import { } from "reflect-metadata"
 import * as FirebaseFirestore from '@google-cloud/firestore'
-import * as firebase from 'firebase'
+import * as firebase from 'firebase/app'
 import { BatchType, Batch } from './batch'
 import { firestore } from './index'
 import {

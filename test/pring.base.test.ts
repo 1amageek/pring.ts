@@ -1,5 +1,5 @@
 process.env.NODE_ENV = 'test';
-import * as firebase from 'firebase'
+import * as firebase from 'firebase/app'
 import * as Pring from "../src/index"
 import { config } from "./config"
 import { DocumentLite } from './document'

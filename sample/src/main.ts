@@ -6,7 +6,7 @@ import './registerServiceWorker';
 
 import * as Pring from '../../src/index';
 import { config } from "../../test/config";
-import firebase from 'firebase';
+import firebase from 'firebase/app';
 import 'firebase/firestore';
 
 const app = firebase.initializeApp(config);

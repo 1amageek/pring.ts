@@ -1,5 +1,5 @@
 import * as FirebaseFirestore from '@google-cloud/firestore'
-import * as firebase from 'firebase'
+import * as firebase from 'firebase/app'
 import {
     DocumentReference,
     WriteBatch,

@@ -8,8 +8,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import HelloWorld from '../components/HelloWorld.vue'; // @ is an alias to /src
-import firebase from 'firebase';
-import 'firebase/firestore';
+import firebase from 'firebase/app';
 import * as Pring from '../../../src/index';
 import { User } from '../models/user';
 
@@ -27,7 +26,7 @@ export default class Home extends Vue {
   }
   
   public async created() {
-    const dataSource = User.query().dataSource(User)
+    const dataSource = User.query().dataSource()
 
     // GET
     const docs = await dataSource.get()
