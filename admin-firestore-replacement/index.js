@@ -1,4 +1,4 @@
-const f = () => { }
+const f = function() {}
 
 // Object.keys(require('@google-cloud/firestore'))
 module.exports = {
