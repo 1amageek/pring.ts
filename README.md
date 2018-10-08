@@ -90,6 +90,19 @@ required
 }
 ```
 
+### webpack.config.js
+
+```js
+const alias = require('pring/webpack-alias')
+
+module.exports = {
+  // ...
+  resolve: {
+    alias
+  },
+}
+```
+
 ### Initialize
 
 When using Pring in Vue please include it in `main.ts`.

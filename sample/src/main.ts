@@ -6,8 +6,7 @@ import './registerServiceWorker';
 
 import * as Pring from '../../src/index';
 import { config } from "../../test/config";
-import firebase from 'firebase';
-import 'firebase/firestore';
+import firebase from 'firebase/app';
 
 const app = firebase.initializeApp(config);
 Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp());
