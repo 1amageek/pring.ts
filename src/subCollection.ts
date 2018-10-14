@@ -14,7 +14,7 @@ import {
     DocumentData
 } from './base'
 
-export class SubCollection<T extends Base> implements AnySubCollection {
+export class SubCollection<T extends typeof Base> implements AnySubCollection {
 
     public path!: string
 
@@ -26,11 +26,11 @@ export class SubCollection<T extends Base> implements AnySubCollection {
 
     public batchID?: string
 
-    public objects: T[] = []
+    public objects: InstanceType<T>[] = []
 
-    protected _insertions: T[] = []
+    protected _insertions: InstanceType<T>[] = []
 
-    protected _deletions: T[] = []
+    protected _deletions: InstanceType<T>[] = []
 
     public constructor(parent: Base) {
         this.parent = parent
@@ -55,7 +55,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         return firestore.collection(this.getPath())
     }
 
-    public insert(newMember: T) {
+    public insert(newMember: InstanceType<T>) {
         newMember.reference = this.reference.doc(newMember.id)
         this.objects.push(newMember)
         if (this.isSaved()) {
@@ -63,9 +63,9 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }
     }
 
-    public delete(member: T) {
+    public delete(member: InstanceType<T>) {
         this.objects.some((v, i) => {
-            if (v.id === member.id) {
+            if ((v as InstanceType<T>).id === member.id) {
                 this.objects.splice(i, 1)
                 return true
             }
@@ -77,7 +77,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         member.reference = member.getReference()
     }
 
-    public async doc(id: string, type: { new(id?: string, data?: DocumentData): T; }, transaction?: Transaction) {
+    public async doc(id: string, type: T, transaction?: Transaction) {
         try {
             let snapshot: DocumentSnapshot
             if (transaction) {
@@ -90,7 +90,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                 snapshot = await this.reference.doc(id).get()
             }
             if (snapshot.exists) {
-                const document: T = new type(snapshot.id, {})
+                const document = new type(snapshot.id, {}) as InstanceType<T>
                 document.setData(snapshot.data()!)
                 document.setParent(this)
                 return document
@@ -102,7 +102,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }
     }
 
-    public async get(type: { new(id?: string, data?: DocumentData): T; }, transaction?: Transaction) {
+    public async get(type: T, transaction?: Transaction) {
         try {
             let snapshot: QuerySnapshot
             if (transaction instanceof FirebaseFirestore.Transaction) {
@@ -112,8 +112,8 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                 snapshot = await this.reference.get()
             }
             const docs: DocumentSnapshot[] = snapshot.docs
-            const documents: T[] = docs.map((documentSnapshot) => {
-                const document: T = new type(documentSnapshot.id, {})
+            const documents: InstanceType<T>[] = docs.map((documentSnapshot) => {
+                const document = new type(documentSnapshot.id, {}) as InstanceType<T>
                 document.setData(documentSnapshot.data()!)
                 return document
             })
@@ -133,7 +133,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }
     }
 
-    public forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any) {
+    public forEach(callbackfn: (value: InstanceType<T>, index: number, array: InstanceType<T>[]) => void, thisArg?: any) {
         this.objects.forEach(callbackfn)
     }
 

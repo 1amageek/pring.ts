@@ -74,7 +74,7 @@ export interface AnySubCollection extends Batchable {
     path: string
     reference: CollectionReference
     key: string
-    setParent(parent: Base, key: string): void
+    setParent<T extends Base>(parent: T, key: string): void
 }
 
 export function isCollection(arg: any): boolean {
@@ -352,7 +352,7 @@ export class Base implements Document {
         }
     }
 
-    public setParent<T extends Base>(parent: NestedCollection<T>) {
+    public setParent<T extends typeof Base>(parent: SubCollection<T>) {
         // Set reference
         this.path = `${parent.path}/${this.id}`
         this.reference = firestore.doc(this.path)
