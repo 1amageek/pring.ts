@@ -77,7 +77,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         member.reference = member.getReference()
     }
 
-    public async doc<Type extends typeof Base>(id: string, type: Type, transaction?: Transaction) {
+    public async doc(id: string, type: { new(...args: any[]): T }, transaction?: Transaction) {
         try {
             let snapshot: DocumentSnapshot
             if (transaction) {
@@ -90,7 +90,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                 snapshot = await this.reference.doc(id).get()
             }
             if (snapshot.exists) {
-                const document = new type(snapshot.id, {}) as InstanceType<Type>
+                const document = new type(snapshot.id, {})
                 document.setData(snapshot.data()!)
                 document.setParent(this)
                 return document
@@ -102,7 +102,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }
     }
 
-    public async get<Type extends typeof Base>(type: Type, transaction?: Transaction) {
+    public async get(type: { new(...args: any[]): T }, transaction?: Transaction) {
         try {
             let snapshot: QuerySnapshot
             if (transaction instanceof FirebaseFirestore.Transaction) {
@@ -113,7 +113,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
             }
             const docs: DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
-                const document = new type(documentSnapshot.id, {}) as InstanceType<Type>
+                const document = new type(documentSnapshot.id, {})
                 document.setData(documentSnapshot.data()!)
                 return document
             })

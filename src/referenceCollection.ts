@@ -91,9 +91,9 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         }
     }
 
-    public async doc<Type extends typeof Base>(id: string, type: Type) {
+    public async doc(id: string, type: { new(...args: any[]): T }) {
         try {
-            const document = new type(id, {}) as InstanceType<Type>
+            const document = new type(id, {})
             await document.fetch()
             return document
         } catch (error) {
@@ -101,12 +101,12 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         }
     }
 
-    public async get<Type extends typeof Base>(type: Type) {
+    public async get(type: { new(...args: any[]): T }) {
         try {
             const snapshot: QuerySnapshot = await this.reference.get()
             const docs: DocumentSnapshot[] = snapshot.docs
-            const documents: InstanceType<Type>[] = docs.map((documentSnapshot) => {
-                const document: InstanceType<Type> = new type(documentSnapshot.id, {}) as InstanceType<Type>
+            const documents: T[] = docs.map((documentSnapshot) => {
+                const document: T = new type(documentSnapshot.id, {})
                 return document
             })
             this.objects = documents
