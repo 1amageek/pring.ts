@@ -11,16 +11,16 @@ import {
     DocumentReference,
 } from './base'
 
-export class ReferenceCollection<T extends typeof Base> extends SubCollection<InstanceType<T>> {
+export class ReferenceCollection<T extends Base> extends SubCollection<T> {
 
-    public insert(newMember: InstanceType<T>) {
+    public insert(newMember: T) {
         this.objects.push(newMember)
         if (this.isSaved()) {
             this._insertions.push(newMember)
         }
     }
 
-    public delete(member: InstanceType<T>) {
+    public delete(member: T) {
         this.objects.some((v, i) => {
             if (v.id === member.id) {
                 this.objects.splice(i, 1)
@@ -91,9 +91,9 @@ export class ReferenceCollection<T extends typeof Base> extends SubCollection<In
         }
     }
 
-    public async doc(id: string, type: T) {
+    public async doc<Type extends typeof Base>(id: string, type: Type) {
         try {
-            const document = new type(id, {}) as InstanceType<T>
+            const document = new type(id, {}) as InstanceType<Type>
             await document.fetch()
             return document
         } catch (error) {
@@ -101,12 +101,12 @@ export class ReferenceCollection<T extends typeof Base> extends SubCollection<In
         }
     }
 
-    public async get(type: T) {
+    public async get<Type extends typeof Base>(type: Type) {
         try {
             const snapshot: QuerySnapshot = await this.reference.get()
             const docs: DocumentSnapshot[] = snapshot.docs
-            const documents: InstanceType<T>[] = docs.map((documentSnapshot) => {
-                const document: InstanceType<T> = new type(documentSnapshot.id, {}) as InstanceType<T>
+            const documents: InstanceType<Type>[] = docs.map((documentSnapshot) => {
+                const document: InstanceType<Type> = new type(documentSnapshot.id, {}) as InstanceType<Type>
                 return document
             })
             this.objects = documents

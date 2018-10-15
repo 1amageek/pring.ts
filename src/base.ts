@@ -352,7 +352,7 @@ export class Base implements Document {
         }
     }
 
-    public setParent<T extends typeof Base>(parent: SubCollection<T>) {
+    public setParent<T extends Base>(parent: SubCollection<T>) {
         // Set reference
         this.path = `${parent.path}/${this.id}`
         this.reference = firestore.doc(this.path)
