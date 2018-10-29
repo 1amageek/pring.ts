@@ -35,7 +35,7 @@ describe("SubCollection pack", () => {
     });
 
     describe("NestedCollection", async () => {
-        describe("Get NestedCollection's document", async () => {            
+        describe("Get NestedCollection's document", async () => {
 
             test("Root document", async () => {
                 try {
@@ -45,7 +45,7 @@ describe("SubCollection pack", () => {
                     console.log(error)
                 }
             })
-    
+
             test("doc0's NestedCollection", async () => {
                 try {
                     const doc = await new DocumentLite(doc0_nested_id).nestedCollection.get(DocumentLite)
@@ -54,7 +54,7 @@ describe("SubCollection pack", () => {
                     console.log(error)
                 }
             })
-    
+
             test("doc1's NestedCollection", async () => {
                 try {
                     const doc = await new DocumentLite(doc1_nested_id).nestedCollection.get(DocumentLite)
@@ -63,7 +63,7 @@ describe("SubCollection pack", () => {
                     console.log(error)
                 }
             })
-    
+
             test("A NestedCollection saved before doc0_nested is saved", async () => {
                 try {
                     const doc = await DocumentLite.get(doc1_other_nested_id) as DocumentLite
@@ -85,10 +85,39 @@ describe("SubCollection pack", () => {
             test("DocumentLite saved as a child can be get", async () => {
                 try {
                     const docs = await new DocumentLite(doc0_nested_id).nestedCollection.get(DocumentLite)
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == child.id)
                     })).toBeTruthy()
                     expect(docs[0]).not.toBeNull()
+                } catch (error) {
+                    console.log(error)
+                }
+            })
+
+            test("DocumentLite dataSource get", async () => {
+                try {
+                    const doc = await new DocumentLite(doc0_nested_id, {})
+                    const dataSource = doc.nestedCollection.query(DocumentLite).dataSource()
+                    dataSource.on((snapshot, changes) => {
+
+                        switch (changes.type) {
+                            case "initial": {
+                                console.log(dataSource.documents)
+                                break
+                            }
+                            case "update": {
+                                console.log("insert", changes.insertions)
+                                console.log("change", changes.modifications)
+                                console.log("delete", changes.deletions)
+                                break
+                            }
+                            case "error": {
+                                break
+                            }
+                        }
+                    })
+                    const a = await dataSource.get()
+                    console.log(a[0].value())
                 } catch (error) {
                     console.log(error)
                 }
@@ -106,7 +135,7 @@ describe("SubCollection pack", () => {
     //                 expect(error).not.toBeNull()
     //             }
     //         })
-    
+
     //         test("doc 1", async () => {
     //             try {
     //                 const doc = await DocumentLite.get(doc1_id)
@@ -115,7 +144,7 @@ describe("SubCollection pack", () => {
     //                 console.log(error)
     //             }
     //         })
-    
+
     //         test("doc 2", async () => {
     //             try {
     //                 const doc = await DocumentLite.get(doc2_id)
@@ -124,7 +153,7 @@ describe("SubCollection pack", () => {
     //                 console.log(error)
     //             }
     //         })
-    
+
     //         test("doc 1 other", async () => {
     //             try {
     //                 const doc = await DocumentLite.get(doc1_other_id)

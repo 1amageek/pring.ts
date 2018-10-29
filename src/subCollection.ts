@@ -10,9 +10,9 @@ import {
     DocumentSnapshot,
     QuerySnapshot,
     WriteBatch,
-    Transaction,
-    DocumentData
+    Transaction
 } from './base'
+import * as DataSourceQuery from './query'
 
 export class SubCollection<T extends Base> implements AnySubCollection {
 
@@ -171,6 +171,10 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                 })
                 return _batch.batch()
         }
+    }
+
+    public query<T extends typeof Base>(type: T): DataSourceQuery.Query<T> {
+        return new DataSourceQuery.Query(this.reference, type)
     }
 
     public batch(type: BatchType, batchID: string) {

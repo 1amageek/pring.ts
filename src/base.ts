@@ -119,7 +119,7 @@ export class Base implements Document {
     }
 
     public static query<T extends typeof Base>(this: T): DataSourceQuery.Query<T> {
-        return new DataSourceQuery.Query(this)
+        return new DataSourceQuery.Query(this.getReference(), this)
     }
 
     public static async get<T extends typeof Base>(this: T, id: string) {

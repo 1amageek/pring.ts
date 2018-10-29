@@ -5,7 +5,6 @@ import {
     FieldPath,
     DocumentSnapshot,
     QuerySnapshot,
-    DocumentData,
     OrderByDirection,
     WhereFilterOp,
     GetOptions
@@ -19,9 +18,9 @@ export class Query<Element extends typeof Base.Base> {
 
     private _Element: Element
 
-    public constructor(type: Element, isReference: boolean = false) {
+    public constructor(reference: Base.Query, type: Element, isReference: boolean = false) {
         this._Element = type
-        this.query = type.getReference()
+        this.query = reference
         this.isReference = isReference
     }
 
@@ -43,19 +42,19 @@ export class Query<Element extends typeof Base.Base> {
     }
 
     public where(fieldPath: string | FieldPath, opStr: WhereFilterOp, value: any): Query<Element> {
-        const query: Query<Element> = new Query(this._Element, this.isReference)
+        const query: Query<Element> = new Query(this.query, this._Element, this.isReference)
         query.query = this.query.where(fieldPath, opStr, value)
         return query
     }
 
     public orderBy(fieldPath: string | FieldPath, directionStr?: OrderByDirection): Query<Element> {
-        const query: Query<Element> = new Query(this._Element, this.isReference)
+        const query: Query<Element> = new Query(this.query, this._Element, this.isReference)
         query.query = this.query.orderBy(fieldPath, directionStr)
         return query
     }
 
     public limit(limit: number): Query<Element> {
-        const query: Query<Element> = new Query(this._Element, this.isReference)
+        const query: Query<Element> = new Query(this.query, this._Element, this.isReference)
         query.query = this.query.limit(limit)
         return query
     }
@@ -63,7 +62,7 @@ export class Query<Element extends typeof Base.Base> {
     public startAt(snapshot: DocumentSnapshot): Query<Element>
     public startAt(...fieldValues: any[]): Query<Element>
     public startAt(arg: DocumentSnapshot | any[]): Query<Element> {
-        const query: Query<Element> = new Query(this._Element, this.isReference)
+        const query: Query<Element> = new Query(this.query, this._Element, this.isReference)
         query.query = this.query.startAt(arg)
         return query
     }
@@ -71,7 +70,7 @@ export class Query<Element extends typeof Base.Base> {
     public startAfter(snapshot: DocumentSnapshot): Query<Element>
     public startAfter(...fieldValues: any[]): Query<Element>
     public startAfter(arg: DocumentSnapshot | any[]): Query<Element> {
-        const query: Query<Element> = new Query(this._Element, this.isReference)
+        const query: Query<Element> = new Query(this.query, this._Element, this.isReference)
         query.query = this.query.startAfter(arg)
         return query
     }
@@ -79,7 +78,7 @@ export class Query<Element extends typeof Base.Base> {
     public endBefore(snapshot: DocumentSnapshot): Query<Element>
     public endBefore(...fieldValues: any[]): Query<Element>
     public endBefore(arg: DocumentSnapshot | any[]): Query<Element> {
-        const query: Query<Element> = new Query(this._Element, this.isReference)
+        const query: Query<Element> = new Query(this.query, this._Element, this.isReference)
         query.query = this.query.endBefore(arg)
         return query
     }
@@ -87,7 +86,7 @@ export class Query<Element extends typeof Base.Base> {
     public endAt(snapshot: DocumentSnapshot): Query<Element>
     public endAt(...fieldValues: any[]): Query<Element>
     public endAt(arg: DocumentSnapshot | any[]): Query<Element> {
-        const query: Query<Element> = new Query(this._Element, this.isReference)
+        const query: Query<Element> = new Query(this.query, this._Element, this.isReference)
         query.query = this.query.endAt(arg)
         return query
     }
