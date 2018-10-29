@@ -113,12 +113,7 @@ export class DataSource<Element extends typeof Base> {
     }
 
     private async _operate(snapshot: QuerySnapshot, isFirst: boolean) {
-        let changes: DocumentChange[] = []
-        if (snapshot instanceof FirebaseFirestore.QuerySnapshot) {
-            changes = snapshot.docChanges
-        } else {
-            changes = snapshot.docChanges()
-        }
+        const changes: DocumentChange[] = snapshot.docChanges()
         changes.forEach(async change => {
             const id: string = change.doc.id
             switch (change.type) {
