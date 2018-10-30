@@ -2,7 +2,7 @@ import { } from "reflect-metadata"
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as firebase from 'firebase/app'
 import { BatchType, Batch } from './batch'
-import { firestore } from './index'
+import { firestore, timestamp } from './index'
 import {
     Base,
     AnySubCollection,
@@ -113,8 +113,8 @@ export class SubCollection<T extends Base> implements AnySubCollection {
             }
             const docs: DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
-                const document = new type(documentSnapshot.id, {})
-                document.setData(documentSnapshot.data()!)
+                const document = new type(documentSnapshot.id, documentSnapshot.data())
+                // document.setData(documentSnapshot.data()!)
                 return document
             })
             this.objects = documents
@@ -145,18 +145,23 @@ export class SubCollection<T extends Base> implements AnySubCollection {
             case BatchType.save:
                 this.forEach(document => {
                     const reference = self.reference.doc(document.id)
-                    if (document.isSaved) {
-                        _batch.set(reference, document.value())
-                    } else {
-                        _batch.set(reference, document.value(), { merge: true })
-                    }
+                    _batch.set(reference, document.value(), { merge: true })
                 })
                 return _batch.batch()
             case BatchType.update:
                 const insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
                 insertions.forEach(document => {
-                    const reference = self.reference.doc(document.id)
-                    _batch.set(reference, document.value(), { merge: true })
+                    if (document.isSaved) {
+                        const updateValue = document.updateValue()
+                        if (Object.keys(updateValue).length) {
+                            const reference = self.reference.doc(document.id)
+                            updateValue.updatedAt = timestamp
+                            _batch.set(reference, updateValue, { merge: true })
+                        }
+                    } else {
+                        const reference = self.reference.doc(document.id)
+                        _batch.set(reference, document.value(), { merge: true })
+                    }
                 })
                 const deletions = this._deletions.filter(item => this._insertions.indexOf(item) < 0)
                 deletions.forEach(document => {

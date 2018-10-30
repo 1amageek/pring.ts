@@ -269,6 +269,10 @@ export class Base implements Document {
         return values
     }
 
+    public updateValue(): DocumentData {
+        return this._updateValues
+    }
+
     public pack(type: BatchType, batchID?: string, writeBatch?: WriteBatch): WriteBatch {
         const _writeBatch: WriteBatch = writeBatch || firestore.batch()
         const _batch: Batch = new Batch(_writeBatch)
@@ -354,8 +358,25 @@ export class Base implements Document {
 
     public setParent<T extends Base>(parent: SubCollection<T>) {
         // Set reference
+
         this.path = `${parent.path}/${this.id}`
         this.reference = firestore.doc(this.path)
+
+        const properties = this.getProperties()
+        for (const key of properties) {
+            const descriptor = Object.getOwnPropertyDescriptor(this, key)
+            if (descriptor) {
+                if (descriptor.get) {
+                    const value = descriptor.get()
+                    if (value) {
+                        if (isCollection(value)) {
+                            const collection: AnySubCollection = value as AnySubCollection
+                            collection.setParent(this, key)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public async save() {

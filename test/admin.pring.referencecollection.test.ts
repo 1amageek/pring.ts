@@ -49,6 +49,9 @@ describe("SubCollection pack", () => {
                     expect(doc).not.toBeNull()
                     expect(doc0.isSaved).toEqual(true)
                     expect(doc1.isSaved).toEqual(true)
+                    expect(doc).not.toBeUndefined()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -58,7 +61,10 @@ describe("SubCollection pack", () => {
             test("doc0's ReferenceCollection", async () => {
                 try {
                     const doc = await Document.get(doc1_id) as Document
+                    expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -68,7 +74,10 @@ describe("SubCollection pack", () => {
             test("doc1's ReferenceCollection", async () => {
                 try {
                     const doc = await Document.get(doc2_id) as Document
+                    expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -78,7 +87,10 @@ describe("SubCollection pack", () => {
             test("A ReferenceCollection saved before doc0 is saved", async () => {
                 try {
                     const doc = await Document.get(doc1_other_id) as Document
+                    expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -88,7 +100,10 @@ describe("SubCollection pack", () => {
             test("This doc2_other is saved in another ReferenceCollection", async () => {
                 try {
                     const doc = await Document.get(doc2_other_id) as Document
+                    expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -107,6 +122,12 @@ describe("SubCollection pack", () => {
                     expect( docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -123,6 +144,12 @@ describe("SubCollection pack", () => {
                     expect( docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -139,6 +166,12 @@ describe("SubCollection pack", () => {
                     expect( docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -154,6 +187,12 @@ describe("SubCollection pack", () => {
                     expect( docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -167,6 +206,12 @@ describe("SubCollection pack", () => {
                     expect( docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -180,6 +225,12 @@ describe("SubCollection pack", () => {
                     expect( docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -196,6 +247,12 @@ describe("SubCollection pack", () => {
                     expect( docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -210,6 +267,12 @@ describe("SubCollection pack", () => {
                     expect( docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -224,6 +287,12 @@ describe("SubCollection pack", () => {
                     expect( docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)

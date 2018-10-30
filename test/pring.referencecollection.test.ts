@@ -36,7 +36,7 @@ describe("SubCollection pack", () => {
         doc0.referenceCollection.insert(doc1_other)
         doc0.referenceCollection.insert(doc2_other)
         await doc0.save()
-        
+
         doc1.referenceCollection.insert(doc2)
         doc1.referenceCollection.insert(doc2_other)
         await doc1.update()
@@ -52,37 +52,48 @@ describe("SubCollection pack", () => {
                     expect(doc).not.toBeNull()
                     expect(doc0.isSaved).toEqual(true)
                     expect(doc1.isSaved).toEqual(true)
+                    expect(doc).not.toBeUndefined()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
-    
+
             test("doc0's ReferenceCollection", async () => {
                 try {
                     const doc = await DocumentLite.get(doc1_id) as DocumentLite
+                    expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
-    
+
             test("doc1's ReferenceCollection", async () => {
                 try {
                     const doc = await DocumentLite.get(doc2_id) as DocumentLite
+                    expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
-    
+
             test("A ReferenceCollection saved before doc0 is saved", async () => {
                 try {
                     const doc = await DocumentLite.get(doc1_other_id) as DocumentLite
-
+                    expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -92,14 +103,17 @@ describe("SubCollection pack", () => {
             test("This doc2_other is saved in another ReferenceCollection", async () => {
                 try {
                     const doc = await DocumentLite.get(doc2_other_id) as DocumentLite
+                    expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
         })
-    
+
         describe("DocumentLite get reference", async () => {
             test("doc 1 reference", async () => {
                 try {
@@ -108,41 +122,59 @@ describe("SubCollection pack", () => {
                         await doc.fetch()
                     }
                     expect(docs.length !== 0).toBeTruthy()
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
-    
+
             test("doc 2 reference", async () => {
                 try {
                     const docs = await new DocumentLite(doc1_id).referenceCollection.get(DocumentLite)
                     for (const doc of docs) {
                         await doc.fetch()
-                    } 
+                    }
                     expect(docs.length !== 0).toBeTruthy()
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
-    
+
             test("doc 1 reference before saved document", async () => {
                 try {
                     const docs = await new DocumentLite(doc0_id).referenceCollection.get(DocumentLite)
                     for (const doc of docs) {
                         await doc.fetch()
-                    } 
+                    }
                     expect(docs.length !== 0).toBeTruthy()
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -155,35 +187,53 @@ describe("SubCollection pack", () => {
                 try {
                     const docs = await new DocumentLite(doc0_id).referenceCollection.get(DocumentLite)
                     expect(docs.length !== 0).toBeTruthy()
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
-    
+
             test("doc 2 reference", async () => {
                 try {
                     const docs = await new DocumentLite(doc1_id).referenceCollection.get(DocumentLite)
                     expect(docs.length !== 0).toBeTruthy()
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
-    
+
             test("doc 1 reference before saved document", async () => {
                 try {
                     const docs = await new DocumentLite(doc0_id).referenceCollection.get(DocumentLite)
                     expect(docs.length !== 0).toBeTruthy()
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
@@ -197,45 +247,78 @@ describe("SubCollection pack", () => {
                     const doc = await DocumentLite.get(doc0_id) as DocumentLite
                     const docs = await doc.referenceCollection.get(DocumentLite)
                     expect(docs.length === 3).toBeTruthy()
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == doc1_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
-    
+
             test("doc 2 reference", async () => {
                 try {
                     const doc = await DocumentLite.get(doc1_id) as DocumentLite
                     const docs = await doc.referenceCollection.get(DocumentLite)
                     expect(docs.length !== 0).toBeTruthy()
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == doc2_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
-    
+
             test("doc 1 reference before saved document", async () => {
                 try {
                     const doc = await DocumentLite.get(doc0_id) as DocumentLite
                     const docs = await doc.referenceCollection.get(DocumentLite)
                     expect(docs.length !== 0).toBeTruthy()
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == doc1_other_id)
                     })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     expect(error).toBeNull()
                     console.log(error)
                 }
             })
         })
-    })
 
+        describe("DataSource", async () => {
+            test("DocumentLite dataSource get", async () => {
+                try {
+                    const parent = await new DocumentLite(doc0_id, {})
+                    const dataSource = parent.referenceCollection.query(DocumentLite).dataSource()
+                    const doc = await dataSource.get()
+                    expect(doc[0]).not.toBeUndefined()
+                    expect(doc[0]).not.toBeNull()
+                    expect(doc[0].createdAt).not.toBeNull()
+                    expect(doc[0].updatedAt).not.toBeNull()
+                } catch (error) {
+                    console.log(error)
+                }
+            })
+        })
+    })
 
     afterAll(() => {
         app.delete()

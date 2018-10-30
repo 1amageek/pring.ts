@@ -27,6 +27,7 @@ describe("SubCollection pack", () => {
 
     beforeAll(async () => {
         // Nested
+
         await doc1_other_nested.save()
         doc0_nested.nestedCollection.insert(doc1_nested)
         doc0_nested.nestedCollection.insert(doc1_other_nested)
@@ -38,39 +39,49 @@ describe("SubCollection pack", () => {
     });
 
     describe("NestedCollection", async () => {
-        describe("Get NestedCollection's document", async () => {            
+        describe("Get NestedCollection's document", async () => {
 
             test("Root document", async () => {
                 try {
                     const doc: Document = await Document.get(doc0_nested_id) as Document
+                    expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     console.log(error)
                 }
             })
-    
+
             test("doc0's NestedCollection", async () => {
                 try {
-                    const doc = await new Document(doc0_nested_id).nestedCollection.get(Document)
-                    expect(doc[0]).not.toBeNull()
+                    const docs = await new Document(doc0_nested_id).nestedCollection.get(Document)
+                    expect(docs.filter((value) => {
+                        return (value.id == child.id)
+                    })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     console.log(error)
                 }
             })
-    
+
             test("doc1's NestedCollection", async () => {
                 try {
-                    const doc = await new Document(doc1_nested_id).nestedCollection.get(Document)
-                    expect(doc[0]).not.toBeNull()
-                } catch (error) {
-                    console.log(error)
-                }
-            })
-    
-            test("A NestedCollection saved before doc0_nested is saved", async () => {
-                try {
-                    const doc = await Document.get(doc1_other_nested_id)
-                    expect(doc).not.toBeNull()
+                    const docs = await new Document(doc1_nested_id).nestedCollection.get(Document)
+                    expect(docs.filter((value) => {
+                        return (value.id == child.id)
+                    })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     console.log(error)
                 }
@@ -78,8 +89,29 @@ describe("SubCollection pack", () => {
 
             test("A NestedCollection saved before doc0_nested is saved", async () => {
                 try {
-                    const doc = await new Document(doc0_nested_id).nestedCollection.get(Document)
-                    expect(doc[0]).not.toBeNull()
+                    const doc = await Document.get(doc1_other_nested_id) as Document
+                    expect(doc).not.toBeUndefined()
+                    expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
+                } catch (error) {
+                    expect(error).toBeNull()
+                    console.log(error)
+                }
+            })
+
+            test("A NestedCollection saved before doc0_nested is saved", async () => {
+                try {
+                    const docs = await new Document(doc0_nested_id).nestedCollection.get(Document)
+                    expect(docs.filter((value) => {
+                        return (value.id == child.id)
+                    })).toBeTruthy()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     console.log(error)
                 }
@@ -88,63 +120,31 @@ describe("SubCollection pack", () => {
             test("Document saved as a child can be get", async () => {
                 try {
                     const docs = await new Document(doc0_nested_id).nestedCollection.get(Document)
-                    expect( docs.filter((value) => {
+                    expect(docs.filter((value) => {
                         return (value.id == child.id)
                     })).toBeTruthy()
-                    expect(docs[0]).not.toBeNull()
+                    docs.forEach((doc) => {
+                        expect(doc).not.toBeUndefined()
+                        expect(doc).not.toBeNull()
+                        expect(doc.createdAt).not.toBeNull()
+                        expect(doc.updatedAt).not.toBeNull()
+                    })
                 } catch (error) {
                     console.log(error)
                 }
             })
         })
     })
-    //     describe("Document delete", async () => {
-
-    //         test("doc 0", async () => {
-    //             try {
-    //                 const doc = await Document.get(doc0_id)
-    //                 await doc.delete()
-    //                 await Document.get(doc0_id)
-    //             } catch (error) {
-    //                 expect(error).not.toBeNull()
-    //             }
-    //         })
-    
-    //         test("doc 1", async () => {
-    //             try {
-    //                 const doc = await Document.get(doc1_id)
-    //                 expect(doc).not.toBeNull()
-    //             } catch(error) {
-    //                 console.log(error)
-    //             }
-    //         })
-    
-    //         test("doc 2", async () => {
-    //             try {
-    //                 const doc = await Document.get(doc2_id)
-    //                 expect(doc).not.toBeNull()
-    //             } catch(error) {
-    //                 console.log(error)
-    //             }
-    //         })
-    
-    //         test("doc 1 other", async () => {
-    //             try {
-    //                 const doc = await Document.get(doc1_other_id)
-    //                 expect(doc).not.toBeNull()
-    //             } catch(error) {
-    //                 console.log(error)
-    //             }
-    //         })
-    //     })
-    // })
 
     describe("NestedCollection", async () => {
         describe("Get NestedCollection's document", async () => {
             test("Root document", async () => {
                 try {
-                    const doc = await Document.get(doc0_nested_id)
+                    const doc = await Document.get(doc0_nested_id) as Document
+                    expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
+                    expect(doc.createdAt).not.toBeNull()
+                    expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
                     console.log(error)
                 }
