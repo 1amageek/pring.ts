@@ -49,6 +49,7 @@ describe("SubCollection pack", () => {
                     expect(doc.createdAt).not.toBeNull()
                     expect(doc.updatedAt).not.toBeNull()
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -66,6 +67,7 @@ describe("SubCollection pack", () => {
                         expect(doc.updatedAt).not.toBeNull()
                     })
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -83,6 +85,7 @@ describe("SubCollection pack", () => {
                         expect(doc.updatedAt).not.toBeNull()
                     })
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -113,6 +116,7 @@ describe("SubCollection pack", () => {
                         expect(doc.updatedAt).not.toBeNull()
                     })
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
@@ -130,6 +134,7 @@ describe("SubCollection pack", () => {
                         expect(doc.updatedAt).not.toBeNull()
                     })
                 } catch (error) {
+                    expect(error).toBeNull()
                     console.log(error)
                 }
             })
