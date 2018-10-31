@@ -33,6 +33,7 @@ required
     "module": "commonjs",
     "noImplicitReturns": true,
     "outDir": "lib",
+    "experimentalDecorators": true,
     "sourceMap": true,
     "target": "es2018"
   },
