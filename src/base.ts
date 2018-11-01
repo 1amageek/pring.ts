@@ -1,5 +1,4 @@
 import * as UUID from 'uuid'
-import * as admin from 'firebase-admin'
 import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as firebase from 'firebase/app'
 import 'firebase/auth'
@@ -14,27 +13,27 @@ import { File } from './file'
 import { Batchable, BatchType, Batch } from './batch'
 import * as DataSourceQuery from './query'
 
-export type Firestore = firebase.firestore.Firestore | admin.firestore.Firestore
-export type FieldValue = firebase.firestore.FieldValue | admin.firestore.FieldValue
-export type CollectionReference = firebase.firestore.CollectionReference | admin.firestore.CollectionReference
-export type DocumentReference = firebase.firestore.DocumentReference | admin.firestore.DocumentReference
-export type DocumentSnapshot = firebase.firestore.DocumentSnapshot | admin.firestore.DocumentSnapshot
-export type Query = firebase.firestore.Query | admin.firestore.Query
-export type QuerySnapshot = firebase.firestore.QuerySnapshot | admin.firestore.QuerySnapshot
-export type WriteBatch = firebase.firestore.WriteBatch | admin.firestore.WriteBatch
+export type Firestore = firebase.firestore.Firestore | FirebaseFirestore.Firestore
+export type FieldValue = firebase.firestore.FieldValue | FirebaseFirestore.FieldValue
+export type CollectionReference = firebase.firestore.CollectionReference | FirebaseFirestore.CollectionReference
+export type DocumentReference = firebase.firestore.DocumentReference | FirebaseFirestore.DocumentReference
+export type DocumentSnapshot = firebase.firestore.DocumentSnapshot | FirebaseFirestore.DocumentSnapshot
+export type Query = firebase.firestore.Query | FirebaseFirestore.Query
+export type QuerySnapshot = firebase.firestore.QuerySnapshot | FirebaseFirestore.QuerySnapshot
+export type WriteBatch = firebase.firestore.WriteBatch | FirebaseFirestore.WriteBatch
 export type SetOptions = firebase.firestore.SetOptions | FirebaseFirestore.SetOptions
 export type UpdateData = firebase.firestore.UpdateData | FirebaseFirestore.UpdateData
-export type FieldPath = firebase.firestore.FieldPath | admin.firestore.FieldPath
+export type FieldPath = firebase.firestore.FieldPath | FirebaseFirestore.FieldPath
 export type Transaction = firebase.firestore.Transaction | FirebaseFirestore.Transaction
 export type DocumentData = { createdAt: Date, updatedAt: Date } |
-{ [key: string]: any } | firebase.firestore.DocumentData | admin.firestore.DocumentData
+{ [key: string]: any } | firebase.firestore.DocumentData | FirebaseFirestore.DocumentData
 export type DataOrSnapshot = DocumentData | DocumentSnapshot | DocumentSnapshot
 export type DateType = 'createdAt' | 'updatedAt'
 export type WhereFilterOp = firebase.firestore.WhereFilterOp | FirebaseFirestore.WhereFilterOp
 export type OrderByDirection = firebase.firestore.OrderByDirection | FirebaseFirestore.OrderByDirection
 export type GetOptions = firebase.firestore.GetOptions
 export type DocumentChange = firebase.firestore.DocumentChange | FirebaseFirestore.DocumentChange
-export type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot | admin.firestore.QueryDocumentSnapshot
+export type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot | FirebaseFirestore.QueryDocumentSnapshot
 
 const propertyMetadataKey = Symbol("property")
 
@@ -89,7 +88,7 @@ export function isFile(arg: any): boolean {
 }
 
 export function isTimestamp(arg: any): boolean {
-    return (arg instanceof firebase.firestore.Timestamp) || (arg instanceof admin.firestore.Timestamp)
+    return (arg instanceof firebase.firestore.Timestamp) || (arg instanceof FirebaseFirestore.Timestamp)
 }
 
 export const isUndefined = (value: any): boolean => {
@@ -416,7 +415,7 @@ export class Base implements Document {
                     snapshot = await transaction.get(this.reference as firebase.firestore.DocumentReference)
                 }
                 if (transaction instanceof FirebaseFirestore.Transaction) {
-                    snapshot = await transaction.get(this.reference as admin.firestore.DocumentReference)
+                    snapshot = await transaction.get(this.reference as FirebaseFirestore.DocumentReference)
                 }
             } else {
                 snapshot = await this.reference.get()

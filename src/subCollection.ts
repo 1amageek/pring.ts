@@ -1,5 +1,4 @@
 import { } from "reflect-metadata"
-import * as admin from 'firebase-admin'
 import * as firebase from 'firebase/app'
 import { BatchType, Batch } from './batch'
 import { firestore, timestamp } from './index'
@@ -85,7 +84,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                 if (transaction instanceof firebase.firestore.Transaction) {
                     snapshot = await transaction.get(this.reference.doc(id) as firebase.firestore.DocumentReference)
                 } else {
-                    snapshot = await transaction.get(this.reference.doc(id) as admin.firestore.DocumentReference)
+                    snapshot = await transaction.get(this.reference.doc(id) as FirebaseFirestore.DocumentReference)
                 }
             } else {
                 snapshot = await this.reference.doc(id).get()
@@ -107,7 +106,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         try {
             let snapshot: QuerySnapshot
             if (transaction instanceof FirebaseFirestore.Transaction) {
-                const reference = this.reference as admin.firestore.CollectionReference
+                const reference = this.reference as FirebaseFirestore.CollectionReference
                 snapshot = await (transaction as FirebaseFirestore.Transaction).get(reference)
             } else {
                 snapshot = await this.reference.get()

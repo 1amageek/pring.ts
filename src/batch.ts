@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin'
+import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as firebase from 'firebase/app'
 import {
     DocumentReference,
@@ -24,13 +24,13 @@ export class Batch {
 
     private _writeBatch?: firebase.firestore.WriteBatch
 
-    private _adminWriteBatch?: admin.firestore.WriteBatch
+    private _adminWriteBatch?: FirebaseFirestore.WriteBatch
 
     public constructor(writeBatch: WriteBatch) {
         if (writeBatch instanceof firebase.firestore.WriteBatch) {
             this._writeBatch = writeBatch
         }
-        if (writeBatch instanceof admin.firestore.WriteBatch) {
+        if (writeBatch instanceof FirebaseFirestore.WriteBatch) {
             this._adminWriteBatch = writeBatch
         }
     }
@@ -53,7 +53,7 @@ export class Batch {
         if (documentRef instanceof firebase.firestore.DocumentReference) {
             this._writeBatch!.set(documentRef, data, options)
         }
-        if (documentRef instanceof admin.firestore.DocumentReference) {
+        if (documentRef instanceof FirebaseFirestore.DocumentReference) {
             this._adminWriteBatch!.set(documentRef, data, options)
         }
         return this
@@ -74,7 +74,7 @@ export class Batch {
         if (documentRef instanceof firebase.firestore.DocumentReference) {
             this._writeBatch!.update(documentRef, data)
         }
-        if (documentRef instanceof admin.firestore.DocumentReference) {
+        if (documentRef instanceof FirebaseFirestore.DocumentReference) {
             this._adminWriteBatch!.update(documentRef, data)
         }
         return this
@@ -98,7 +98,7 @@ export class Batch {
     // public update(documentRef: DocumentReference, field: string | FieldPath, value: any, ...moreFieldsAndValues: any[]): Batch
     // public update(documentRef: DocumentReference, field: string | FieldPath | UpdateData, value?: any, ...moreFieldsAndValues: any[]): Batch
     // {
-    //     if (documentRef instanceof admin.firestore.DocumentReference) {
+    //     if (documentRef instanceof FirebaseFirestore.DocumentReference) {
     //         if (field instanceof string | FieldPath) {
     //             this._adminWriteBatch.update(documentRef, field, value, moreFieldsAndValues)
     //         }
@@ -120,7 +120,7 @@ export class Batch {
         if (documentRef instanceof firebase.firestore.DocumentReference) {
             this._writeBatch!.delete(documentRef)
         }
-        if (documentRef instanceof admin.firestore.DocumentReference) {
+        if (documentRef instanceof FirebaseFirestore.DocumentReference) {
             this._adminWriteBatch!.delete(documentRef)
         }
         return this
