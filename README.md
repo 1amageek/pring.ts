@@ -127,8 +127,8 @@ Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp(
 ``` typescript
 import * as Pring from "pring"
 import { config } from "./config"
-import * as admin from "firebase-admin"
 
+const admin = Pring.Admin
 firebase.initializeApp()
 const app = admin.app()
 
