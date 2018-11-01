@@ -125,11 +125,11 @@ Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp(
 #### For Admin
 
 ``` typescript
-import * as Pring from "pring"
+import * as admin from 'firebase-admin'
+import * as Pring from 'pring'
 
-const admin = Pring.Admin
-firebase.initializeApp()
-const app = admin.app()
+var key = require("../key.json")
+const app = admin.initializeApp()
 
 Pring.initialize(app.firestore(), admin.firestore.FieldValue.serverTimestamp())
 ```
