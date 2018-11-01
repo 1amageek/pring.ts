@@ -1,7 +1,7 @@
 process.env.NODE_ENV = 'test';
-import * as admin from 'firebase-admin'
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as Pring from "../src/index"
+
+const admin = Pring.Admin
 
 var key = require("../key.json")
 const app = admin.initializeApp({
@@ -17,7 +17,7 @@ describe("Document property", () => {
     describe("properties before get", async () => {
 
         test("batch", () => {
-            expect(Pring.firestore.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
+            expect(Pring.firestore.batch() instanceof admin.firestore.WriteBatch).toBeTruthy()
         })
 
         test("String type", async () => {
@@ -64,9 +64,9 @@ describe("Document property", () => {
             const document = new Document()
             await document.save()
             const doc = await Document.get(document.id) as Document
-            doc.geoPoint = new FirebaseFirestore.GeoPoint(10, 10)
+            doc.geoPoint = new admin.firestore.GeoPoint(10, 10)
             await doc.update()
-            expect(doc.geoPoint).toEqual(new FirebaseFirestore.GeoPoint(10, 10))
+            expect(doc.geoPoint).toEqual(new admin.firestore.GeoPoint(10, 10))
             await doc.delete()
         })
 
@@ -114,7 +114,7 @@ describe("Document property", () => {
     describe("properties after get", async () => {
 
         test("batch", () => {
-            expect(Pring.firestore.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
+            expect(Pring.firestore.batch() instanceof admin.firestore.WriteBatch).toBeTruthy()
         })
 
         test("String type", async () => {
@@ -165,10 +165,10 @@ describe("Document property", () => {
             const document = new Document()
             await document.save()
             const doc = await Document.get(document.id) as Document
-            doc.geoPoint = new FirebaseFirestore.GeoPoint(10, 10)
+            doc.geoPoint = new admin.firestore.GeoPoint(10, 10)
             await doc.update()
             const newDoc = await Document.get(document.id) as Document
-            expect(newDoc.geoPoint).toEqual(new FirebaseFirestore.GeoPoint(10, 10))
+            expect(newDoc.geoPoint).toEqual(new admin.firestore.GeoPoint(10, 10))
             await newDoc.delete()
         })
 

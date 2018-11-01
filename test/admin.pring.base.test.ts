@@ -1,7 +1,7 @@
 process.env.NODE_ENV = 'test';
-import * as admin from 'firebase-admin'
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as Pring from "../src/index"
+
+const admin = Pring.Admin
 
 var key = require("../key.json")
 const app = admin.initializeApp({
@@ -28,7 +28,7 @@ describe("Document property", () => {
     describe("properties", async () => {
 
         test("batch", () => {
-            expect(Pring.firestore.batch() instanceof FirebaseFirestore.WriteBatch).toBeTruthy()
+            expect(Pring.firestore.batch() instanceof admin.firestore.WriteBatch).toBeTruthy()
         })
 
         test("createdAt", () => {

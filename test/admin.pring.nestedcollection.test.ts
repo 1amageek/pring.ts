@@ -1,6 +1,7 @@
 process.env.NODE_ENV = 'test';
 import * as Pring from "../src/index"
-import * as admin from 'firebase-admin'
+
+const admin = Pring.Admin
 
 var key = require("../key.json")
 const app = admin.initializeApp({
