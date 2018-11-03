@@ -2,7 +2,7 @@ process.env.NODE_ENV = 'test';
 import * as firebase from 'firebase/app'
 import * as Pring from "../src/index"
 import { config } from "./config"
-import { DocumentLite } from './document'
+import { Document } from './document'
 
 const app = firebase.initializeApp(config);
 
@@ -10,14 +10,14 @@ Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp(
 
 describe("Document property", () => {
 
-    const document = new DocumentLite()
-    var doc: DocumentLite
+    const document = new Document()
+    var doc: Document
 
     beforeAll(async () => {
         document.createdAt = new Date(100)
         document.updatedAt = new Date(100)
         await document.save()
-        doc = await DocumentLite.get(document.id) as DocumentLite
+        doc = await Document.get(document.id) as Document
     });
 
     describe("properties", async () => {
@@ -69,7 +69,7 @@ describe("Document property", () => {
 
     describe("Documents that do not exist", async () => {
         test("not exist", async () => {
-            const doc = await DocumentLite.get("not")
+            const doc = await Document.get("not")
             expect(doc).toBeUndefined()
         })
     })
@@ -79,7 +79,7 @@ describe("Document property", () => {
             try {
                 const document_id = doc.id
                 await doc.delete()
-                await DocumentLite.get(document_id)
+                await Document.get(document_id)
             } catch (error) {
                 expect(error).not.toBeNull()
             }

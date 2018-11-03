@@ -1,5 +1,4 @@
 import * as UUID from 'uuid'
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
@@ -10,30 +9,29 @@ import { SubCollection } from './subCollection'
 import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
 import { File } from './file'
-import { Batchable, BatchType, Batch } from './batch'
+import { Batchable, BatchType } from './batch'
 import * as DataSourceQuery from './query'
 
-export type Firestore = firebase.firestore.Firestore | FirebaseFirestore.Firestore
-export type FieldValue = firebase.firestore.FieldValue | FirebaseFirestore.FieldValue
-export type CollectionReference = firebase.firestore.CollectionReference | FirebaseFirestore.CollectionReference
-export type DocumentReference = firebase.firestore.DocumentReference | FirebaseFirestore.DocumentReference
-export type DocumentSnapshot = firebase.firestore.DocumentSnapshot | FirebaseFirestore.DocumentSnapshot
-export type Query = firebase.firestore.Query | FirebaseFirestore.Query
-export type QuerySnapshot = firebase.firestore.QuerySnapshot | FirebaseFirestore.QuerySnapshot
-export type WriteBatch = firebase.firestore.WriteBatch | FirebaseFirestore.WriteBatch
-export type SetOptions = firebase.firestore.SetOptions | FirebaseFirestore.SetOptions
-export type UpdateData = firebase.firestore.UpdateData | FirebaseFirestore.UpdateData
-export type FieldPath = firebase.firestore.FieldPath | FirebaseFirestore.FieldPath
-export type Transaction = firebase.firestore.Transaction | FirebaseFirestore.Transaction
-export type DocumentData = { createdAt: Date, updatedAt: Date } |
-{ [key: string]: any } | firebase.firestore.DocumentData | FirebaseFirestore.DocumentData
+export type Firestore = firebase.firestore.Firestore
+export type FieldValue = firebase.firestore.FieldValue
+export type CollectionReference = firebase.firestore.CollectionReference
+export type DocumentReference = firebase.firestore.DocumentReference
+export type DocumentSnapshot = firebase.firestore.DocumentSnapshot
+export type Query = firebase.firestore.Query
+export type QuerySnapshot = firebase.firestore.QuerySnapshot
+export type WriteBatch = firebase.firestore.WriteBatch
+export type SetOptions = firebase.firestore.SetOptions
+export type UpdateData = firebase.firestore.UpdateData
+export type FieldPath = firebase.firestore.FieldPath
+export type Transaction = firebase.firestore.Transaction
+export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | firebase.firestore.DocumentData
 export type DataOrSnapshot = DocumentData | DocumentSnapshot | DocumentSnapshot
 export type DateType = 'createdAt' | 'updatedAt'
-export type WhereFilterOp = firebase.firestore.WhereFilterOp | FirebaseFirestore.WhereFilterOp
-export type OrderByDirection = firebase.firestore.OrderByDirection | FirebaseFirestore.OrderByDirection
+export type WhereFilterOp = firebase.firestore.WhereFilterOp
+export type OrderByDirection = firebase.firestore.OrderByDirection
 export type GetOptions = firebase.firestore.GetOptions
-export type DocumentChange = firebase.firestore.DocumentChange | FirebaseFirestore.DocumentChange
-export type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot | FirebaseFirestore.QueryDocumentSnapshot
+export type DocumentChange = firebase.firestore.DocumentChange
+export type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
 
 const propertyMetadataKey = Symbol("property")
 
@@ -88,7 +86,7 @@ export function isFile(arg: any): boolean {
 }
 
 export function isTimestamp(arg: any): boolean {
-    return (arg instanceof firebase.firestore.Timestamp) || (arg instanceof FirebaseFirestore.Timestamp)
+    return (arg instanceof firebase.firestore.Timestamp)
 }
 
 export const isUndefined = (value: any): boolean => {
@@ -275,14 +273,13 @@ export class Base implements Document {
 
     public pack(type: BatchType, batchID?: string, writeBatch?: WriteBatch): WriteBatch {
         const _writeBatch: WriteBatch = writeBatch || firestore.batch()
-        const _batch: Batch = new Batch(_writeBatch)
 
         // If a batch ID is not specified, it is generated
         const _batchID = batchID || UUID.v4()
 
         // If you do not process already packed documents
         if (_batchID === this.batchID) {
-            return _batch.batch()
+            return _writeBatch
         }
 
         this.batchID = _batchID
@@ -290,7 +287,7 @@ export class Base implements Document {
         const properties = this.getProperties()
         switch (type) {
             case BatchType.save:
-                _batch.set(reference, this.value(), { merge: true })
+                _writeBatch.set(reference, this.value(), { merge: true })
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
                     if (descriptor) {
@@ -305,12 +302,12 @@ export class Base implements Document {
                         }
                     }
                 }
-                return _batch.batch()
+                return _writeBatch
             case BatchType.update:
                 const updateValues: DocumentData = this._updateValues
                 const updatedAt: (keyof DocumentData) = "updatedAt"
                 updateValues[updatedAt] = timestamp
-                _batch.update(reference, updateValues)
+                _writeBatch.update(reference, updateValues)
                 for (const key of properties) {
                     const descriptor = Object.getOwnPropertyDescriptor(this, key)
                     if (descriptor) {
@@ -325,10 +322,10 @@ export class Base implements Document {
                         }
                     }
                 }
-                return _batch.batch()
+                return _writeBatch
             case BatchType.delete:
-                _batch.delete(reference)
-                return _batch.batch()
+                _writeBatch.delete(reference)
+                return _writeBatch
         }
     }
 
@@ -411,12 +408,7 @@ export class Base implements Document {
         try {
             let snapshot!: DocumentSnapshot
             if (transaction) {
-                if (transaction instanceof firebase.firestore.Transaction) {
-                    snapshot = await transaction.get(this.reference as firebase.firestore.DocumentReference)
-                }
-                if (transaction instanceof FirebaseFirestore.Transaction) {
-                    snapshot = await transaction.get(this.reference as FirebaseFirestore.DocumentReference)
-                }
+                snapshot = await transaction.get(this.reference)
             } else {
                 snapshot = await this.reference.get()
             }

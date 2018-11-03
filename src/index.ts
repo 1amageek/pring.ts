@@ -1,4 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import { BatchType } from './batch'
 import { Firestore, FieldValue, Base, property } from './base'
 import { SubCollection } from './subCollection'
@@ -14,10 +13,6 @@ export let timestamp: FieldValue
 
 export const initialize = (appFirestore: Firestore, serverTimestamp: FieldValue) => {
     firestore = appFirestore
-    if (firestore instanceof FirebaseFirestore.Firestore) {
-        firestore.settings({timestampsInSnapshots: true})
-    } else {
-        firestore.settings({timestampsInSnapshots: true})
-    }
+    firestore.settings({timestampsInSnapshots: true})
     timestamp = serverTimestamp
 }

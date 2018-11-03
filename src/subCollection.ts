@@ -1,8 +1,7 @@
 import { } from "reflect-metadata"
 import * as firebase from 'firebase/app'
-import { BatchType, Batch } from './batch'
+import { BatchType } from './batch'
 import { firestore, timestamp } from './index'
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import {
     Base,
     AnySubCollection,
@@ -81,11 +80,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         try {
             let snapshot: DocumentSnapshot
             if (transaction) {
-                if (transaction instanceof firebase.firestore.Transaction) {
-                    snapshot = await transaction.get(this.reference.doc(id) as firebase.firestore.DocumentReference)
-                } else {
-                    snapshot = await transaction.get(this.reference.doc(id) as FirebaseFirestore.DocumentReference)
-                }
+                snapshot = await transaction.get(this.reference.doc(id))
             } else {
                 snapshot = await this.reference.doc(id).get()
             }
@@ -102,19 +97,13 @@ export class SubCollection<T extends Base> implements AnySubCollection {
         }
     }
 
-    public async get(type: { new(...args: any[]): T }, transaction?: Transaction) {
+    public async get(type: { new(...args: any[]): T }) {
         try {
             let snapshot: QuerySnapshot
-            if (transaction instanceof FirebaseFirestore.Transaction) {
-                const reference = this.reference as FirebaseFirestore.CollectionReference
-                snapshot = await (transaction as FirebaseFirestore.Transaction).get(reference)
-            } else {
-                snapshot = await this.reference.get()
-            }
+            snapshot = await this.reference.get()
             const docs: DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
                 const document = new type(documentSnapshot.id, documentSnapshot.data())
-                // document.setData(documentSnapshot.data()!)
                 return document
             })
             this.objects = documents
@@ -139,15 +128,14 @@ export class SubCollection<T extends Base> implements AnySubCollection {
 
     public pack(type: BatchType, batchID: string, writeBatch?: WriteBatch): WriteBatch {
         const _writeBatch: WriteBatch = writeBatch || firestore.batch()
-        const _batch: Batch = new Batch(_writeBatch)
         const self = this
         switch (type) {
             case BatchType.save:
                 this.forEach(document => {
                     const reference = self.reference.doc(document.id)
-                    _batch.set(reference, document.value(), { merge: true })
+                    _writeBatch.set(reference, document.value(), { merge: true })
                 })
-                return _batch.batch()
+                return _writeBatch
             case BatchType.update:
                 const insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
                 insertions.forEach(document => {
@@ -156,25 +144,25 @@ export class SubCollection<T extends Base> implements AnySubCollection {
                         if (Object.keys(updateValue).length) {
                             const reference = self.reference.doc(document.id)
                             updateValue.updatedAt = timestamp
-                            _batch.set(reference, updateValue, { merge: true })
+                            _writeBatch.set(reference, updateValue, { merge: true })
                         }
                     } else {
                         const reference = self.reference.doc(document.id)
-                        _batch.set(reference, document.value(), { merge: true })
+                        _writeBatch.set(reference, document.value(), { merge: true })
                     }
                 })
                 const deletions = this._deletions.filter(item => this._insertions.indexOf(item) < 0)
                 deletions.forEach(document => {
                     const reference = self.reference.doc(document.id)
-                    _batch.delete(reference)
+                    _writeBatch.delete(reference)
                 })
-                return _batch.batch()
+                return _writeBatch
             case BatchType.delete:
                 this.forEach(document => {
                     const reference = self.reference.doc(document.id)
-                    _batch.delete(reference)
+                    _writeBatch.delete(reference)
                 })
-                return _batch.batch()
+                return _writeBatch
         }
     }
 

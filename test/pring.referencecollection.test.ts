@@ -1,7 +1,7 @@
 process.env.NODE_ENV = 'test';
 import * as Pring from "../src/index"
 import * as firebase from 'firebase/app'
-import { DocumentLite } from './document'
+import { Document } from './document'
 import { config } from "./config"
 
 const app = firebase.initializeApp(config);
@@ -11,11 +11,11 @@ Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp(
 describe("SubCollection pack", () => {
 
     // ReferenceCollection
-    const doc0 = new DocumentLite()
-    const doc1 = new DocumentLite()
-    const doc2 = new DocumentLite()
-    const doc1_other = new DocumentLite()
-    const doc2_other = new DocumentLite()
+    const doc0 = new Document()
+    const doc1 = new Document()
+    const doc2 = new Document()
+    const doc1_other = new Document()
+    const doc2_other = new Document()
 
     doc0.name = "doc0"
     doc1.name = "doc1"
@@ -48,7 +48,7 @@ describe("SubCollection pack", () => {
 
             test("Root document", async () => {
                 try {
-                    const doc: DocumentLite = await DocumentLite.get(doc0_id) as DocumentLite
+                    const doc: Document = await Document.get(doc0_id) as Document
                     expect(doc).not.toBeNull()
                     expect(doc0.isSaved).toEqual(true)
                     expect(doc1.isSaved).toEqual(true)
@@ -63,7 +63,7 @@ describe("SubCollection pack", () => {
 
             test("doc0's ReferenceCollection", async () => {
                 try {
-                    const doc = await DocumentLite.get(doc1_id) as DocumentLite
+                    const doc = await Document.get(doc1_id) as Document
                     expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
                     expect(doc.createdAt).not.toBeNull()
@@ -76,7 +76,7 @@ describe("SubCollection pack", () => {
 
             test("doc1's ReferenceCollection", async () => {
                 try {
-                    const doc = await DocumentLite.get(doc2_id) as DocumentLite
+                    const doc = await Document.get(doc2_id) as Document
                     expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
                     expect(doc.createdAt).not.toBeNull()
@@ -89,7 +89,7 @@ describe("SubCollection pack", () => {
 
             test("A ReferenceCollection saved before doc0 is saved", async () => {
                 try {
-                    const doc = await DocumentLite.get(doc1_other_id) as DocumentLite
+                    const doc = await Document.get(doc1_other_id) as Document
                     expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
                     expect(doc.createdAt).not.toBeNull()
@@ -102,7 +102,7 @@ describe("SubCollection pack", () => {
 
             test("This doc2_other is saved in another ReferenceCollection", async () => {
                 try {
-                    const doc = await DocumentLite.get(doc2_other_id) as DocumentLite
+                    const doc = await Document.get(doc2_other_id) as Document
                     expect(doc).not.toBeUndefined()
                     expect(doc).not.toBeNull()
                     expect(doc.createdAt).not.toBeNull()
@@ -114,10 +114,10 @@ describe("SubCollection pack", () => {
             })
         })
 
-        describe("DocumentLite get reference", async () => {
+        describe("Document get reference", async () => {
             test("doc 1 reference", async () => {
                 try {
-                    const docs = await new DocumentLite(doc0_id).referenceCollection.get(DocumentLite)
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
                     for (const doc of docs) {
                         await doc.fetch()
                     }
@@ -139,7 +139,7 @@ describe("SubCollection pack", () => {
 
             test("doc 2 reference", async () => {
                 try {
-                    const docs = await new DocumentLite(doc1_id).referenceCollection.get(DocumentLite)
+                    const docs = await new Document(doc1_id).referenceCollection.get(Document)
                     for (const doc of docs) {
                         await doc.fetch()
                     }
@@ -161,7 +161,7 @@ describe("SubCollection pack", () => {
 
             test("doc 1 reference before saved document", async () => {
                 try {
-                    const docs = await new DocumentLite(doc0_id).referenceCollection.get(DocumentLite)
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
                     for (const doc of docs) {
                         await doc.fetch()
                     }
@@ -182,10 +182,10 @@ describe("SubCollection pack", () => {
             })
         })
 
-        describe("Initilizeed DocumentLite get reference", async () => {
+        describe("Initilizeed Document get reference", async () => {
             test("doc 1 reference", async () => {
                 try {
-                    const docs = await new DocumentLite(doc0_id).referenceCollection.get(DocumentLite)
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
                     expect(docs.length !== 0).toBeTruthy()
                     expect(docs.filter((value) => {
                         return (value.id == doc1_id)
@@ -204,7 +204,7 @@ describe("SubCollection pack", () => {
 
             test("doc 2 reference", async () => {
                 try {
-                    const docs = await new DocumentLite(doc1_id).referenceCollection.get(DocumentLite)
+                    const docs = await new Document(doc1_id).referenceCollection.get(Document)
                     expect(docs.length !== 0).toBeTruthy()
                     expect(docs.filter((value) => {
                         return (value.id == doc2_id)
@@ -223,7 +223,7 @@ describe("SubCollection pack", () => {
 
             test("doc 1 reference before saved document", async () => {
                 try {
-                    const docs = await new DocumentLite(doc0_id).referenceCollection.get(DocumentLite)
+                    const docs = await new Document(doc0_id).referenceCollection.get(Document)
                     expect(docs.length !== 0).toBeTruthy()
                     expect(docs.filter((value) => {
                         return (value.id == doc1_other_id)
@@ -241,11 +241,11 @@ describe("SubCollection pack", () => {
             })
         })
 
-        describe("DocumentLite get reference", async () => {
+        describe("Document get reference", async () => {
             test("doc 1 reference", async () => {
                 try {
-                    const doc = await DocumentLite.get(doc0_id) as DocumentLite
-                    const docs = await doc.referenceCollection.get(DocumentLite)
+                    const doc = await Document.get(doc0_id) as Document
+                    const docs = await doc.referenceCollection.get(Document)
                     expect(docs.length === 3).toBeTruthy()
                     expect(docs.filter((value) => {
                         return (value.id == doc1_id)
@@ -264,8 +264,8 @@ describe("SubCollection pack", () => {
 
             test("doc 2 reference", async () => {
                 try {
-                    const doc = await DocumentLite.get(doc1_id) as DocumentLite
-                    const docs = await doc.referenceCollection.get(DocumentLite)
+                    const doc = await Document.get(doc1_id) as Document
+                    const docs = await doc.referenceCollection.get(Document)
                     expect(docs.length !== 0).toBeTruthy()
                     expect(docs.filter((value) => {
                         return (value.id == doc2_id)
@@ -284,8 +284,8 @@ describe("SubCollection pack", () => {
 
             test("doc 1 reference before saved document", async () => {
                 try {
-                    const doc = await DocumentLite.get(doc0_id) as DocumentLite
-                    const docs = await doc.referenceCollection.get(DocumentLite)
+                    const doc = await Document.get(doc0_id) as Document
+                    const docs = await doc.referenceCollection.get(Document)
                     expect(docs.length !== 0).toBeTruthy()
                     expect(docs.filter((value) => {
                         return (value.id == doc1_other_id)
@@ -304,10 +304,10 @@ describe("SubCollection pack", () => {
         })
 
         describe("DataSource", async () => {
-            test("DocumentLite dataSource get", async () => {
+            test("Document dataSource get", async () => {
                 try {
-                    const parent = await new DocumentLite(doc0_id, {})
-                    const dataSource = parent.referenceCollection.query(DocumentLite).dataSource()
+                    const parent = await new Document(doc0_id, {})
+                    const dataSource = parent.referenceCollection.query(Document).dataSource()
                     const doc = await dataSource.get()
                     expect(doc[0]).not.toBeUndefined()
                     expect(doc[0]).not.toBeNull()

@@ -1,4 +1,3 @@
-import * as FirebaseFirestore from '@google-cloud/firestore'
 import * as Base from './base'
 import { Option, DataSource } from './dataSource'
 import {
@@ -34,11 +33,7 @@ export class Query<Element extends typeof Base.Base> {
         error?: (error: Error) => void;
         complete?: () => void;
     }): () => void {
-        if (this.query instanceof FirebaseFirestore.Query) {
-            return this.query.onSnapshot(observer.next!, observer.error)
-        } else {
-            return this.query.onSnapshot(observer)
-        }
+        return this.query.onSnapshot(observer)
     }
 
     public where(fieldPath: string | FieldPath, opStr: WhereFilterOp, value: any): Query<Element> {
@@ -92,10 +87,6 @@ export class Query<Element extends typeof Base.Base> {
     }
 
     public async get(options?: GetOptions) {
-        if (this.query instanceof FirebaseFirestore.Query) {
-            return await this.query.get()
-        } else {
-            return await this.query.get(options)
-        }
+        return await this.query.get(options)
     }
 }
