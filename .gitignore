@@ -9,6 +9,7 @@ playground.ts
 playground.js
 *.json
 !tsconfig.json
+
 # Runtime data
 pids
 *.pid
@@ -64,3 +65,6 @@ typings/
 .env
 
 lib/
+
+# firebase
+.firebaserc
