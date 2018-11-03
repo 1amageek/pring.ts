@@ -13,7 +13,7 @@ Firebase Cloud Firestore model framework for TypeScript. It supports both Web Cl
 
 ### TypeScript
 
-required 
+required
 
 ```JSON
   "devDependencies": {
@@ -128,7 +128,6 @@ Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp(
 import * as admin from 'firebase-admin'
 import * as Pring from 'pring'
 
-var key = require("../key.json")
 const app = admin.initializeApp()
 
 Pring.initialize(app.firestore(), admin.firestore.FieldValue.serverTimestamp())
@@ -169,7 +168,7 @@ let user = new User("YOUR_ID", {})
 ```
 __memo__
 
-The developer is responsible for managing the Document being saved. 
+The developer is responsible for managing the Document being saved.
 In Pring it is prohibited to save the already saved Document again.
 
 Please use explicitly by the initialization method.
@@ -274,7 +273,7 @@ export default class Home extends Vue {
 https://facebook.github.io/jest/
 
 ```shell
-npm install -g jest 
+npm install -g jest
 ```
 
 ```shell
