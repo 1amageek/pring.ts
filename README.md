@@ -3,7 +3,8 @@
 Firebase Cloud Firestore model framework for TypeScript. It supports both Web Client and Admin.
 
 - [Pring for iOS](https://github.com/1amageek/Pring)
-- [Pring for Typescript](https://github.com/1amageek/pring.ts)
+- [Pring for Web](https://github.com/1amageek/pring.ts)
+- [Pring for CloudFunctions](https://github.com/1amageek/pring-admin.ts)
 
 ## Installation ⚙
 
@@ -23,31 +24,6 @@ required
 ```
 
 ### tsconfig.json
-
-#### For Firebase CloudFunctions
-
-```JSON
-{
-  "compilerOptions": {
-    "lib": ["es2018", "dom"],
-    "module": "commonjs",
-    "noImplicitReturns": true,
-    "outDir": "lib",
-    "experimentalDecorators": true,
-    "sourceMap": true,
-    "target": "es2018"
-  },
-  "compileOnSave": true,
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
-}
-```
-
-#### For WebClient
 
 ```JSON
 {
@@ -120,17 +96,6 @@ firebase.initializeApp(config)
 const app = firebase.app()
 
 Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp())
-```
-
-#### For Admin
-
-``` typescript
-import * as admin from 'firebase-admin'
-import * as Pring from 'pring'
-
-const app = admin.initializeApp()
-
-Pring.initialize(app.firestore(), admin.firestore.FieldValue.serverTimestamp())
 ```
 
 ### Scheme
