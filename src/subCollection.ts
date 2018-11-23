@@ -168,7 +168,7 @@ export class SubCollection<T extends Base> implements AnySubCollection {
     }
 
     public query<T extends typeof Base>(type: T): DataSourceQuery.Query<T> {
-        return new DataSourceQuery.Query(this.reference, type)
+        return new DataSourceQuery.Query(this.reference, this.reference, type)
     }
 
     public batch(type: BatchType, batchID: string) {
