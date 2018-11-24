@@ -177,6 +177,7 @@ export class DataSource<Element extends typeof Base> {
             return document
         } else {
             const document = new this._Element(id, data) as InstanceType<Element>
+            document.setData(data)
             document.setReference(this.query.reference)
             return document
         }
