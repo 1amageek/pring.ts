@@ -63,7 +63,11 @@ describe("Document property", () => {
         })
 
         test("File type", () => {
-            expect(doc.file).toEqual(document.file)
+            expect(doc.file.value()).toEqual({
+                "mimeType": "file.jpg",
+                "name": "https://file",
+                "url": "image/png",
+              })
         })
     })
 
