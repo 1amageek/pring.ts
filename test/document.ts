@@ -1,5 +1,6 @@
 import * as Pring from "../src/index"
 import "reflect-metadata"
+import { firestore } from "firebase";
 
 const property = Pring.property
 const File = Pring.File
@@ -11,7 +12,8 @@ export class Document extends Pring.Base {
     @property bool: boolean                           = true
     @property file: Pring.File                        = new Pring.File("file.jpg", "https://file", "image/png")
     @property number: number                          = 9223372036854776000
-    @property date: Date                              = new Date(100)
+    @property day: Date = new Date(100)
+    @property date: firestore.Timestamp                   = firestore.Timestamp.fromDate(new Date(100))
     @property dictionary: object                      = {"key": "value"}  
     @property string: string                          = "string"
 

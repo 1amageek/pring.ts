@@ -6,7 +6,7 @@ import { config } from "./config"
 
 const app = firebase.initializeApp(config);
 
-Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp())
+Pring.initialize(app.firestore())
 
 describe("Document property", () => {
 
@@ -50,9 +50,9 @@ describe("Document property", () => {
             const document = new Document()
             await document.save()
             const doc = await Document.get(document.id) as Document
-            doc.date = new Date(1000)
+            doc.date = firebase.firestore.Timestamp.fromDate(new Date(1000))
             await doc.update()
-            expect(doc.date).toEqual(new Date(1000))
+            expect(doc.date).toEqual(firebase.firestore.Timestamp.fromDate(new Date(1000)))
             await doc.delete()
         })
 
@@ -150,10 +150,10 @@ describe("Document property", () => {
             const document = new Document()
             await document.save()
             const doc = await Document.get(document.id) as Document
-            doc.date = new Date(1000)
+            doc.date = firebase.firestore.Timestamp.fromDate(new Date(1000))
             await doc.update()
             const newDoc = await Document.get(document.id) as Document
-            expect(newDoc.date).toEqual(new Date(1000))
+            expect(newDoc.date).toEqual(firebase.firestore.Timestamp.fromDate(new Date(1000)))
             await newDoc.delete()
         })
 

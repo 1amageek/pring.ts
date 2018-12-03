@@ -1,9 +1,9 @@
 import { } from "reflect-metadata"
-import * as firebase from 'firebase/app'
 import { BatchType } from './batch'
-import { firestore, timestamp } from './index'
+import { firestore } from './index'
 import {
     Base,
+    timestamp,
     AnySubCollection,
     CollectionReference,
     DocumentSnapshot,

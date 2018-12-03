@@ -1,13 +1,14 @@
 import { } from "reflect-metadata"
 import { BatchType } from './batch'
-import { firestore, timestamp } from './index'
+import { firestore } from './index'
 import { SubCollection } from './subCollection'
 import {
     Base,
     DocumentSnapshot,
     QuerySnapshot,
     WriteBatch,
-    DocumentData
+    DocumentData,
+    timestamp
 } from './base'
 
 export class ReferenceCollection<T extends Base> extends SubCollection<T> {

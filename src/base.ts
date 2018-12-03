@@ -4,7 +4,7 @@ import 'firebase/auth'
 import 'firebase/firestore'
 import "reflect-metadata"
 
-import { firestore, timestamp } from './index';
+import { firestore } from './index'
 import { SubCollection } from './subCollection'
 import { NestedCollection } from './nestedCollection'
 import { ReferenceCollection } from './referenceCollection'
@@ -24,6 +24,7 @@ export type SetOptions = firebase.firestore.SetOptions
 export type UpdateData = firebase.firestore.UpdateData
 export type FieldPath = firebase.firestore.FieldPath
 export type Transaction = firebase.firestore.Transaction
+export type Timestamp = firebase.firestore.Timestamp
 export type DocumentData = { createdAt: Date, updatedAt: Date } | { [key: string]: any } | firebase.firestore.DocumentData
 export type DataOrSnapshot = DocumentData | DocumentSnapshot | DocumentSnapshot
 export type DateType = 'createdAt' | 'updatedAt'
@@ -32,6 +33,8 @@ export type OrderByDirection = firebase.firestore.OrderByDirection
 export type GetOptions = firebase.firestore.GetOptions
 export type DocumentChange = firebase.firestore.DocumentChange
 export type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
+
+export const timestamp = firebase.firestore.FieldValue.serverTimestamp()
 
 const propertyMetadataKey = Symbol("property")
 
@@ -60,8 +63,8 @@ export interface Document extends Batchable, ValueProtocol {
     path: string
     id: string
     reference: DocumentReference
-    createdAt: Date
-    updatedAt: Date
+    createdAt: Timestamp
+    updatedAt: Timestamp
     getVersion(): number
     getModelName(): string
     getPath(): string
@@ -157,9 +160,9 @@ export class Base implements Document {
 
     public id: string
 
-    public createdAt!: Date
+    public createdAt!: Timestamp
 
-    public updatedAt!: Date
+    public updatedAt!: Timestamp
 
     public isSaved: boolean = false
 
@@ -268,6 +271,15 @@ export class Base implements Document {
                         } else if (isFile(value)) {
                             const file: ValueProtocol = value as ValueProtocol
                             values[key] = file.value()
+                        } else if (value instanceof Date) {
+                            console.log(
+                                "******************** Warnings ********************\n" +
+                                "\n" +
+                                " pring-admin.ts is not support `Date` type.\n" +
+                                " Please migrate `Date` type to `Timestamp` type.\n" +
+                                "\n" +
+                                "**************************************************\n"
+                                )
                         } else {
                             values[key] = value
                         }
@@ -483,9 +495,6 @@ export class Base implements Document {
             enumerable: true,
             configurable: true,
             get: () => {
-                if (isTimestamp(_value)) {
-                    return _value.toDate()
-                }
                 return _value
             },
             set: (newValue) => {

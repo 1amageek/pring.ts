@@ -6,7 +6,7 @@ import { config } from "./config"
 
 const app = firebase.initializeApp(config);
 
-Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp())
+Pring.initialize(app.firestore())
 
 describe("SubCollection pack", () => {
 

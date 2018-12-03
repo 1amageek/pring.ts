@@ -6,7 +6,7 @@ import { Document } from './document'
 
 const app = firebase.initializeApp(config);
 
-Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp())
+Pring.initialize(app.firestore())
 
 describe("Document property", () => {
 
@@ -14,8 +14,8 @@ describe("Document property", () => {
     var doc: Document
 
     beforeAll(async () => {
-        document.createdAt = new Date(100)
-        document.updatedAt = new Date(100)
+        document.createdAt = firebase.firestore.Timestamp.fromDate(new Date(100))
+        document.updatedAt = firebase.firestore.Timestamp.fromDate(new Date(100))
         await document.save()
         doc = await Document.get(document.id) as Document
     });
@@ -27,11 +27,11 @@ describe("Document property", () => {
         })
 
         test("createdAt", () => {
-            expect(doc.createdAt).toEqual(new Date(100))
+            expect(doc.createdAt).toEqual(firebase.firestore.Timestamp.fromDate(new Date(100)))
         })
 
         test("updatedAt", () => {
-            expect(doc.updatedAt).toEqual(new Date(100))
+            expect(doc.updatedAt).toEqual(firebase.firestore.Timestamp.fromDate(new Date(100)))
         })
 
         test("String type", () => {
