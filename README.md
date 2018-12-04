@@ -1,6 +1,6 @@
 # pring.ts
 
-Firebase Cloud Firestore model framework for TypeScript. It supports both Web Client and Admin.
+Firebase Cloud Firestore model framework for TypeScript.
 
 - [Pring for iOS](https://github.com/1amageek/Pring)
 - [Pring for Web](https://github.com/1amageek/pring.ts)
