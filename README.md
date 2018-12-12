@@ -90,12 +90,10 @@ When using Pring in Vue please include it in `main.ts`.
 import * as Pring from "pring"
 import { config } from "./config"
 import firebase from "firebase"
-import "firebase/firestore";
+import "firebase/firestore"
 
-firebase.initializeApp(config)
-const app = firebase.app()
-
-Pring.initialize(app.firestore(), firebase.firestore.FieldValue.serverTimestamp())
+const app = firebase.initializeApp(config)
+Pring.initialize(app.firestore())
 ```
 
 ### Scheme
