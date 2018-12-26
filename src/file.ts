@@ -11,18 +11,18 @@ export class File implements ValueProtocol {
     public additionalData?: { [key: string]: any }
 
     public constructor(name?: string, url?: string, mimeType?: string, additionalData?: { [key: string]: any }) {
-        this._defineProperty("mimeType", name)
-        this._defineProperty("name", url)
-        this._defineProperty("url", mimeType)
-        this._defineProperty("additionalData", additionalData)
+        this._defineProperty('mimeType', name)
+        this._defineProperty('name', url)
+        this._defineProperty('url', mimeType)
+        this._defineProperty('additionalData', additionalData)
         this._updateValues = {}
     }
 
     public init(value: FileData) {
-        const mimeType: (keyof FileData) = "mimeType"
-        const name: (keyof FileData) = "name"
-        const url: (keyof FileData) = "url"
-        const additionalData: (keyof FileData) = "additionalData"
+        const mimeType: (keyof FileData) = 'mimeType'
+        const name: (keyof FileData) = 'name'
+        const url: (keyof FileData) = 'url'
+        const additionalData: (keyof FileData) = 'additionalData'
         this.mimeType = value[mimeType]
         this.name = value[name]
         this.url = value[url]
@@ -36,9 +36,9 @@ export class File implements ValueProtocol {
 
     public value(): any {
         const value: FileData = {
-            "name": this.name || "",
-            "url": this.url || "",
-            "mimeType": this.mimeType || ""
+            'name': this.name || '',
+            'url': this.url || '',
+            'mimeType': this.mimeType || ''
         }
         if (this.additionalData) {
             value.additionalData = this.additionalData

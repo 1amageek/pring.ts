@@ -1,17 +1,22 @@
-import { } from "reflect-metadata"
+import { } from 'reflect-metadata'
 import { BatchType } from './batch'
 import { firestore } from './index'
 import { SubCollection } from './subCollection'
+import * as firebase from 'firebase/app'
+import * as DataSourceQuery from './query'
 import {
     Base,
     DocumentSnapshot,
     QuerySnapshot,
-    WriteBatch,
-    DocumentData,
-    timestamp
+    WriteBatch
 } from './base'
 
 export class ReferenceCollection<T extends Base> extends SubCollection<T> {
+
+    public doc(id: string, type: { new(...args: any[]): T }) {
+        const document = new type(id, {})
+        return document
+    }
 
     public insert(newMember: T) {
         this.objects.push(newMember)
@@ -38,65 +43,64 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         switch (type) {
             case BatchType.save: {
                 this.forEach(document => {
-                    let value: DocumentData = {}
                     if (document.shouldBeReplicated()) {
-                        value = document.value()
+                        const reference = this.reference.doc(document.id)
+                        const value = document.value()
+                        value['createdAt'] = firebase.firestore.FieldValue.serverTimestamp()
+                        value['updatedAt'] = firebase.firestore.FieldValue.serverTimestamp()
+                        _writeBatch.set(reference, value, { merge: true })
+                    } else {
+                        const reference = this.reference.doc(document.id)
+                        const value = {
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        }
+                        _writeBatch.set(reference, value, { merge: true })
                     }
-                    value.createdAt = timestamp
-                    value.updatedAt = timestamp
-                    if (!document.isSaved) {
-                        _writeBatch.set(document.getReference(), document.value(), {merge: true})
-                    }
-                    const reference = this.reference.doc(document.id)
-                    _writeBatch.set(reference, value, { merge: true})
+                    document.pack(BatchType.save, batchID, _writeBatch)
                 })
                 return _writeBatch
             }
             case BatchType.update:
                 const insertions = this._insertions.filter(item => this._deletions.indexOf(item) < 0)
                 insertions.forEach(document => {
-                    let value: DocumentData = {}
-                    if (document.isSaved) {
-                        if (document.shouldBeReplicated()) {
-                            value = document.value()
+                    if (document.shouldBeReplicated()) {
+                        const reference = this.reference.doc(document.id)
+                        const value = document.value()
+                        if (document.isSaved) {
+                            value['updatedAt'] = firebase.firestore.FieldValue.serverTimestamp()
+                        } else {
+                            value['createdAt'] = firebase.firestore.FieldValue.serverTimestamp()
+                            value['updatedAt'] = firebase.firestore.FieldValue.serverTimestamp()
                         }
-                        if (document.createdAt) {
-                            value.createdAt = document.createdAt
-                        }
-                        value.updatedAt = timestamp
+                        _writeBatch.set(reference, value, { merge: true })
                     } else {
-                        if (document.shouldBeReplicated()) {
-                            value = document.value()
+                        const reference = this.reference.doc(document.id)
+                        if (document.isSaved) {
+                            const value = {
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            }
+                            _writeBatch.set(reference, value, { merge: true })
+                        } else {
+                            const value = {
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            }
+                            _writeBatch.set(reference, value, { merge: true })
                         }
-                        value.createdAt = timestamp
-                        value.updatedAt = timestamp
-                        _writeBatch.set(document.getReference(), document.value(), { merge: true})
                     }
-                    const reference = this.reference.doc(document.id)
-                    _writeBatch.set(reference, value, { merge: true})
+                    document.pack(BatchType.update, batchID, _writeBatch)
                 })
                 const deletions = this._deletions.filter(item => this._insertions.indexOf(item) < 0)
                 deletions.forEach(document => {
-                    const reference = this.reference.doc(document.id)
-                    _writeBatch.delete(reference)
+                    _writeBatch.delete(document.reference)
                 })
                 return _writeBatch
             case BatchType.delete:
                 this.forEach(document => {
-                    const reference = this.reference.doc(document.id)
-                    _writeBatch.delete(reference)
+                    _writeBatch.delete(document.reference)
                 })
                 return _writeBatch
-        }
-    }
-
-    public async doc(id: string, type: { new(...args: any[]): T }) {
-        try {
-            const document = new type(id, {})
-            await document.fetch()
-            return document
-        } catch (error) {
-            throw error
         }
     }
 
@@ -106,6 +110,7 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
             const docs: DocumentSnapshot[] = snapshot.docs
             const documents: T[] = docs.map((documentSnapshot) => {
                 const document: T = new type(documentSnapshot.id, {})
+                document.setParent(this)
                 return document
             })
             this.objects = documents
@@ -113,5 +118,11 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
         } catch (error) {
             throw error
         }
+    }
+
+    public query<T extends typeof Base>(type: T): DataSourceQuery.Query<T> {
+        const query = new DataSourceQuery.Query(this.reference, this.reference, type)
+        query.isReference = true
+        return query
     }
 }

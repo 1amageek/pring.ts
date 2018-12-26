@@ -12,10 +12,6 @@ describe("Document property", () => {
 
     describe("properties before get", async () => {
 
-        test("batch", () => {
-            expect(Pring.firestore.batch() instanceof firebase.firestore.WriteBatch).toBeTruthy()
-        })
-
         test("String type", async () => {
             const document = new Document()
             await document.save()
@@ -185,10 +181,9 @@ describe("Document property", () => {
             const doc = await Document.get(document.id) as Document
             doc.set = { "update": true }
             await doc.update()
-            const newDoc = await Document.get(document.id) as Document
-            expect(newDoc.set).toEqual({ "update": true })
-            await newDoc.delete()
-        })
+            expect(doc.set).toEqual({ "update": true })
+            await doc.delete()
+        }, 10000)
 
         test("File type", async () => {
             const document = new Document()
