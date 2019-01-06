@@ -37,7 +37,7 @@ export type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
 
 export const timestamp = firebase.firestore.FieldValue.serverTimestamp()
 
-const propertyMetadataKey = Symbol('property')
+const propertyMetadataKey = Symbol("property")
 
 export const property = <T extends Document>(target: T, propertyKey: string) => {
     const properties = Reflect.getMetadata(propertyMetadataKey, target) || []
@@ -171,11 +171,15 @@ export class Base implements Document {
 
     public reference: DocumentReference
 
+    public snapshot?: DocumentSnapshot
+
     public id: string
 
     public createdAt!: Timestamp
 
     public updatedAt!: Timestamp
+
+    public isExists: boolean = false
 
     public isSaved: boolean = false
 
@@ -191,7 +195,7 @@ export class Base implements Document {
         this.modelName = this.getModelName()
 
         if (!firestore) {
-            throw Error('[Pring] Pring is not initialized.')
+            throw Error("[Pring] Pring is not initialized.")
         }
 
         // Set reference
@@ -214,13 +218,13 @@ export class Base implements Document {
                 }
             }
             const keys = Object.keys(data)
-            if (keys.includes('createdAt')) {
-                const value = data['createdAt']
-                this._defineProperty('createdAt', value)
+            if (keys.includes("createdAt")) {
+                const value = data["createdAt"]
+                this._defineProperty("createdAt", value)
             }
-            if (keys.includes('updatedAt')) {
-                const value = data['updatedAt']
-                this._defineProperty('updatedAt', value)
+            if (keys.includes("updatedAt")) {
+                const value = data["updatedAt"]
+                this._defineProperty("updatedAt", value)
             }
             this.isSaved = true
         } else {
@@ -232,6 +236,7 @@ export class Base implements Document {
     }
 
     public setData(data: DocumentData) {
+        this.isExists = true
         if (data.createdAt) {
             this._defineProperty('createdAt')
             this._prop['createdAt'] = data.createdAt
@@ -310,12 +315,12 @@ export class Base implements Document {
                             values[key] = file.value()
                         } else if (value instanceof Date) {
                             console.log(
-                                '******************** Warnings ********************\n' +
-                                '\n' +
-                                ' pring-admin.ts is not support `Date` type.\n' +
-                                ' Please migrate `Date` type to `Timestamp` type.\n' +
-                                '\n' +
-                                '**************************************************\n'
+                                "******************** Warnings ********************\n" +
+                                "\n" +
+                                " pring-admin.ts is not support `Date` type.\n" +
+                                " Please migrate `Date` type to `Timestamp` type.\n" +
+                                "\n" +
+                                "**************************************************\n"
                             )
                         } else {
                             values[key] = value
@@ -329,23 +334,23 @@ export class Base implements Document {
 
     public value(): any {
         const values: DocumentData = this.rawValue()
-        const updatedAt: (keyof DocumentData) = 'updatedAt'
-        const createdAt: (keyof DocumentData) = 'createdAt'
-        values[updatedAt] = this.updatedAt || firebase.firestore.Timestamp.fromDate(new Date())
+        const createdAt: (keyof DocumentData) = "createdAt"
+        const updatedAt: (keyof DocumentData) = "updatedAt"
         values[createdAt] = this.createdAt || firebase.firestore.Timestamp.fromDate(new Date())
+        values[updatedAt] = this.updatedAt || firebase.firestore.Timestamp.fromDate(new Date())
         return values
     }
 
     private _value(): DocumentData {
         const values: DocumentData = this.rawValue()
         if (this.isSaved) {
-            const updatedAt: (keyof DocumentData) = 'updatedAt'
+            const updatedAt: (keyof DocumentData) = "updatedAt"
             values[updatedAt] = firebase.firestore.FieldValue.serverTimestamp()
         } else {
-            const updatedAt: (keyof DocumentData) = 'updatedAt'
-            const createdAt: (keyof DocumentData) = 'createdAt'
-            values[updatedAt] = this.updatedAt || firebase.firestore.FieldValue.serverTimestamp()
+            const createdAt: (keyof DocumentData) = "createdAt"
+            const updatedAt: (keyof DocumentData) = "updatedAt"
             values[createdAt] = this.updatedAt || firebase.firestore.FieldValue.serverTimestamp()
+            values[updatedAt] = this.updatedAt || firebase.firestore.FieldValue.serverTimestamp()
         }
         return values
     }
@@ -379,7 +384,7 @@ export class Base implements Document {
 
     private _updateValue(): any {
         const updateValue: any = this.updateValue()
-        const updatedAt: (keyof DocumentData) = 'updatedAt'
+        const updatedAt: (keyof DocumentData) = "updatedAt"
         updateValue[updatedAt] = firebase.firestore.FieldValue.serverTimestamp()
         return updateValue
     }
@@ -415,6 +420,9 @@ export class Base implements Document {
                         }
                     }
                 }
+                if (this.shouldBeReplicated()) {
+                    _writeBatch.set(this.getReference(), this._value(), { merge: true })
+                }
                 return _writeBatch
             case BatchType.update:
 
@@ -424,9 +432,15 @@ export class Base implements Document {
                         const updateValue: any = this._updateValue()
                         _writeBatch.set(reference, updateValue, { merge: true })
                     }
+                    if (this.shouldBeReplicated()) {
+                        _writeBatch.set(this.getReference(), updateValue, { merge: true })
+                    }
                 } else {
                     const reference = this.reference
                     _writeBatch.set(reference, this._value(), { merge: true })
+                    if (this.shouldBeReplicated()) {
+                        _writeBatch.set(this.getReference(), this._value(), { merge: true })
+                    }
                 }
 
                 for (const key of properties) {
@@ -446,6 +460,9 @@ export class Base implements Document {
                 return _writeBatch
             case BatchType.delete:
                 _writeBatch.delete(reference)
+                if (this.shouldBeReplicated()) {
+                    _writeBatch.delete(this.getReference())
+                }
                 return _writeBatch
         }
     }
@@ -543,6 +560,7 @@ export class Base implements Document {
             } else {
                 snapshot = await this.reference.get()
             }
+            this.snapshot = snapshot
             const data = snapshot.data()
             if (data) {
                 this.setData(data)

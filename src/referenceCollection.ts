@@ -14,7 +14,7 @@ import {
 export class ReferenceCollection<T extends Base> extends SubCollection<T> {
 
     public doc(id: string, type: { new(...args: any[]): T }) {
-        const document = new type(id, {})
+        const document = new type(id)
         return document
     }
 
@@ -46,8 +46,8 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                     if (document.shouldBeReplicated()) {
                         const reference = this.reference.doc(document.id)
                         const value = document.value()
-                        value['createdAt'] = firebase.firestore.FieldValue.serverTimestamp()
-                        value['updatedAt'] = firebase.firestore.FieldValue.serverTimestamp()
+                        value["createdAt"] = firebase.firestore.FieldValue.serverTimestamp()
+                        value["updatedAt"] = firebase.firestore.FieldValue.serverTimestamp()
                         _writeBatch.set(reference, value, { merge: true })
                     } else {
                         const reference = this.reference.doc(document.id)
@@ -68,10 +68,10 @@ export class ReferenceCollection<T extends Base> extends SubCollection<T> {
                         const reference = this.reference.doc(document.id)
                         const value = document.value()
                         if (document.isSaved) {
-                            value['updatedAt'] = firebase.firestore.FieldValue.serverTimestamp()
+                            value["updatedAt"] = firebase.firestore.FieldValue.serverTimestamp()
                         } else {
-                            value['createdAt'] = firebase.firestore.FieldValue.serverTimestamp()
-                            value['updatedAt'] = firebase.firestore.FieldValue.serverTimestamp()
+                            value["createdAt"] = firebase.firestore.FieldValue.serverTimestamp()
+                            value["updatedAt"] = firebase.firestore.FieldValue.serverTimestamp()
                         }
                         _writeBatch.set(reference, value, { merge: true })
                     } else {
