@@ -20,3 +20,17 @@ export class Document extends Pring.Base {
     @property referenceCollection: Pring.ReferenceCollection<Document> = new Pring.ReferenceCollection(this)
     @property nestedCollection: Pring.NestedCollection<Document> = new Pring.NestedCollection(this)
 }
+
+export class OptionalDocument extends Pring.Base {
+    @property array?: string[]
+    @property set?: object
+    @property bool?: boolean
+    @property file?: Pring.File
+    @property files?: Pring.File[]
+    @property number?: number
+    @property date?: firebase.firestore.Timestamp
+    @property geoPoint?: firebase.firestore.GeoPoint
+    @property dictionary?: object
+    @property json?: {[key: string]: any}
+    @property string?: String
+}

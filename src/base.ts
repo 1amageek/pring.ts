@@ -93,6 +93,16 @@ export function isList(arg: any): boolean {
     return (arg instanceof List)
 }
 
+export function isFileArray(arg: any): boolean {
+    if (arg instanceof Array) {
+        return arg.reduce((prev, value) => {
+            return prev && isFileType(value)
+        }, true)
+    } else {
+        return false
+    }
+}
+
 export function isCollection(arg: any): boolean {
     return (arg instanceof SubCollection) ||
         (arg instanceof NestedCollection) ||
@@ -253,7 +263,13 @@ export class Base implements Document {
                 if (isFileType(value)) {
                     const file: File = new File()
                     file.init(value)
-                    this._defineProperty(key, file)
+                    this._prop[key] = file
+                } else if (isFileArray(value)) {
+                    this._prop[key] = (value as any[]).map( fileValue => {
+                        const file: File = new File()
+                        file.init(fileValue)
+                        return file
+                    })
                 } else {
                     const prop = this._prop[key]
                     if (isList(prop)) {
@@ -317,11 +333,15 @@ export class Base implements Document {
                             console.log(
                                 "******************** Warnings ********************\n" +
                                 "\n" +
-                                " pring-admin.ts is not support `Date` type.\n" +
+                                " pring.ts is not support `Date` type.\n" +
                                 " Please migrate `Date` type to `Timestamp` type.\n" +
                                 "\n" +
                                 "**************************************************\n"
                             )
+                        } else if (isFileArray(value)) { 
+                            values[key] = (value as Array<File>).map( file => {
+                                return file.value()
+                            })
                         } else {
                             values[key] = value
                         }
@@ -334,10 +354,10 @@ export class Base implements Document {
 
     public value(): any {
         const values: DocumentData = this.rawValue()
-        const createdAt: (keyof DocumentData) = "createdAt"
         const updatedAt: (keyof DocumentData) = "updatedAt"
-        values[createdAt] = this.createdAt || firebase.firestore.Timestamp.fromDate(new Date())
+        const createdAt: (keyof DocumentData) = "createdAt"
         values[updatedAt] = this.updatedAt || firebase.firestore.Timestamp.fromDate(new Date())
+        values[createdAt] = this.createdAt || firebase.firestore.Timestamp.fromDate(new Date())
         return values
     }
 
@@ -347,10 +367,10 @@ export class Base implements Document {
             const updatedAt: (keyof DocumentData) = "updatedAt"
             values[updatedAt] = firebase.firestore.FieldValue.serverTimestamp()
         } else {
-            const createdAt: (keyof DocumentData) = "createdAt"
             const updatedAt: (keyof DocumentData) = "updatedAt"
-            values[createdAt] = this.updatedAt || firebase.firestore.FieldValue.serverTimestamp()
+            const createdAt: (keyof DocumentData) = "createdAt"
             values[updatedAt] = this.updatedAt || firebase.firestore.FieldValue.serverTimestamp()
+            values[createdAt] = this.updatedAt || firebase.firestore.FieldValue.serverTimestamp()
         }
         return values
     }
@@ -369,11 +389,16 @@ export class Base implements Document {
                             if (Object.keys(updateValue).length > 0) {
                                 updateValues[key] = updateValue
                             }
-                        } else if (isFile(value)) {
+                        }
+                         else if (isFile(value)) {
                             const file: File = value as File
                             if (Object.keys(file).length) {
                                 updateValues[key] = file.value()
                             }
+                        } else if (isFileArray(value)) { 
+                            updateValues[key] = (value as Array<File>).map( file => {
+                                return file.value()
+                            })
                         }
                     }
                 }
@@ -425,7 +450,6 @@ export class Base implements Document {
                 }
                 return _writeBatch
             case BatchType.update:
-
                 if (this.isSaved) {
                     const updateValue = this.updateValue()
                     if (Object.keys(updateValue).length > 0) {
@@ -591,6 +615,10 @@ export class Base implements Document {
                 } else if (isFile(newValue)) {
                     const file: ValueProtocol = newValue as ValueProtocol
                     this._updateValues[key] = file.value()
+                } else if (isFileArray(newValue)) {
+                    this._updateValues[key] = (newValue as Array<File>).map( file => {
+                        return file.value()
+                    })
                 } else {
                     this._updateValues[key] = newValue
                 }
