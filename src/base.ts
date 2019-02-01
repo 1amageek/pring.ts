@@ -282,6 +282,7 @@ export class Base implements Document {
             }
         }
         this._updateValues = {}
+        return this
     }
 
     public shouldBeReplicated(): boolean {

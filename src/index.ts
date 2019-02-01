@@ -14,5 +14,4 @@ export { BatchType, Base, property, DataSource, Query, List, SubCollection, Nest
 export let firestore: Firestore
 export const initialize = (appFirestore: Firestore) => {
     firestore = appFirestore
-    firestore.settings({timestampsInSnapshots: true})
 }
