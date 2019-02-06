@@ -362,7 +362,7 @@ export class Base implements Document {
         return values
     }
 
-    private _value(): DocumentData {
+    public _value(): DocumentData {
         const values: DocumentData = this.rawValue()
         if (this.isSaved) {
             const updatedAt: (keyof DocumentData) = "updatedAt"
@@ -408,7 +408,7 @@ export class Base implements Document {
         return updateValues
     }
 
-    private _updateValue(): any {
+    public _updateValue(): any {
         const updateValue: any = this.updateValue()
         const updatedAt: (keyof DocumentData) = "updatedAt"
         updateValue[updatedAt] = firebase.firestore.FieldValue.serverTimestamp()
